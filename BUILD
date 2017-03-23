@@ -1032,6 +1032,14 @@ py_binary(
     main = "python/random_agent.py",
 )
 
+py_binary(
+    name = "deepmind_lab_gym_dummy",
+    srcs = ["deepmind_lab_gym.py"
+           , "python/deepmind_lab_gym_dummy.py"],
+    data = [":deepmind_lab.so"],
+    main = "python/deepmind_lab_gym_dummy.py"
+)
+
 py_test(
     name = "random_agent_test",
     srcs = ["python/random_agent_test.py"],
