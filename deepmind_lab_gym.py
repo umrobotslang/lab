@@ -2,8 +2,6 @@ import time
 import os
 
 import numpy as np
-import cv2
-
 import deepmind_lab
 import gym
 from gym.envs.registration import register
@@ -153,22 +151,68 @@ class ChDirCtxt(object):
         
     def __enter__(self):
         self.old_dir = os.getcwd()
-        print("cd {}".format(self.new_dir))
         os.chdir(self.new_dir)
 
     def __exit__(self, *args):
         os.chdir(self.old_dir)
-    
+
+class CallMethodsWithCtxt(object):
+    """
+    Call methods of a given object with a given context
+    """
+    def __init__(self, obj, ctxt):
+        self._call_method_with_ctxt_obj = obj
+        self._call_method_with_ctxt_ctxt = ctxt
+
+    def __getattr__(self, attr):
+        val = getattr(self._call_method_with_ctxt_obj, attr)
+        if callable(val):
+            # Define a function that calls the
+            # val function within the context
+            def wrap(*args, **kwargs):
+                with self._call_method_with_ctxt_ctxt:
+                    return val(*args, **kwargs)
+            # Return the wrapped function instead
+            return wrap
+        else:
+            # if the original value was not a callable (function or
+            # class or bultin) return it as it is.
+            return val
+
+    def __setattr__(self, attr, val):
+        if attr not in ['_call_method_with_ctxt_obj'
+                        , '_call_method_with_ctxt_ctxt']:
+            setattr(self._call_method_with_ctxt_obj, attr, val)
+        else:
+            # https://docs.python.org/2/reference/datamodel.html#object.__setattr__
+            #
+            # If __setattr__() wants to assign to an instance
+            # attribute, it should not simply execute self.name =
+            # value - this would cause a recursive call to
+            # itself. Instead, it should insert the value in the
+            # dictionary of instance attributes, e.g.,
+            # self.__dict__[name] = value. For new-style classes,
+            # rather than accessing the instance dictionary, it should
+            # call the base class method with the same name, for
+            # example, object.__setattr__(self, name, value).
+            object.__setattr__(self, attr, val)
+
+
 class DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
     observation_type = 'RGB_INTERLACED'
     def __init__(self, level_script, config):
-        with ChDirCtxt(os.path.dirname(__file__) or '.'):
-            self._dl_env = deepmind_lab.Lab(level_script
+        self._curr_mod_dir = os.path.dirname(__file__) or '.'
+        with ChDirCtxt(self._curr_mod_dir):
+             dlenv = deepmind_lab.Lab(level_script
                                             , [self.observation_type]
                                             , {k: str(v)
                                                for k, v in config.items()})
-            self._dl_env.reset()
+        # Wraps all the callable methods so that they are called from
+        # the current module directory
+        self._dl_env = CallMethodsWithCtxt(dlenv
+                                           , ChDirCtxt(self._curr_mod_dir))
+        self._dl_env.reset()
 
         self._action_space = ActionSpace(self._dl_env.action_spec(), config)
         self._obs_space = ObservationSpace([
@@ -192,18 +236,20 @@ class DeepmindLab(gym.Env):
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action , self._current_velocities)
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
-        episode_over = False
-        if not self._dl_env.is_running():
-            episode_over = True
+        episode_over = (not self._dl_env.is_running())
         self._last_obs = self._dl_env.observations()
         return self._last_obs['RGB_INTERLACED'], reward, episode_over, {}
 
     def _reset(self):
         self._dl_env.reset()
+        self._last_obs = self._dl_env.observations()
+        return self._last_obs['RGB_INTERLACED']
 
     def _render(self, mode='human', close=False):
         if close:
             return
+
+        import cv2
         cv2.imshow("c", self._last_obs['RGB_INTERLACED'])
         cv2.waitKey(1)
 
