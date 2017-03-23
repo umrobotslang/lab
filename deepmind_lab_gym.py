@@ -236,8 +236,8 @@ class DeepmindLab(gym.Env):
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action , self._current_velocities)
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
-        episode_over = (not self._dl_env.is_running())
         self._last_obs = self._dl_env.observations()
+        episode_over = (not self._dl_env.is_running())
         return self._last_obs['RGB_INTERLACED'], reward, episode_over, {}
 
     def _reset(self):
