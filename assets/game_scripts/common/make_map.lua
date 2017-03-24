@@ -1,4 +1,4 @@
--- local map_maker = require 'dmlab.system.map_maker'
+local map_maker = require 'dmlab.system.map_maker'
 
 local make_map = {}
 make_map.proxy_userdata = newproxy(true)
