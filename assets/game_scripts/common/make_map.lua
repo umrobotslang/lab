@@ -1,10 +1,18 @@
 local map_maker = require 'dmlab.system.map_maker'
 
-local LEVEL_DATA = '/tmp/dmlab_level_data'
 local make_map = {}
+
+function make_map.getpid()
+  local f = assert(io.open("/proc/self/stat", "r"))
+  local pid = f:read("*number")
+  return pid
+end
+
+local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', make_map.getpid())
 
 local pickups = {
     A = 'apple_reward',
+    L = 'lemon_reward',
     G = 'goal',
 }
 
