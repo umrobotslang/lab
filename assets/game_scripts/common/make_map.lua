@@ -1,6 +1,8 @@
-local map_maker = require 'dmlab.system.map_maker'
+-- local map_maker = require 'dmlab.system.map_maker'
 
 local make_map = {}
+make_map.proxy_userdata = newproxy(true)
+make_map.proxy_mt = getmetatable(make_map.proxy_userdata)
 
 function make_map.getpid()
   local f = assert(io.open("/proc/self/stat", "r"))
@@ -9,6 +11,10 @@ function make_map.getpid()
 end
 
 local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', make_map.getpid())
+make_map.proxy_mt.__gc = function (proxy)
+   os.remove(LEVEL_DATA .. '/baselab')
+   os.remove(LEVEL_DATA)
+end
 
 local pickups = {
     A = 'apple_reward',
