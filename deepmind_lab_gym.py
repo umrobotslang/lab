@@ -17,15 +17,18 @@ class ActionSpace(gym.Space):
     ACTION_SET     = [ACT_LOOK_YAW, ACT_LOOK_PITCH, ACT_MOVE_Y,
                       ACT_MOVE_X, ACT_FIRE, ACT_JUMP, ACT_CROUCH]
     ACTION_SPACE_INC = np.array([
-        [   2.5 , -2.5 ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  2.5 , -2.5 ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.01, -0.01,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.01, -0.01,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]])
+        [   2.5 , -2.5 ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.05, -0.05,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.05, -0.05]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
+    ])
     DEEPMIND_ACTION_DIM = 7
-    INPUT_ACTION_SIZE = 11
+    # Look left, look right, look down, look up,
+    # Move left, move right, move back, move forward
+    INPUT_ACTION_SIZE = 6 
 
     def __init__(self, action_spec, config):
         assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
@@ -42,6 +45,8 @@ class ActionSpace(gym.Space):
         self.indices = {a['name']: i for i, a in enumerate(self.action_spec)}
         self.mins = np.array([a['min'] for a in self.action_spec])
         self.maxs = np.array([a['max'] for a in self.action_spec])
+        self.mins[self.indices[self.ACT_LOOK_YAW]] = -8
+        self.maxs[self.indices[self.ACT_LOOK_YAW]] = 8
 
     def action_space_inc(self):
         act_space_inc = self.ACTION_SPACE_INC.copy()
@@ -262,8 +267,22 @@ class DeepmindLabDemoMap(DeepmindLab):
     def __init__(self):
         DeepmindLab.__init__(self, 'tests/demo_map'
                              , dict(width=80, height=80, fps=60))
-
 register(
-    id='{}-v0'.format(DeepmindLabDemoMap.__name__),
+    id='{}-v1'.format(DeepmindLabDemoMap.__name__),
     entry_point='{}:{}'.format(__name__, DeepmindLabDemoMap.__name__)
 )
+
+for level_script in """lt_space_bounce_hard     nav_maze_static_03
+                       nav_maze_random_goal_01  random_maze
+                       nav_maze_random_goal_02  seekavoid_arena_01
+                       lt_chasm            nav_maze_random_goal_03  stairway_to_melon
+                       lt_hallway_slope    nav_maze_static_01       
+                       lt_horseshoe_color  nav_maze_static_02""".split():
+    entry_point_name = "DeepmindLab" + level_script
+    globals()[entry_point_name] = \
+        lambda : DeepmindLab(level_script, dict(width=80, height=80, fps=60))
+    register(
+        id='{}-v1'.format(entry_point_name),
+        entry_point='{}:{}'.format(__name__, entry_point_name)
+    )
+
