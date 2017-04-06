@@ -1,10 +1,15 @@
 import time
 import os
+import functools
+import numbers
 
 import numpy as np
 import deepmind_lab
 import gym
 from gym.envs.registration import register
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class ActionSpace(gym.Space):
     ACT_LOOK_YAW   = 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'
@@ -17,18 +22,18 @@ class ActionSpace(gym.Space):
     ACTION_SET     = [ACT_LOOK_YAW, ACT_LOOK_PITCH, ACT_MOVE_Y,
                       ACT_MOVE_X, ACT_FIRE, ACT_JUMP, ACT_CROUCH]
     ACTION_SPACE_INC = np.array([
-        [   2.5 , -2.5 ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.05, -0.05,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.05, -0.05]#,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
+        [   2.5 , -2.5 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.1 , -0.1 ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
     ])
     DEEPMIND_ACTION_DIM = 7
     # Look left, look right, look down, look up,
     # Move left, move right, move back, move forward
-    INPUT_ACTION_SIZE = 6 
+    INPUT_ACTION_SIZE = 4 
 
     def __init__(self, action_spec, config):
         assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
@@ -121,12 +126,18 @@ class ObservationSpace(gym.Space):
         self._channel_dim_last = ('RGB_INTERLACED' == obs_spec
                               or 'RGBD_INTERLACED' == obs_spec)
 
+    @property
+    def shape(self):
+        return self._img_shape
+
     def sample(self, seed=0):
         """
         Uniformly randomly sample a random elemnt of this space
         """
         return np.random.randint(0, high=np.iinfo(self._img_dtype).max
                                  , size=self._img_shape)
+    def make_null(self):
+        return np.zeros(self._img_shape)
 
     def contains(self, x):
         """
@@ -202,14 +213,41 @@ class CallMethodsWithCtxt(object):
             # example, object.__setattr__(self, name, value).
             object.__setattr__(self, attr, val)
 
+class LogMethodCalls(object):
+    def __init__(self, obj):
+        self._LogMethodCalls_obj = obj
 
-class DeepmindLab(gym.Env):
+    def __getattr__(self, attr):
+        val = getattr(self._LogMethodCalls_obj, attr)
+        if callable(val):
+            # Define a function that calls the
+            # val function within the context
+            def wrap(*args, **kwargs):
+                logger.debug("Called: {attr}({args}, {kwargs})".format(
+                    attr=attr, args=args, kwargs=kwargs))
+                return val(*args, **kwargs)
+            # Return the wrapped function instead
+            return wrap
+        else:
+            # if the original value was not a callable (function or
+            # class or bultin) return it as it is.
+            logger.debug("Requested {attr}".format(attr=attr))
+            return val
+
+    def __setattr__(self, attr, val):
+        logger.debug("Setting {attr} = {val}".format(attr=attr, val=val))
+        if attr not in ['_LogMethodCalls_obj']:
+            setattr(self._LogMethodCalls_obj, attr, val)
+        else:
+            object.__setattr__(self, attr, val)
+
+class _DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
     observation_type = 'RGB_INTERLACED'
     def __init__(self, level_script, config):
         self._curr_mod_dir = os.path.dirname(__file__) or '.'
         with ChDirCtxt(self._curr_mod_dir):
-             dlenv = deepmind_lab.Lab(level_script
+            dlenv = deepmind_lab.Lab(level_script
                                             , [self.observation_type]
                                             , {k: str(v)
                                                for k, v in config.items()})
@@ -224,6 +262,7 @@ class DeepmindLab(gym.Env):
             ospace for ospace in self._dl_env.observation_spec()
             if ospace['name'] == self.observation_type][0])
         self._current_velocities = np.zeros(4) # roll pitch y x
+        self._last_obs = self._obs_space.make_null()
 
     @property
     def action_space(self):
@@ -237,31 +276,55 @@ class DeepmindLab(gym.Env):
     def reward_range(self):
         return [-1, 1]
 
+    def _observations(self):
+        if self._dl_env.is_running():
+            self._last_obs = self._dl_env.observations()[self.observation_type]
+            assert self._obs_space.contains(self._last_obs), \
+                'Observations outside observation space'
+        else:
+            self._last_obs = self._obs_space.make_null()
+        return self._last_obs
+
     def _step(self, action):
+        # Input checking
+        if not self._action_space.contains(action):
+            raise ValueError('Action out of action space')
+
+        # Start of method logic
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action , self._current_velocities)
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
         episode_over = (not self._dl_env.is_running())
-        if not episode_over:
-            self._last_obs = self._dl_env.observations()
-        return self._last_obs['RGB_INTERLACED'], reward, episode_over, {}
+        observations = self._observations()
+        
+        # output checking
+        assert isinstance(reward, numbers.Number), \
+            'Reward outside numbers'
+        assert isinstance(episode_over, bool), \
+            'episode_over is not a bool'
+        return observations, reward, episode_over, {}
 
     def _reset(self):
         self._dl_env.reset()
-        self._last_obs = self._dl_env.observations()
-        return self._last_obs['RGB_INTERLACED']
+        return self._observations()
 
     def _render(self, mode='human', close=False):
         if close:
             return
 
         import cv2
-        cv2.imshow("c", self._last_obs['RGB_INTERLACED'])
-        cv2.waitKey(1)
+        if self._last_obs is not None:
+            cv2.imshow("c", self._last_obs)
+            cv2.waitKey(1)
 
     def _seed(self, seed=None):
         if seed is not None:
             np.random.seed(seed)
+
+#class DeepmindLab(LogMethodCalls):
+#    def __init__(self, *args, **kwargs):
+#        LogMethodCalls.__init__(self, _DeepmindLab(*args, **kwargs))
+DeepmindLab = _DeepmindLab
 
 class DeepmindLabDemoMap(DeepmindLab):
     def __init__(self):
@@ -272,17 +335,25 @@ register(
     entry_point='{}:{}'.format(__name__, DeepmindLabDemoMap.__name__)
 )
 
-for level_script in """lt_space_bounce_hard     nav_maze_static_03
+MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     nav_maze_static_03
                        nav_maze_random_goal_01  random_maze
-                       nav_maze_random_goal_02  seekavoid_arena_01
+                       nav_maze_random_goal_02
                        lt_chasm            nav_maze_random_goal_03  stairway_to_melon
                        lt_hallway_slope    nav_maze_static_01       
-                       lt_horseshoe_color  nav_maze_static_02""".split():
-    entry_point_name = "DeepmindLab" + level_script
-    globals()[entry_point_name] = \
-        lambda : DeepmindLab(level_script, dict(width=80, height=80, fps=60))
-    register(
-        id='{}-v1'.format(entry_point_name),
-        entry_point='{}:{}'.format(__name__, entry_point_name)
-    )
+                       lt_horseshoe_color  nav_maze_static_02
+                       seekavoid_arena_01""".split()
 
+def register_all():
+    for level_script in MAP_LEVEL_SCRIPTS:
+        entry_point_name = "DeepmindLab" + level_script
+        globals()[entry_point_name] = \
+            functools.partial(DeepmindLab,
+                            level_script, dict(width=80, height=80, fps=60))
+        env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
+        print("Registering {}".format(env_id))
+        register(
+            id=env_id
+            , entry_point='{}:{}'.format(__name__, entry_point_name)
+        )
+
+register_all()
