@@ -2,6 +2,7 @@ import time
 import os
 import functools
 import numbers
+import itertools
 
 import numpy as np
 import deepmind_lab
@@ -10,6 +11,64 @@ from gym.envs.registration import register
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+class ActionMapper(object):
+    ACTION_SPACE_INC = np.array([
+        [   2.5 , -2.5 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.1 , -0.1 ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
+        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
+    ])
+    # Look left, look right, look down, look up,
+    # Move left, move right, move back, move forward
+    INPUT_ACTION_SIZE = 4 
+    DEEPMIND_ACTION_DIM = 7
+    def __init__(self, frame_width, frame_per_sec, mm_type):
+        assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
+        assert self.INPUT_ACTION_SIZE == self.ACTION_SPACE_INC.shape[1]
+        self.frame_width = frame_width
+        self.frame_per_sec = frame_per_sec
+        self.mm_type = mm_type
+
+    def action_space_inc(self):
+        act_space_inc = self.ACTION_SPACE_INC.copy()
+        act_space_inc[:2, :] *= self.frame_width / self.frame_per_sec
+        act_space_inc[2:4, :] *= self.frame_width / self.frame_per_sec
+        return act_space_inc
+
+    def to_deepmind_action_space(self, action_index, current_velocities):
+        """
+        >>> act_spec = [
+        ...    {'max': 512, 'min': -512, 'name': 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'},
+        ...    {'max': 512, 'min': -512, 'name': 'LOOK_DOWN_UP_PIXELS_PER_FRAME'},
+        ...    {'max': 1, 'min': -1, 'name': 'STRAFE_LEFT_RIGHT'},
+        ...    {'max': 1, 'min': -1, 'name': 'MOVE_BACK_FORWARD'},
+        ...    {'max': 1, 'min': 0, 'name': 'FIRE'},
+        ...    {'max': 1, 'min': 0, 'name': 'JUMP'},
+        ...    {'max': 1, 'min': 0, 'name': 'CROUCH'}]
+        >>> act_space = ActionSpace(act_spec, dict(width=80, height=80, fps=60))
+        >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
+        array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
+        >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
+        array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
+        """
+        action = np.zeros(self.INPUT_ACTION_SIZE)
+        action[action_index] = 1
+        velocity_increments = self.action_space_inc().dot(action)
+        deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
+        if self.mm_type == 'acceleration':
+            current_velocities += velocity_increments[:4]
+            deepmind_action[:4] = current_velocities
+        elif self.mm_type == 'discrete':
+            deepmind_action[:4] = velocity_increments[:4] * 10
+        else:
+            assert "Bad motion model type {}".format(self.mm_type)
+
+        deepmind_action[4:7] = velocity_increments[4:]
+        return deepmind_action
 
 class ActionSpace(gym.Space):
     ACT_LOOK_YAW   = 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'
@@ -21,23 +80,8 @@ class ActionSpace(gym.Space):
     ACT_CROUCH     = 'CROUCH'
     ACTION_SET     = [ACT_LOOK_YAW, ACT_LOOK_PITCH, ACT_MOVE_Y,
                       ACT_MOVE_X, ACT_FIRE, ACT_JUMP, ACT_CROUCH]
-    ACTION_SPACE_INC = np.array([
-        [   2.5 , -2.5 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.1 , -0.1 ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
-        , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
-    ])
-    DEEPMIND_ACTION_DIM = 7
-    # Look left, look right, look down, look up,
-    # Move left, move right, move back, move forward
-    INPUT_ACTION_SIZE = 4 
 
-    def __init__(self, action_spec, config):
-        assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
-        assert self.INPUT_ACTION_SIZE == self.ACTION_SPACE_INC.shape[1]
+    def __init__(self, action_spec, config, action_mapper):
         assert all(a['name'] == act
                    for a, act in zip(action_spec, self.ACTION_SET)), \
                        "Unexpected action spec {}".format(action_spec)
@@ -53,15 +97,11 @@ class ActionSpace(gym.Space):
         self.mins[self.indices[self.ACT_LOOK_YAW]] = -8
         self.maxs[self.indices[self.ACT_LOOK_YAW]] = 8
 
-    def action_space_inc(self):
-        act_space_inc = self.ACTION_SPACE_INC.copy()
-        act_space_inc[:2, :] *= self.frame_width / self.frame_per_sec
-        act_space_inc[2:4, :] *= self.frame_width / self.frame_per_sec
-        return act_space_inc
+        self._action_mapper = action_mapper
 
     def size(self):
         """ size of action space """
-        return self.INPUT_ACTION_SIZE
+        return self._action_mapper.INPUT_ACTION_SIZE
 
     @property
     def n(self):
@@ -94,29 +134,8 @@ class ActionSpace(gym.Space):
         return np.clip(action, self.mins, self.maxs).astype(np.intc)
 
     def to_deepmind_action_space(self, action_index, current_velocities):
-        """
-        >>> act_spec = [
-        ...    {'max': 512, 'min': -512, 'name': 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'},
-        ...    {'max': 512, 'min': -512, 'name': 'LOOK_DOWN_UP_PIXELS_PER_FRAME'},
-        ...    {'max': 1, 'min': -1, 'name': 'STRAFE_LEFT_RIGHT'},
-        ...    {'max': 1, 'min': -1, 'name': 'MOVE_BACK_FORWARD'},
-        ...    {'max': 1, 'min': 0, 'name': 'FIRE'},
-        ...    {'max': 1, 'min': 0, 'name': 'JUMP'},
-        ...    {'max': 1, 'min': 0, 'name': 'CROUCH'}]
-        >>> act_space = ActionSpace(act_spec, dict(width=80, height=80, fps=60))
-        >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
-        array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
-        >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
-        array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
-        """
-        action = np.zeros(self.size())
-        action[action_index] = 1
-        velocity_increments = self.action_space_inc().dot(action)
-        current_velocities += velocity_increments[:4]
-        deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
-        deepmind_action[:4] = current_velocities
-        deepmind_action[4:7] = velocity_increments[4:]
-        return self.clip_action(deepmind_action)
+        return self.clip_action(
+            self._action_mapper.to_deepmind_action_space(action_index, current_velocities))
 
 class ObservationSpace(gym.Space):
     def __init__(self, obs_spec):
@@ -137,7 +156,7 @@ class ObservationSpace(gym.Space):
         return np.random.randint(0, high=np.iinfo(self._img_dtype).max
                                  , size=self._img_shape)
     def make_null(self):
-        return np.zeros(self._img_shape)
+        return np.zeros(self._img_shape, dtype=np.uint8)
 
     def contains(self, x):
         """
@@ -244,7 +263,7 @@ class LogMethodCalls(object):
 class _DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
     observation_type = 'RGB_INTERLACED'
-    def __init__(self, level_script, config):
+    def __init__(self, level_script, config, mm_type):
         self._curr_mod_dir = os.path.dirname(__file__) or '.'
         with ChDirCtxt(self._curr_mod_dir):
             dlenv = deepmind_lab.Lab(level_script
@@ -257,7 +276,9 @@ class _DeepmindLab(gym.Env):
                                            , ChDirCtxt(self._curr_mod_dir))
         self._dl_env.reset()
 
-        self._action_space = ActionSpace(self._dl_env.action_spec(), config)
+        self._action_space = ActionSpace(self._dl_env.action_spec(), config
+                                         , ActionMapper(config['width'], config['fps']
+                                                        , mm_type))
         self._obs_space = ObservationSpace([
             ospace for ospace in self._dl_env.observation_spec()
             if ospace['name'] == self.observation_type][0])
@@ -314,7 +335,7 @@ class _DeepmindLab(gym.Env):
 
         import cv2
         if self._last_obs is not None:
-            cv2.imshow("c", self._last_obs)
+            cv2.imshow("c", cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR))
             cv2.waitKey(1)
 
     def _seed(self, seed=None):
@@ -335,6 +356,7 @@ register(
     entry_point='{}:{}'.format(__name__, DeepmindLabDemoMap.__name__)
 )
 
+MM_TYPE_OPTIONS = ['acceleration', 'discrete']
 MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     nav_maze_static_03
                        nav_maze_random_goal_01  random_maze
                        nav_maze_random_goal_02
@@ -344,11 +366,12 @@ MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     nav_maze_static_03
                        seekavoid_arena_01""".split()
 
 def register_all():
-    for level_script in MAP_LEVEL_SCRIPTS:
-        entry_point_name = "DeepmindLab" + level_script
+    for level_script, mm_type in itertools.product(MAP_LEVEL_SCRIPTS, MM_TYPE_OPTIONS):
+        entry_point_name = "DeepmindLab" + mm_type[:1].upper() + '_' + level_script 
         globals()[entry_point_name] = \
-            functools.partial(DeepmindLab,
-                            level_script, dict(width=80, height=80, fps=60))
+            functools.partial(DeepmindLab
+                              , level_script, dict(width=80, height=80, fps=60)
+                              , mm_type)
         env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
         print("Registering {}".format(env_id))
         register(
