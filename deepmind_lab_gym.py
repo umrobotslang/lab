@@ -3,6 +3,7 @@ import os
 import functools
 import numbers
 import itertools
+import getpass
 
 import numpy as np
 import deepmind_lab
@@ -284,6 +285,18 @@ class _DeepmindLab(gym.Env):
             if ospace['name'] == self.observation_type][0])
         self._current_velocities = np.zeros(4) # roll pitch y x
         self._last_obs = self._obs_space.make_null()
+        self._img_save_index = 0
+
+    def _next_image_file(self):
+        filename = '/tmp/{user}/{klass}/{index:04d}.png'.format(
+            user=getpass.getuser()
+            , klass=self.__class__.__name__
+            , index=self._img_save_index)
+        if self._img_save_index == 0:
+            if not os.path.exists(os.path.dirname(filename)):
+                os.makedirs(os.path.dirname(filename))
+        self._img_save_index += 1
+        return filename
 
     @property
     def action_space(self):
@@ -335,7 +348,9 @@ class _DeepmindLab(gym.Env):
 
         import cv2
         if self._last_obs is not None:
-            cv2.imshow("c", cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR))
+            im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
+            cv2.imshow("c",im)
+            cv2.imwrite(self._next_image_file(), im)
             cv2.waitKey(1)
 
     def _seed(self, seed=None):
