@@ -296,6 +296,7 @@ class _DeepmindLab(gym.Env):
             if not os.path.exists(os.path.dirname(filename)):
                 os.makedirs(os.path.dirname(filename))
         self._img_save_index += 1
+        self._img_save_index = self._img_save_index % 10000
         return filename
 
     @property
