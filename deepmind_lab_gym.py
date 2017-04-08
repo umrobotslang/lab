@@ -24,7 +24,7 @@ ActionMapperParams = namedtuple('ActionMapperParams', ['inc_mat', 'rel_mask_mat'
 # accelerate forward or backward or sideways, or induce rotational
 # acceleration while moving
 # ```
-L2NActionMapper_v0 = ActionMapperParams(
+L2NActMapParams_v0 = ActionMapperParams(
     # Look left, look right, acc left, acc right,
     # acc left, acc right, acc back, acc forward
     inc_mat = np.array([
@@ -55,27 +55,46 @@ class L2NActionMapper(object):
     def __init__(self, inc_mat, rel_mask_mat):
         assert self.DEEPMIND_ACTION_DIM == inc_mat.shape[0]
         assert self.DEEPMIND_ACTION_DIM == rel_mask_mat.shape[0]
-        self.input_action_size = inc_mat.shape[1]
-        assert self.input_action_size == rel_mask_mat.shape[1]
+        self.INPUT_ACTION_SIZE = inc_mat.shape[1]
+        assert self.INPUT_ACTION_SIZE == rel_mask_mat.shape[1]
         self.inc_mat = inc_mat
         self.rel_mask_mat = rel_mask_mat
         self._current_velocities = np.zeros(self.DEEPMIND_ACTION_DIM) # roll pitch y x jump fire
 
     def to_deepmind_action_space(self, action_index):
         """
-        >>> act_space = L2NActionMapper(L2NActionMapper_v0.inc_mat, L2NActionMapper_v0.rel_mask_mat)
-        >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
-        array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
-        >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
-        array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
+        >>> am = L2NActionMapper(L2NActMapParams_v0.inc_mat, L2NActMapParams_v0.rel_mask_mat)
+        >>> np.allclose(am.to_deepmind_action_space(0)
+        ...             , [ 2.5,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(2)
+        ...             , [ 5,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(4)
+        ...             , [ 5,  0. ,  0.5,  0. ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(6)
+        ...             , [ 5,  0. ,  0.5,  0.5 ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(7)
+        ...             , [ 5,  0. ,  0.5,  0.0 ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(5)
+        ...             , [ 5,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(3)
+        ...             , [ 2.5,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
+        True
         """
+        if action_index >= self.INPUT_ACTION_SIZE:
+            raise ValueError("Bad action {}".format(action_index))
+
         current_velocities = self._current_velocities
         action = np.zeros(self.INPUT_ACTION_SIZE)
         action[action_index] = 1
         deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
-        deepmind_action[:4] = self.inc_mat.dot(action) \
+        deepmind_action = self.inc_mat.dot(action) \
                               + self.rel_mask_mat.dot(action) * current_velocities
-        deepmind_action[4:7] = velocity_increments[4:]
         self._current_velocities = deepmind_action
         return deepmind_action
 
@@ -100,14 +119,24 @@ class ActionMapper(object):
         self.mm_type = mm_type
         self._current_velocities = np.zeros(4) # roll pitch y x
 
-    def to_deepmind_action_space(self, action_index, scale_inc=1.0):
+    def to_deepmind_action_space(self, action_index):
         """
-        >>> act_space = ActionMapper('acceleration')
-        >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
-        array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
-        >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
-        array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
+        >>> am = ActionMapper('acceleration')
+        >>> np.allclose(am.to_deepmind_action_space(0)
+        ...             , [2.5, 0, 0, 0, 0, 0, 0])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(1)
+        ...             , [0, 0, 0, 0, 0, 0, 0])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(2)
+        ...             , [0, 0, 0, 0.1, 0, 0, 0])
+        True
+        >>> np.allclose(am.to_deepmind_action_space(3)
+        ...             , [0, 0, 0, 0.0, 0, 0, 0])
+        True
         """
+        if action_index >= self.INPUT_ACTION_SIZE:
+            raise ValueError("Bad action {}".format(action_index))
         current_velocities = self._current_velocities
         action = np.zeros(self.INPUT_ACTION_SIZE)
         action[action_index] = 1
@@ -426,8 +455,8 @@ register(
 
 ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
                    for mm_type in ['acceleration', 'discrete']] + \
-                       [('L2N', L2NActionMapper(L2NActionMapper_v0.inc_mat
-                                                , L2NActionMapper_v0.rel_mask_mat))]
+                       [('L2N', L2NActionMapper(L2NActMapParams_v0.inc_mat
+                                                , L2NActMapParams_v0.rel_mask_mat))]
 MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     
                        nav_maze_random_goal_01  random_maze
                        nav_maze_random_goal_02
