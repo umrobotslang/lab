@@ -10,8 +10,75 @@ import deepmind_lab
 import gym
 from gym.envs.registration import register
 import logging
+from collections import namedtuple
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+ActionMapperParams = namedtuple('ActionMapperParams', ['inc_mat', 'rel_mask_mat'])
+
+# Learning to navigate (MiPaViICLR2017) like action mapping 
+# Quote
+# ```
+# The action space is discrete, yet allows finegrained control,
+# comprising 8 actions: the agent can rotate in small increments,
+# accelerate forward or backward or sideways, or induce rotational
+# acceleration while moving
+# ```
+L2NActionMapper_v0 = ActionMapperParams(
+    # Look left, look right, acc left, acc right,
+    # acc left, acc right, acc back, acc forward
+    inc_mat = np.array([
+        [   2.5 , -2.5,  2.5 , -2.5 ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.5 , -0.5  ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.5 , -0.5 ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
+    ])
+    ,
+    rel_mask_mat = np.array([
+        [   0.  ,  0. ,  1.  ,  1.   ,  1.  ,  1.   ,  1.  ,  1.  ]
+        , [ 0.  ,  0. ,  1.  ,  1.   ,  1.  ,  1.   ,  1.  ,  1.  ]
+        , [ 0.  ,  0. ,  1.  ,  1.   ,  1.  ,  1.   ,  1.  ,  1.  ]
+        , [ 0.  ,  0. ,  1.  ,  1.   ,  1.  ,  1.   ,  1.  ,  1.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
+    ])
+)
+
+class L2NActionMapper(object):
+    """ 
+    """
+    DEEPMIND_ACTION_DIM = 7
+    def __init__(self, inc_mat, rel_mask_mat):
+        assert self.DEEPMIND_ACTION_DIM == inc_mat.shape[0]
+        assert self.DEEPMIND_ACTION_DIM == rel_mask_mat.shape[0]
+        self.input_action_size = inc_mat.shape[1]
+        assert self.input_action_size == rel_mask_mat.shape[1]
+        self.inc_mat = inc_mat
+        self.rel_mask_mat = rel_mask_mat
+        self._current_velocities = np.zeros(self.DEEPMIND_ACTION_DIM) # roll pitch y x jump fire
+
+    def to_deepmind_action_space(self, action_index):
+        """
+        >>> act_space = L2NActionMapper(L2NActionMapper_v0.inc_mat, L2NActionMapper_v0.rel_mask_mat)
+        >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
+        array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
+        >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
+        array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
+        """
+        current_velocities = self._current_velocities
+        action = np.zeros(self.INPUT_ACTION_SIZE)
+        action[action_index] = 1
+        deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
+        deepmind_action[:4] = self.inc_mat.dot(action) \
+                              + self.rel_mask_mat.dot(action) * current_velocities
+        deepmind_action[4:7] = velocity_increments[4:]
+        self._current_velocities = deepmind_action
+        return deepmind_action
+
 
 class ActionMapper(object):
     ACTION_SPACE_INC = np.array([
@@ -27,38 +94,24 @@ class ActionMapper(object):
     # Move left, move right, move back, move forward
     INPUT_ACTION_SIZE = 4 
     DEEPMIND_ACTION_DIM = 7
-    def __init__(self, frame_width, frame_per_sec, mm_type):
+    def __init__(self, mm_type):
         assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
         assert self.INPUT_ACTION_SIZE == self.ACTION_SPACE_INC.shape[1]
-        self.frame_width = frame_width
-        self.frame_per_sec = frame_per_sec
         self.mm_type = mm_type
+        self._current_velocities = np.zeros(4) # roll pitch y x
 
-    def action_space_inc(self):
-        act_space_inc = self.ACTION_SPACE_INC.copy()
-        act_space_inc[:2, :] *= self.frame_width / self.frame_per_sec
-        act_space_inc[2:4, :] *= self.frame_width / self.frame_per_sec
-        return act_space_inc
-
-    def to_deepmind_action_space(self, action_index, current_velocities):
+    def to_deepmind_action_space(self, action_index, scale_inc=1.0):
         """
-        >>> act_spec = [
-        ...    {'max': 512, 'min': -512, 'name': 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'},
-        ...    {'max': 512, 'min': -512, 'name': 'LOOK_DOWN_UP_PIXELS_PER_FRAME'},
-        ...    {'max': 1, 'min': -1, 'name': 'STRAFE_LEFT_RIGHT'},
-        ...    {'max': 1, 'min': -1, 'name': 'MOVE_BACK_FORWARD'},
-        ...    {'max': 1, 'min': 0, 'name': 'FIRE'},
-        ...    {'max': 1, 'min': 0, 'name': 'JUMP'},
-        ...    {'max': 1, 'min': 0, 'name': 'CROUCH'}]
-        >>> act_space = ActionSpace(act_spec, dict(width=80, height=80, fps=60))
+        >>> act_space = ActionMapper('acceleration')
         >>> act_space.to_deepmind_action_space(8, [2, 0, 0, 0])
         array([2, 0, 0, 0, 1, 0, 0], dtype=int32)
         >>> act_space.to_deepmind_action_space(0, [2, 0, 0, 0])
         array([4, 0, 0, 0, 1, 0, 0], dtype=int32)
         """
+        current_velocities = self._current_velocities
         action = np.zeros(self.INPUT_ACTION_SIZE)
         action[action_index] = 1
-        velocity_increments = self.action_space_inc().dot(action)
+        velocity_increments = self.ACTION_SPACE_INC.dot(action)
         deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
         if self.mm_type == 'acceleration':
             current_velocities += velocity_increments[:4]
@@ -69,6 +122,7 @@ class ActionMapper(object):
             assert "Bad motion model type {}".format(self.mm_type)
 
         deepmind_action[4:7] = velocity_increments[4:]
+        self._current_velocities = deepmind_action[:4]
         return deepmind_action
 
 class ActionSpace(gym.Space):
@@ -134,9 +188,9 @@ class ActionSpace(gym.Space):
     def clip_action(self, action):
         return np.clip(action, self.mins, self.maxs).astype(np.intc)
 
-    def to_deepmind_action_space(self, action_index, current_velocities):
+    def to_deepmind_action_space(self, action_index):
         return self.clip_action(
-            self._action_mapper.to_deepmind_action_space(action_index, current_velocities))
+            self._action_mapper.to_deepmind_action_space(action_index))
 
 class ObservationSpace(gym.Space):
     def __init__(self, obs_spec):
@@ -264,7 +318,7 @@ class LogMethodCalls(object):
 class _DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
     observation_type = 'RGB_INTERLACED'
-    def __init__(self, level_script, config, mm_type):
+    def __init__(self, level_script, config, action_mapper):
         self._curr_mod_dir = os.path.dirname(__file__) or '.'
         with ChDirCtxt(self._curr_mod_dir):
             dlenv = deepmind_lab.Lab(level_script
@@ -278,12 +332,10 @@ class _DeepmindLab(gym.Env):
         self._dl_env.reset()
 
         self._action_space = ActionSpace(self._dl_env.action_spec(), config
-                                         , ActionMapper(config['width'], config['fps']
-                                                        , mm_type))
+                                         , action_mapper)
         self._obs_space = ObservationSpace([
             ospace for ospace in self._dl_env.observation_spec()
             if ospace['name'] == self.observation_type][0])
-        self._current_velocities = np.zeros(4) # roll pitch y x
         self._last_obs = self._obs_space.make_null()
         self._img_save_index = 0
 
@@ -327,7 +379,7 @@ class _DeepmindLab(gym.Env):
 
         # Start of method logic
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
-            action , self._current_velocities)
+            action)
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
         episode_over = (not self._dl_env.is_running())
         observations = self._observations()
@@ -372,22 +424,25 @@ register(
     entry_point='{}:{}'.format(__name__, DeepmindLabDemoMap.__name__)
 )
 
-MM_TYPE_OPTIONS = ['acceleration', 'discrete']
-MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     nav_maze_static_03
+ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
+                   for mm_type in ['acceleration', 'discrete']] + \
+                       [('L2N', L2NActionMapper(L2NActionMapper_v0.inc_mat
+                                                , L2NActionMapper_v0.rel_mask_mat))]
+MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     
                        nav_maze_random_goal_01  random_maze
                        nav_maze_random_goal_02
                        lt_chasm            nav_maze_random_goal_03  stairway_to_melon
                        lt_hallway_slope    nav_maze_static_01       
-                       lt_horseshoe_color  nav_maze_static_02
+                       lt_horseshoe_color  nav_maze_static_02 nav_maze_static_03
                        seekavoid_arena_01""".split()
 
 def register_all():
-    for level_script, mm_type in itertools.product(MAP_LEVEL_SCRIPTS, MM_TYPE_OPTIONS):
-        entry_point_name = "DeepmindLab" + mm_type[:1].upper() + '_' + level_script 
+    for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
+        entry_point_name = "DeepmindLab" + am_name + '_' + level_script 
         globals()[entry_point_name] = \
             functools.partial(DeepmindLab
                               , level_script, dict(width=80, height=80, fps=60)
-                              , mm_type)
+                              , act_map)
         env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
         print("Registering {}".format(env_id))
         register(
