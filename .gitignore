@@ -1,1 +1,3 @@
 /bazel-*
+build
+deepmind_module_install
