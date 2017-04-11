@@ -28,7 +28,7 @@ L2NActMapParams_v0 = ActionMapperParams(
     # Look left, look right, acc left, acc right,
     # acc left, acc right, acc back, acc forward
     inc_mat = np.array([
-        [   2.5 , -2.5,  2.5 , -2.5 ,  0.  ,  0.   ,  0.  ,  0.  ]
+        [  10.0 ,-10.0, 10.0 ,-10.0 ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.5 , -0.5  ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.5 , -0.5 ]
@@ -346,12 +346,28 @@ class LogMethodCalls(object):
 
 class _DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
-    observation_type = 'RGB_INTERLACED'
-    def __init__(self, level_script, config, action_mapper):
+    RGB_OBS_TYPE = 'RGB_INTERLACED'
+    VELT_OBS_TYPE = 'VEL.TRANS'
+    VELR_OBS_TYPE = 'VEL.ROT'
+    RGBD_OBS_TYPE = 'RGBD'
+    def __init__(self, level_script, config, action_mapper
+                 , enable_velocity=False
+                 , enable_depth=False):
+        self.observation_types = [self.RGB_OBS_TYPE]
+        self.enable_depth = enable_depth
+        self.enable_velocity = enable_velocity
+
+        if self.enable_velocity:
+            self.observation_types += [self.VELT_OBS_TYPE
+                                       , self.VELR_OBS_TYPE]
+
+        if self.enable_depth:
+            self.observation_types += [self.RGBD_OBS_TYPE]
+
         self._curr_mod_dir = os.path.dirname(__file__) or '.'
         with ChDirCtxt(self._curr_mod_dir):
             dlenv = deepmind_lab.Lab(level_script
-                                            , [self.observation_type]
+                                            , self.observation_types
                                             , {k: str(v)
                                                for k, v in config.items()})
         # Wraps all the callable methods so that they are called from
@@ -362,11 +378,21 @@ class _DeepmindLab(gym.Env):
 
         self._action_space = ActionSpace(self._dl_env.action_spec(), config
                                          , action_mapper)
-        self._obs_space = ObservationSpace([
-            ospace for ospace in self._dl_env.observation_spec()
-            if ospace['name'] == self.observation_type][0])
+        self._obs_spec = dict([(o['name'], o)
+                               for o in self._dl_env.observation_spec()])
+        self._obs_space = ObservationSpace(self._obs_spec[self.RGB_OBS_TYPE])
         self._last_obs = self._obs_space.make_null()
+        self._last_info = {}
         self._img_save_index = 0
+
+    def _null_observations(self):
+        obs = {}
+        for oname in self.observation_types:
+            ospec = self._obs_spec[oname]
+            obs[oname] = (np.zeros(ospec['shape'], ospec['dtype'])
+                          if oname != self.RGB_OBS_TYPE
+                          else self._obs_space.make_null())
+        return obs
 
     def _next_image_file(self):
         filename = '/tmp/{user}/{klass}/{index:04d}.png'.format(
@@ -394,12 +420,20 @@ class _DeepmindLab(gym.Env):
 
     def _observations(self):
         if self._dl_env.is_running():
-            self._last_obs = self._dl_env.observations()[self.observation_type]
-            assert self._obs_space.contains(self._last_obs), \
-                'Observations outside observation space'
+            obs = self._dl_env.observations()
         else:
-            self._last_obs = self._obs_space.make_null()
-        return self._last_obs
+            obs = self._null_observations()
+
+        self._last_obs = obs[self.RGB_OBS_TYPE]
+        if self.enable_velocity:
+            self._last_info['vel'] = np.hstack((obs[self.VELT_OBS_TYPE]
+                                                , obs[self.VELR_OBS_TYPE]))
+        if self.enable_depth:
+            self._last_info['depth'] = obs[self.RGBD_OBS_TYPE][3]
+
+        assert self._obs_space.contains(self._last_obs), \
+            'Observations outside observation space'
+        return self._last_obs, self._last_info
 
     def _step(self, action):
         # Input checking
@@ -411,18 +445,19 @@ class _DeepmindLab(gym.Env):
             action)
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
         episode_over = (not self._dl_env.is_running())
-        observations = self._observations()
+        observations, info = self._observations()
         
         # output checking
         assert isinstance(reward, numbers.Number), \
             'Reward outside numbers'
         assert isinstance(episode_over, bool), \
             'episode_over is not a bool'
-        return observations, reward, episode_over, {}
+        return observations, reward, episode_over, info
 
     def _reset(self):
         self._dl_env.reset()
-        return self._observations()
+        obs, _ = self._observations()
+        return obs
 
     def _render(self, mode='human', close=False):
         if close:
@@ -443,15 +478,6 @@ class _DeepmindLab(gym.Env):
 #    def __init__(self, *args, **kwargs):
 #        LogMethodCalls.__init__(self, _DeepmindLab(*args, **kwargs))
 DeepmindLab = _DeepmindLab
-
-class DeepmindLabDemoMap(DeepmindLab):
-    def __init__(self):
-        DeepmindLab.__init__(self, 'tests/demo_map'
-                             , dict(width=80, height=80, fps=60))
-register(
-    id='{}-v1'.format(DeepmindLabDemoMap.__name__),
-    entry_point='{}:{}'.format(__name__, DeepmindLabDemoMap.__name__)
-)
 
 ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
                    for mm_type in ['acceleration', 'discrete']] + \
@@ -478,5 +504,4 @@ def register_all():
             id=env_id
             , entry_point='{}:{}'.format(__name__, entry_point_name)
         )
-
-register_all()
+#register_all()
