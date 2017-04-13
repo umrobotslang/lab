@@ -28,7 +28,7 @@ new_http_archive(
     build_file = "jpeg.BUILD",
     sha256 = "3a753ea48d917945dd54a2d97de388aa06ca2eb1066cbfdc6652036349fe05a7",
     strip_prefix = "jpeg-9a",
-    url = "http://www.ijg.org/files/jpegsrc.v9b.tar.gz",
+    url = "http://www.ijg.org/files/jpegsrc.v9a.tar.gz",
 )
 
 new_http_archive(
