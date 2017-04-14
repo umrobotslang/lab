@@ -16,9 +16,13 @@ make_map.proxy_mt.__gc = function (proxy)
    os.remove(LEVEL_DATA)
 end
 
+-- See definitions in pickups.lua
 local pickups = {
     A = 'apple_reward',
     L = 'lemon_reward',
+    S = 'strawberry_reward',
+    F = 'fungi_reward',
+    W = 'Watermelon',
     G = 'goal',
 }
 
