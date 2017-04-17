@@ -520,10 +520,10 @@ MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard
 def register_all():
     for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
         entry_point_name = "DeepmindLab" + am_name + '_' + level_script 
-        globals()[entry_point_name] = \
-            functools.partial(DeepmindLab
+        setattr(sys.modules[__name__], entry_point_name
+                , functools.partial(DeepmindLab
                               , level_script, dict(width=80, height=80, fps=60)
-                              , act_map)
+                              , act_map))
         env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
         print("Registering {}".format(env_id))
         register(
