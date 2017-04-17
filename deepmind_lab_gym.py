@@ -1,9 +1,12 @@
 import time
 import os
+import sys
 import functools
 import numbers
 import itertools
 import getpass
+import random
+import string
 
 import numpy as np
 import deepmind_lab
@@ -479,6 +482,28 @@ class _DeepmindLab(gym.Env):
 #        LogMethodCalls.__init__(self, _DeepmindLab(*args, **kwargs))
 DeepmindLab = _DeepmindLab
 
+def DeepmindLabD_star_map_01():
+    return DeepmindLab("star_map_01"
+                       , dict(width=80, height=80, fps=60)
+                              , ActionMapper('discrete'))
+register(id='{}-v1'.format(DeepmindLabD_star_map_01.__name__)
+         , entry_point = '{}:{}'.format(__name__
+                                        , DeepmindLabD_star_map_01.__name__))
+
+def random_string(N):
+    return ''.join(random.choice(string.ascii_uppercase +
+                                 string.digits)
+                   for _ in range(N))
+
+def register_and_make(*args, **kwargs):
+    entry_point_name = "DeepmindLab" + random_string(5)
+    setattr(sys.modules[__name__], entry_point_name
+            , functools.partial(DeepmindLab , *args, **kwargs))
+    env_id = '{}-v1'.format(entry_point_name)
+    register(id = env_id
+             , entry_point='{}:{}'.format(__name__, entry_point_name))
+    return gym.make(env_id)
+
 ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
                    for mm_type in ['acceleration', 'discrete']] + \
                        [('L2N', L2NActionMapper(L2NActMapParams_v0.inc_mat
@@ -491,14 +516,6 @@ MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard
                        lt_horseshoe_color  nav_maze_static_02 nav_maze_static_03
                        seekavoid_arena_01
                        star_map_01""".split()
-
-def DeepmindLabD_star_map_01():
-    return DeepmindLab("star_map_01"
-                       , dict(width=80, height=80, fps=60)
-                              , ActionMapper('discrete'))
-register(id='{}-v1'.format(DeepmindLabD_star_map_01.__name__)
-         , entry_point = '{}:{}'.format(__name__
-                                        , DeepmindLabD_star_map_01.__name__))
 
 def register_all():
     for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
