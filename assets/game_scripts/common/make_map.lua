@@ -12,8 +12,9 @@ end
 
 local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', make_map.getpid())
 make_map.proxy_mt.__gc = function (proxy)
-   os.remove(LEVEL_DATA .. '/baselab')
-   os.remove(LEVEL_DATA)
+   local cmd = 'rm -rf ' .. LEVEL_DATA .. '/baselab'
+   print("executing " .. cmd)
+   os.remove(cmd)
 end
 
 -- See definitions in pickups.lua

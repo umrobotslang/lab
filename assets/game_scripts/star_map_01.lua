@@ -5,25 +5,27 @@ local api = {}
 function api:start(episode, seed)
   make_map.seedRng(seed)
   api._count = 0
-  map = [[
-       *****
-       *L  *
-       *** *
-   ***   * *    ***
-   *G*   * *    *P*
-   * *   * *    * *
-   * *   * *    * *
-   * ***** ****** *
-   *              *
-   ******* ********
-         * *
-         * *
-         * *
-       *** *
-       *A  *
-       *****
-  ]]
-  api._star_map = make_map.makeMap("star_map", map)
+  api.mapName = "star_map_01"
+  -- -- The map has been created and dropped into the assets/maps/ folder
+  -- local entityLevel = [[
+  --      *****
+  --      *L  *
+  --      *** *
+  --  ***   * *    ***
+  --  *G*   * *    *P*
+  --  * *   * *    * *
+  --  * *   * *    * *
+  --  * ***** ****** *
+  --  *              *
+  --  ******* ********
+  --        * *
+  --        * *
+  --        * *
+  --      *** *
+  --      *A  *
+  --      *****
+  -- ]]
+  -- api._star_map = make_map.makeMap(api.mapName, entityLevel)
 end
 
 function api:commandLine(oldCommandLine)
@@ -35,7 +37,7 @@ function api:createPickup(className)
 end
 
 function api:nextMap()
-   return api._star_map
+   return api.mapName
 end
 
 return api
