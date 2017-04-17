@@ -489,7 +489,16 @@ MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard
                        lt_chasm            nav_maze_random_goal_03  stairway_to_melon
                        lt_hallway_slope    nav_maze_static_01       
                        lt_horseshoe_color  nav_maze_static_02 nav_maze_static_03
-                       seekavoid_arena_01""".split()
+                       seekavoid_arena_01
+                       star_map_01""".split()
+
+def DeepmindLabD_star_map_01():
+    return DeepmindLab("star_map_01"
+                       , dict(width=80, height=80, fps=60)
+                              , ActionMapper('discrete'))
+register(id='{}-v1'.format(DeepmindLabD_star_map_01.__name__)
+         , entry_point = '{}:{}'.format(__name__
+                                        , DeepmindLabD_star_map_01.__name__))
 
 def register_all():
     for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
@@ -504,4 +513,3 @@ def register_all():
             id=env_id
             , entry_point='{}:{}'.format(__name__, entry_point_name)
         )
-#register_all()
