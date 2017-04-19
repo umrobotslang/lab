@@ -18,7 +18,7 @@ function Logger:debug(msg)
       print(msg)
    end
 end
-local logger = Logger:new{_debug = false}
+local logger = Logger:new{_debug = true}
 
 local factory = {}
 --[[ Creates a Nav Maze Random Goal.
@@ -49,12 +49,15 @@ function factory.createLevelApi(kwargs)
     width = (width - 1) / 2
 
     local possible_goal_locations = {}
+    local chosen_goal_idx = 1
     local rooms = maze:findRooms('*')
     for i = 1, #rooms do
        rooms[i]:visit(
           function (r, c)
-             if maze:getEntityCell(r, c) == 'G' then
-                maze:setEntityCell(r, c, ' ')
+             local ecell = maze:getEntityCell(r, c)
+             logger:debug("r:" .. r .. "; c:" .. c .. "; ecell:" .. ecell)
+             if ecell == 'G' then
+                --maze:setEntityCell(r, c, ' ')
                 possible_goal_locations[#possible_goal_locations + 1] = {r,c}
              end
           end)
@@ -68,6 +71,7 @@ function factory.createLevelApi(kwargs)
         api._goal = possible_goal_locations[chosen_goal_idx]
         logger:debug("Chosen goal is " .. helpers.dir(api._goal))
     else
+       assert(false, "Provide atleast one goal")
         api._goal = {random.uniformInt(1, height) * 2,
                      random.uniformInt(1, width) * 2}
     end
@@ -100,7 +104,12 @@ function factory.createLevelApi(kwargs)
     helpers.shuffleInPlace(fruit_locations)
     api._goal_location = goal_location
     api._fruit_locations = fruit_locations
-    api._all_spawn_locations = all_spawn_locations
+    if #all_spawn_locations > 0 then
+       api._all_spawn_locations = all_spawn_locations
+    else
+       table.remove(possible_goal_locations, chosen_goal_idx)
+       api._all_spawn_locations = possible_goal_locations
+    end
   end
 
   function api:pickup(spawn_id)
