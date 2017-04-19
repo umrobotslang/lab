@@ -31,4 +31,46 @@ function helpers.split(str, sep)
   return words
 end
 
+------------------------------------------------------------------------
+-- based on:
+-- "Dir (objects introspection like Python's dir) - Lua"
+-- http://snipplr.com/view/13085/
+-- (added iteration through getmetatable of userdata, and recursive call)
+-- make a global function here (in case it's needed in requires)
+--- Returns string representation of object obj
+-- @return String representation of obj
+------------------------------------------------------------------------
+function helpers.dir(obj,level)
+  local s,t = '', type(obj)
+
+  level = level or ' '
+  if string.len(level) > 5 then
+     return '...'
+  end
+
+  if (t=='nil') or (t=='boolean') or (t=='number') or (t=='string') then
+    s = tostring(obj)
+    if t=='string' then
+      s = '"' .. s .. '"'
+    end
+  elseif t=='function' then s='function'
+  elseif t=='userdata' then
+    s='userdata'
+    for n,v in pairs(getmetatable(obj)) do  s = s .. " (" .. n .. "," .. helpers.dir(v) .. ")" end
+  elseif t=='thread' then s='thread'
+  elseif t=='table' then
+    s = '{'
+    for k,v in pairs(obj) do
+      local k_str = tostring(k)
+      if type(k)=='string' then
+        k_str = '["' .. k_str .. '"]'
+      end
+      s = s .. k_str .. ' = ' .. helpers.dir(v,level .. level) .. ', '
+    end
+    s = string.sub(s, 1, -3)
+    s = s .. '}'
+  end
+  return s
+end
+
 return helpers
