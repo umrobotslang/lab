@@ -366,7 +366,7 @@ class _DeepmindLab(gym.Env):
         if self.enable_depth:
             self.observation_types += [self.RGBD_OBS_TYPE]
 
-        self._curr_mod_dir = os.path.dirname(__file__) or '.'
+        self._curr_mod_dir = os.path.dirname(os.path.dirname(__file__) or '.')
         with ChDirCtxt(self._curr_mod_dir):
             dlenv = deepmind_lab.Lab(level_script
                                             , self.observation_types
