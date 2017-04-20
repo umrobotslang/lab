@@ -73,4 +73,20 @@ function helpers.dir(obj,level)
   return s
 end
 
+local Logger = {}
+Logger.DEBUG = 3
+Logger.NONE = 0
+function Logger:new(o)
+   o = o or {level = DEBUG}
+   setmetatable(o, self)
+   self.__index = self
+   return o
+end
+function Logger:debug(msg)
+   if self.level >= Logger.DEBUG then
+      print("[DEBUG]:" .. msg)
+   end
+end
+helpers.Logger = Logger
+
 return helpers
