@@ -6,21 +6,9 @@ local helpers = require 'common.helpers'
 local custom_observations = require 'decorators.custom_observations'
 local timeout = require 'decorators.timeout'
 
-local Logger = {}
-function Logger:new(o)
-   o = o or {}
-   setmetatable(o, self)
-   self.__index = self
-   return o
-end
-function Logger:debug(msg)
-   if self._debug then
-      print(msg)
-   end
-end
-local logger = Logger:new{_debug = true}
-
+local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
+
 --[[ Creates a Nav Maze Random Goal.
 Keyword arguments:
 
@@ -42,38 +30,26 @@ function factory.createLevelApi(kwargs)
 
   function api:start(episode, seed, params)
     api._time_remaining = kwargs.episodeLengthSeconds
-    random.seed(seed)
+    random.seed(seed + 13)
     local height, width = maze:size()
-    -- don't know why (may because odd is wall, even is free space)
-    height = (height - 1) / 2 
-    width = (width - 1) / 2
-
-    local possible_goal_locations = {}
-    local chosen_goal_idx = 1
-    local rooms = maze:findRooms('*')
-    for i = 1, #rooms do
-       rooms[i]:visit(
-          function (r, c)
-             local ecell = maze:getEntityCell(r, c)
-             logger:debug("r:" .. r .. "; c:" .. c .. "; ecell:" .. ecell)
-             if ecell == 'G' then
-                --maze:setEntityCell(r, c, ' ')
-                possible_goal_locations[#possible_goal_locations + 1] = {r,c}
-             end
-          end)
+    local possibleGoalLocations = {}
+    for r = 1,height do
+        for c = 1,width do
+            if maze:getEntityCell(r, c) == "G" then
+                possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
+                logger:debug(string.format("Found G at (%d, %d)", r, c))
+            end
+        end
     end
-    if #possible_goal_locations >= 1 then
-        assert(#possible_goal_locations >= 1, "Need at least one G in the rooms")
-        logger:debug("possible goal locations are "
-                 .. tostring(#possible_goal_locations))
-        chosen_goal_idx = random.uniformInt(1, #possible_goal_locations)
-        logger:debug("Chosen goal index is " .. tostring(chosen_goal_idx))
-        api._goal = possible_goal_locations[chosen_goal_idx]
-        logger:debug("Chosen goal is " .. helpers.dir(api._goal))
+
+    if next(possibleGoalLocations) ~= nil then
+        local chosen_goal_index = random.uniformInt(
+            1, #possibleGoalLocations)
+        local goal_location = possibleGoalLocations[chosen_goal_index]
+        api._goal = goal_location
     else
-       assert(false, "Provide atleast one goal")
-        api._goal = {random.uniformInt(1, height) * 2,
-                     random.uniformInt(1, width) * 2}
+        api._goal = {random.uniformInt(1, height),
+                    random.uniformInt(1, width)}
     end
 
     local goal_location
@@ -81,35 +57,27 @@ function factory.createLevelApi(kwargs)
     local fruit_locations = {}
     local fruit_locations_reverse = {}
     maze:visitFill{cell = api._goal, func = function(row, col, distance)
-      logger:debug("row:" .. row .. "; col:" .. col .. "; dist:" .. distance)
-      if row % 2 == 1 or col % 2 == 1 then
-        return
-      end
-      row = row / 2 - 1
-      col = col / 2 - 1
+      -- logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
       -- Axis is flipped in DeepMind Lab.
-      row = height - row - 1
-      local key = ''.. (col * 100 + 50) .. ' ' .. (row * 100 + 50) .. ' '
+      row = height - row + 1
+      local key = ''.. (col * 100 - 50) .. ' ' .. (row * 100 - 50)
 
-      if distance <= 2 then
-        goal_location = key .. '20'
+      if distance == 0 then
+        goal_location = key
       end
       if distance > 0 then
-        fruit_locations[#fruit_locations + 1] = key .. '20'
+        fruit_locations[#fruit_locations + 1] = key
       end
       if distance > 8 then
-        all_spawn_locations[#all_spawn_locations + 1] = key .. '30'
+          logger:debug(string.format("possible spawn location :(%d, %d): ", row, col)
+                    .. key)
+        all_spawn_locations[#all_spawn_locations + 1] = key
       end
     end}
     helpers.shuffleInPlace(fruit_locations)
     api._goal_location = goal_location
     api._fruit_locations = fruit_locations
-    if #all_spawn_locations > 0 then
-       api._all_spawn_locations = all_spawn_locations
-    else
-       table.remove(possible_goal_locations, chosen_goal_idx)
-       api._all_spawn_locations = possible_goal_locations
-    end
+    api._all_spawn_locations = all_spawn_locations
   end
 
   function api:pickup(spawn_id)
@@ -121,8 +89,19 @@ function factory.createLevelApi(kwargs)
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
-    if classname == 'apple_reward' then
-      return api._newSpawnVars[spawnVars.origin]
+    logger:debug("existing: " .. helpers.dir(spawnVars))
+    if classname == 'apple_reward' or classname == 'goal' then
+      local coords = {}
+      for x in spawnVars.origin:gmatch("%S+") do
+          coords[#coords + 1] = x
+      end
+      local origin_2D = coords[1] .. " " .. coords[2]
+      local updated_spawn_vars = api._newSpawnVars[origin_2D]
+      if not updated_spawn_vars then
+        logger:debug("origin: " .. origin_2D .. " not found in table:"
+                         .. helpers.dir(api._newSpawnVars))
+      end
+      return updated_spawn_vars
     elseif classname == 'info_player_start' then
       return api._newSpawnVarsPlayerStart
     end
@@ -145,20 +124,22 @@ function factory.createLevelApi(kwargs)
       end
       api._newSpawnVars[fruit_location] = {
           classname = 'apple_reward',
-          origin = fruit_location
+          origin = fruit_location .. ' 30'
       }
     end
 
     local spawn_location = api._all_spawn_locations[
                                 random.uniformInt(1, #api._all_spawn_locations)]
+    logger:debug("Chosen spawn location: " .. spawn_location)
     api._newSpawnVarsPlayerStart = {
         classname = 'info_player_start',
-        origin = spawn_location
+        origin = spawn_location .. ' 30'
     }
 
+    logger:debug("Chosen goal location: " .. api._goal_location)
     api._newSpawnVars[api._goal_location] = {
         classname = 'goal',
-        origin = api._goal_location
+        origin = api._goal_location .. ' 20'
     }
 
     return kwargs.mapName

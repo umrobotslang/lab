@@ -1034,7 +1034,7 @@ py_binary(
 
 py_binary(
     name = "deepmind_lab_gym_dummy",
-    srcs = ["deepmind_lab_gym.py"
+    srcs = ["python/deepmind_lab_gym.py"
            , "python/deepmind_lab_gym_dummy.py"],
     data = [":deepmind_lab.so"],
     main = "python/deepmind_lab_gym_dummy.py"
