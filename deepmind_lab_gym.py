@@ -1,6 +1,5 @@
 import time
 import os
-import sys
 import functools
 import numbers
 import itertools
@@ -194,11 +193,11 @@ class ActionSpace(gym.Space):
     def n(self):
         return self.size()
 
-    def sample(self, seed=0):
+    def sample(self):
         """
         Uniformly randomly sample a random elemnt of this space
         """
-        return np.random.randint(self.size(), seed=seed)
+        return np.random.randint(self.size())
 
     def contains(self, x):
         """
@@ -482,28 +481,6 @@ class _DeepmindLab(gym.Env):
 #        LogMethodCalls.__init__(self, _DeepmindLab(*args, **kwargs))
 DeepmindLab = _DeepmindLab
 
-def DeepmindLabD_star_map_01():
-    return DeepmindLab("star_map_01"
-                       , dict(width=80, height=80, fps=60)
-                              , ActionMapper('discrete'))
-register(id='{}-v1'.format(DeepmindLabD_star_map_01.__name__)
-         , entry_point = '{}:{}'.format(__name__
-                                        , DeepmindLabD_star_map_01.__name__))
-
-def random_string(N):
-    return ''.join(random.choice(string.ascii_uppercase +
-                                 string.digits)
-                   for _ in range(N))
-
-def register_and_make(*args, **kwargs):
-    entry_point_name = "DeepmindLab" + random_string(5)
-    setattr(sys.modules[__name__], entry_point_name
-            , functools.partial(DeepmindLab , *args, **kwargs))
-    env_id = '{}-v1'.format(entry_point_name)
-    register(id = env_id
-             , entry_point='{}:{}'.format(__name__, entry_point_name))
-    return gym.make(env_id)
-
 ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
                    for mm_type in ['acceleration', 'discrete']] + \
                        [('L2N', L2NActionMapper(L2NActMapParams_v0.inc_mat
@@ -517,13 +494,29 @@ MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard
                        seekavoid_arena_01
                        star_map_01""".split()
 
+def random_string(N):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
+
+def register_and_make(*args, **kwargs):
+    name  = random_string(5)
+    entry_point_name = "DeepmindLab" + name
+    globals()[entry_point_name] = \
+        functools.partial(DeepmindLab
+                          , *args, **kwargs)
+    env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
+    register(
+        id=env_id
+        , entry_point='{}:{}'.format(__name__, entry_point_name)
+    )
+    return gym.make(env_id)
+
 def register_all():
     for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
         entry_point_name = "DeepmindLab" + am_name + '_' + level_script 
-        setattr(sys.modules[__name__], entry_point_name
-                , functools.partial(DeepmindLab
+        globals()[entry_point_name] = \
+            functools.partial(DeepmindLab
                               , level_script, dict(width=80, height=80, fps=60)
-                              , act_map))
+                              , act_map)
         env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
         print("Registering {}".format(env_id))
         register(
