@@ -531,6 +531,7 @@ def register_gym_env(entry_point_name, dl_args, dl_kwargs):
         id=env_id
         , entry_point='{}:{}'.format(__name__, entry_point_name)
     )
+    return env_id
 
 def random_string(N):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
@@ -538,5 +539,5 @@ def random_string(N):
 def register_and_make(*args, **kwargs):
     name  = random_string(5)
     entry_point_name = "DeepmindLab" + name
-    register_gym_env(entry_point_name, args, kwargs)
+    env_id = register_gym_env(entry_point_name, args, kwargs)
     return gym.make(env_id)
