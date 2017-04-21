@@ -96,9 +96,7 @@ function factory.createLevelApi(kwargs)
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
-    if classname == 'apple_reward' or classname == 'goal'
-        or classname == 'info_player_start'
-    then
+    if classname == 'apple_reward' or classname == 'goal' then
       local coords = {}
       for x in spawnVars.origin:gmatch("%S+") do
           coords[#coords + 1] = x

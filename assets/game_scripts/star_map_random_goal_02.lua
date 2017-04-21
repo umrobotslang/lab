@@ -54,5 +54,5 @@ return factory.createLevelApi{
     mapName = mapName
     , entityLayer = entityLayer
     , episodeLengthSeconds = 60
-    , scatteredRewardDensity = 0.2
+    , scatteredRewardDensity = 0.4
 }
