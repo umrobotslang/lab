@@ -61,43 +61,51 @@ class L2NActionMapper(object):
         assert self.INPUT_ACTION_SIZE == rel_mask_mat.shape[1]
         self.inc_mat = inc_mat
         self.rel_mask_mat = rel_mask_mat
-        self._current_velocities = np.zeros(self.DEEPMIND_ACTION_DIM) # roll pitch y x jump fire
 
-    def to_deepmind_action_space(self, action_index):
+    def initial_deepmind_velocities(self):
+        return np.zeros(self.DEEPMIND_ACTION_DIM)
+
+    def to_deepmind_action_space(self, action_index, current_velocities):
         """
         >>> am = L2NActionMapper(L2NActMapParams_v0.inc_mat, L2NActMapParams_v0.rel_mask_mat)
-        >>> np.allclose(am.to_deepmind_action_space(0)
-        ...             , [ 2.5,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
+        >>> cv = np.zeros(am.DEEPMIND_ACTION_DIM)
+        >>> cv = am.to_deepmind_action_space(0, cv)
+        >>> np.allclose(cv
+        ...             , [ 10,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(2)
-        ...             , [ 5,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
+        >>> cv = am.to_deepmind_action_space(2, cv)
+        >>> np.allclose(cv
+        ...             , [ 20,  0. ,  0. ,  0. ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(4)
-        ...             , [ 5,  0. ,  0.5,  0. ,  0. ,  0. ,  0. ])
+        >>> cv = am.to_deepmind_action_space(4, cv)
+        >>> np.allclose(cv
+        ...             , [ 20,  0. ,  0.5,  0. ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(6)
-        ...             , [ 5,  0. ,  0.5,  0.5 ,  0. ,  0. ,  0. ])
+        >>> cv = am.to_deepmind_action_space(6, cv)
+        >>> np.allclose(cv
+        ...             , [ 20,  0. ,  0.5,  0.5 ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(7)
-        ...             , [ 5,  0. ,  0.5,  0.0 ,  0. ,  0. ,  0. ])
+        >>> cv = am.to_deepmind_action_space(7, cv)
+        >>> np.allclose(cv
+        ...             , [ 20,  0. ,  0.5,  0.0 ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(5)
-        ...             , [ 5,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
+        >>> cv  = am.to_deepmind_action_space(5, cv)
+        >>> np.allclose(cv
+        ...             , [ 20,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
         True
-        >>> np.allclose(am.to_deepmind_action_space(3)
-        ...             , [ 2.5,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
+        >>> cv = am.to_deepmind_action_space(3, cv)
+        >>> np.allclose(cv
+        ...             , [ 10,  0. ,  0.0,  0.0 ,  0. ,  0. ,  0. ])
         True
         """
         if action_index >= self.INPUT_ACTION_SIZE:
             raise ValueError("Bad action {}".format(action_index))
 
-        current_velocities = self._current_velocities
         action = np.zeros(self.INPUT_ACTION_SIZE)
         action[action_index] = 1
         deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
         deepmind_action = self.inc_mat.dot(action) \
                               + self.rel_mask_mat.dot(action) * current_velocities
-        self._current_velocities = deepmind_action
         return deepmind_action
 
 
@@ -119,42 +127,60 @@ class ActionMapper(object):
         assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
         assert self.INPUT_ACTION_SIZE == self.ACTION_SPACE_INC.shape[1]
         self.mm_type = mm_type
-        self._current_velocities = np.zeros(4) # roll pitch y x
 
-    def to_deepmind_action_space(self, action_index):
+    def to_deepmind_action_space(self, action_index, current_velocities):
         """
         >>> am = ActionMapper('acceleration')
-        >>> np.allclose(am.to_deepmind_action_space(0)
+        >>> cv = np.zeros(am.DEEPMIND_ACTION_DIM)
+        >>> cv = am.to_deepmind_action_space(0, cv)
+        >>> np.allclose(cv
         ...             , [2.5, 0, 0, 0, 0, 0, 0])
         True
-        >>> np.allclose(am.to_deepmind_action_space(1)
+        >>> cv = am.to_deepmind_action_space(1, cv)
+        >>> np.allclose(cv
         ...             , [0, 0, 0, 0, 0, 0, 0])
         True
-        >>> np.allclose(am.to_deepmind_action_space(2)
+        >>> cv = am.to_deepmind_action_space(2, cv)
+        >>> np.allclose(cv
         ...             , [0, 0, 0, 0.1, 0, 0, 0])
         True
-        >>> np.allclose(am.to_deepmind_action_space(3)
+        >>> cv = am.to_deepmind_action_space(3, cv)
+        >>> np.allclose(cv
         ...             , [0, 0, 0, 0.0, 0, 0, 0])
+        True
+        >>> ad = ActionMapper('discrete')
+        >>> np.allclose(ad.to_deepmind_action_space(0, cv)
+        ...             , [25, 0, 0, 0, 0, 0, 0])
+        True
+        >>> np.allclose(ad.to_deepmind_action_space(1, cv)
+        ...             , [-25, 0, 0, 0, 0, 0, 0])
+        True
+        >>> np.allclose(ad.to_deepmind_action_space(2, cv)
+        ...             , [0, 0, 0, 1.0, 0, 0, 0])
+        True
+        >>> np.allclose(ad.to_deepmind_action_space(3, cv)
+        ...             , [0, 0, 0, -1.0, 0, 0, 0])
         True
         """
         if action_index >= self.INPUT_ACTION_SIZE:
             raise ValueError("Bad action {}".format(action_index))
-        current_velocities = self._current_velocities
         action = np.zeros(self.INPUT_ACTION_SIZE)
         action[action_index] = 1
         velocity_increments = self.ACTION_SPACE_INC.dot(action)
         deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
         if self.mm_type == 'acceleration':
-            current_velocities += velocity_increments[:4]
-            deepmind_action[:4] = current_velocities
+            current_velocities[:4] += velocity_increments[:4] * 0.1
+            deepmind_action[:4] = current_velocities[:4]
         elif self.mm_type == 'discrete':
-            deepmind_action[:4] = velocity_increments[:4] * 10
+            deepmind_action[:4] = velocity_increments[:4] * 10 # FIXME
         else:
             assert "Bad motion model type {}".format(self.mm_type)
 
         deepmind_action[4:7] = velocity_increments[4:]
-        self._current_velocities = deepmind_action[:4]
         return deepmind_action
+
+    def initial_deepmind_velocities(self):
+        return np.zeros(self.DEEPMIND_ACTION_DIM)
 
 class ActionSpace(gym.Space):
     ACT_LOOK_YAW   = 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'
@@ -219,9 +245,10 @@ class ActionSpace(gym.Space):
     def clip_action(self, action):
         return np.clip(action, self.mins, self.maxs).astype(np.intc)
 
-    def to_deepmind_action_space(self, action_index):
+    def to_deepmind_action_space(self, action_index, current_velocities):
         return self.clip_action(
-            self._action_mapper.to_deepmind_action_space(action_index))
+            self._action_mapper.to_deepmind_action_space(
+                action_index, current_velocities))
 
 class ObservationSpace(gym.Space):
     def __init__(self, obs_spec):
@@ -346,7 +373,7 @@ class LogMethodCalls(object):
         else:
             object.__setattr__(self, attr, val)
 
-class _DeepmindLab(gym.Env):
+class DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human']}
     RGB_OBS_TYPE = 'RGB_INTERLACED'
     VELT_OBS_TYPE = 'VEL.TRANS'
@@ -354,10 +381,16 @@ class _DeepmindLab(gym.Env):
     RGBD_OBS_TYPE = 'RGBD'
     def __init__(self, level_script, config, action_mapper
                  , enable_velocity=False
-                 , enable_depth=False):
-        self.observation_types = [self.RGB_OBS_TYPE]
+                 , enable_depth=False
+                 , additional_observation_types = []):
+        self.observation_types = [self.RGB_OBS_TYPE] \
+                                 + additional_observation_types
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
+        self.level_script = level_script
+        self.lab_config = config
+        self.action_mapper = action_mapper
+        self.additional_observation_types = additional_observation_types
 
         if self.enable_velocity:
             self.observation_types += [self.VELT_OBS_TYPE
@@ -380,6 +413,7 @@ class _DeepmindLab(gym.Env):
 
         self._action_space = ActionSpace(self._dl_env.action_spec(), config
                                          , action_mapper)
+        self._current_velocities = action_mapper.initial_deepmind_velocities()
         self._obs_spec = dict([(o['name'], o)
                                for o in self._dl_env.observation_spec()])
         self._obs_space = ObservationSpace(self._obs_spec[self.RGB_OBS_TYPE])
@@ -397,9 +431,10 @@ class _DeepmindLab(gym.Env):
         return obs
 
     def _next_image_file(self):
-        filename = '/tmp/{user}/{klass}/{index:04d}.png'.format(
+        filename = '/tmp/{user}/{klass}/{level_script}/{index:04d}.png'.format(
             user=getpass.getuser()
             , klass=self.__class__.__name__
+            , level_script = self.level_script
             , index=self._img_save_index)
         if self._img_save_index == 0:
             if not os.path.exists(os.path.dirname(filename)):
@@ -432,6 +467,8 @@ class _DeepmindLab(gym.Env):
                                                 , obs[self.VELR_OBS_TYPE]))
         if self.enable_depth:
             self._last_info['depth'] = obs[self.RGBD_OBS_TYPE][3]
+        for ot in self.additional_observation_types:
+            self._last_info[ot] = obs[ot]
 
         assert self._obs_space.contains(self._last_obs), \
             'Observations outside observation space'
@@ -444,7 +481,8 @@ class _DeepmindLab(gym.Env):
 
         # Start of method logic
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
-            action)
+            action, self._current_velocities)
+        self._current_velocities = deepmind_lab_actions
         reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
         episode_over = (not self._dl_env.is_running())
         observations, info = self._observations()
@@ -458,6 +496,9 @@ class _DeepmindLab(gym.Env):
 
     def _reset(self):
         self._dl_env.reset()
+        # Reset the velociries
+        self._current_velocities = \
+                            self.action_mapper.initial_deepmind_velocities()
         obs, _ = self._observations()
         return obs
 
@@ -476,23 +517,20 @@ class _DeepmindLab(gym.Env):
         if seed is not None:
             np.random.seed(seed)
 
-#class DeepmindLab(LogMethodCalls):
-#    def __init__(self, *args, **kwargs):
-#        LogMethodCalls.__init__(self, _DeepmindLab(*args, **kwargs))
-DeepmindLab = _DeepmindLab
+ActionMapperDiscrete = ActionMapper("discrete")
+ActionMapperAcceleration = ActionMapper("acceleration")
+L2NActionMapper_v0 = L2NActionMapper(L2NActMapParams_v0.inc_mat
+                                     , L2NActMapParams_v0.rel_mask_mat)
 
-ACT_MAP_LIST = [(mm_type[:1].upper(), ActionMapper(mm_type))
-                   for mm_type in ['acceleration', 'discrete']] + \
-                       [('L2N', L2NActionMapper(L2NActMapParams_v0.inc_mat
-                                                , L2NActMapParams_v0.rel_mask_mat))]
-MAP_LEVEL_SCRIPTS = """lt_space_bounce_hard     
-                       nav_maze_random_goal_01  random_maze
-                       nav_maze_random_goal_02
-                       lt_chasm            nav_maze_random_goal_03  stairway_to_melon
-                       lt_hallway_slope    nav_maze_static_01       
-                       lt_horseshoe_color  nav_maze_static_02 nav_maze_static_03
-                       seekavoid_arena_01
-                       star_map_01""".split()
+def register_gym_env(entry_point_name, dl_args, dl_kwargs):
+    globals()[entry_point_name] = \
+        functools.partial(DeepmindLab
+                          , *dl_args, **dl_kwargs)
+    env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
+    register(
+        id=env_id
+        , entry_point='{}:{}'.format(__name__, entry_point_name)
+    )
 
 def random_string(N):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
@@ -500,26 +538,5 @@ def random_string(N):
 def register_and_make(*args, **kwargs):
     name  = random_string(5)
     entry_point_name = "DeepmindLab" + name
-    globals()[entry_point_name] = \
-        functools.partial(DeepmindLab
-                          , *args, **kwargs)
-    env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
-    register(
-        id=env_id
-        , entry_point='{}:{}'.format(__name__, entry_point_name)
-    )
+    register_gym_env(entry_point_name, args, kwargs)
     return gym.make(env_id)
-
-def register_all():
-    for level_script, (am_name, act_map) in itertools.product(MAP_LEVEL_SCRIPTS, ACT_MAP_LIST):
-        entry_point_name = "DeepmindLab" + am_name + '_' + level_script 
-        globals()[entry_point_name] = \
-            functools.partial(DeepmindLab
-                              , level_script, dict(width=80, height=80, fps=60)
-                              , act_map)
-        env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
-        print("Registering {}".format(env_id))
-        register(
-            id=env_id
-            , entry_point='{}:{}'.format(__name__, entry_point_name)
-        )

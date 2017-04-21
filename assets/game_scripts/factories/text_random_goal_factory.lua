@@ -5,9 +5,11 @@ local pickups = require 'common.pickups'
 local helpers = require 'common.helpers'
 local custom_observations = require 'decorators.custom_observations'
 local timeout = require 'decorators.timeout'
+local tensor = require 'dmlab.system.tensor'
 
 local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
+local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
 
 --[[ Creates a Nav Maze Random Goal.
 Keyword arguments:
@@ -27,7 +29,7 @@ function factory.createLevelApi(kwargs)
   function api:createPickup(class_name)
     return pickups.defaults[class_name]
   end
-
+  
   function api:start(episode, seed, params)
     api._time_remaining = kwargs.episodeLengthSeconds
     random.seed(seed + 13)
@@ -51,6 +53,11 @@ function factory.createLevelApi(kwargs)
         api._goal = {random.uniformInt(1, height),
                     random.uniformInt(1, width)}
     end
+    
+    -- Add custom obsevations
+    api._obs_value = {}
+    api._obs_value[ goal_location_custom_obs.name ] =
+        tensor.DoubleTensor{api._goal[1], api._goal[2]}
 
     local goal_location
     local all_spawn_locations = {}
@@ -89,18 +96,15 @@ function factory.createLevelApi(kwargs)
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
-    logger:debug("existing: " .. helpers.dir(spawnVars))
-    if classname == 'apple_reward' or classname == 'goal' then
+    if classname == 'apple_reward' or classname == 'goal'
+        or classname == 'info_player_start'
+    then
       local coords = {}
       for x in spawnVars.origin:gmatch("%S+") do
           coords[#coords + 1] = x
       end
       local origin_2D = coords[1] .. " " .. coords[2]
       local updated_spawn_vars = api._newSpawnVars[origin_2D]
-      if not updated_spawn_vars then
-        logger:debug("origin: " .. origin_2D .. " not found in table:"
-                         .. helpers.dir(api._newSpawnVars))
-      end
       return updated_spawn_vars
     elseif classname == 'info_player_start' then
       return api._newSpawnVarsPlayerStart
@@ -143,6 +147,21 @@ function factory.createLevelApi(kwargs)
     }
 
     return kwargs.mapName
+  end
+
+  -- Add GOAL.LOC to the observation specs
+  local customObservationSpec = api.customObservationSpec
+  function api:customObservationSpec()
+    -- This is called before api:init so it should depend on constant things
+    local specs = customObservationSpec and customObservationSpec(api) or {}
+    specs[#specs + 1] = goal_location_custom_obs
+    return specs
+  end
+
+  -- Return GOAL.LOC value when requested
+  local customObservation = api.customObservation
+  function api:customObservation(name)
+    return api._obs_value[name] or customObservation(api, name)
   end
 
   custom_observations.decorate(api)
