@@ -23,6 +23,7 @@ Keyword arguments:
 function factory.createLevelApi(kwargs)
   kwargs.scatteredRewardDensity = kwargs.scatteredRewardDensity or 0.1
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
+  kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
   local api = {}
 
@@ -64,7 +65,7 @@ function factory.createLevelApi(kwargs)
     local fruit_locations = {}
     local fruit_locations_reverse = {}
     maze:visitFill{cell = api._goal, func = function(row, col, distance)
-      -- logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
+      logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
       -- Axis is flipped in DeepMind Lab.
       row = height - row + 1
       local key = ''.. (col * 100 - 50) .. ' ' .. (row * 100 - 50)
@@ -75,7 +76,7 @@ function factory.createLevelApi(kwargs)
       if distance > 0 then
         fruit_locations[#fruit_locations + 1] = key
       end
-      if distance > 8 then
+      if distance > kwargs.minSpawnGoalDistance then
           logger:debug(string.format("possible spawn location :(%d, %d): ", row, col)
                     .. key)
         all_spawn_locations[#all_spawn_locations + 1] = key
@@ -84,6 +85,10 @@ function factory.createLevelApi(kwargs)
     helpers.shuffleInPlace(fruit_locations)
     api._goal_location = goal_location
     api._fruit_locations = fruit_locations
+
+    if #all_spawn_locations == 0 then
+        error("Unable to find any spawn location, consider decreasing minSpawnGoalDistance")
+    end
     api._all_spawn_locations = all_spawn_locations
   end
 
