@@ -443,6 +443,9 @@ class DeepmindLab(gym.Env):
         self._img_save_index = self._img_save_index % 10000
         return filename
 
+    def _configure(self, *args, **kwargs):
+        pass
+
     @property
     def action_space(self):
         return self._action_space
@@ -453,7 +456,7 @@ class DeepmindLab(gym.Env):
 
     @property
     def reward_range(self):
-        return [-1, 1]
+        return [-1, 100]
 
     def _observations(self):
         if self._dl_env.is_running():
