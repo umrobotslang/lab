@@ -169,10 +169,10 @@ class ActionMapper(object):
         velocity_increments = self.ACTION_SPACE_INC.dot(action)
         deepmind_action = np.zeros(self.DEEPMIND_ACTION_DIM)
         if self.mm_type == 'acceleration':
-            current_velocities[:4] += velocity_increments[:4] * 0.1
+            current_velocities[:4] += velocity_increments[:4] * 0.5
             deepmind_action[:4] = current_velocities[:4]
         elif self.mm_type == 'discrete':
-            deepmind_action[:4] = velocity_increments[:4] * 10 # FIXME
+            deepmind_action[:4] = velocity_increments[:4]
         else:
             assert "Bad motion model type {}".format(self.mm_type)
 
@@ -206,8 +206,6 @@ class ActionSpace(gym.Space):
         self.indices = {a['name']: i for i, a in enumerate(self.action_spec)}
         self.mins = np.array([a['min'] for a in self.action_spec])
         self.maxs = np.array([a['max'] for a in self.action_spec])
-        self.mins[self.indices[self.ACT_LOOK_YAW]] = -8
-        self.maxs[self.indices[self.ACT_LOOK_YAW]] = 8
 
         self._action_mapper = action_mapper
 
