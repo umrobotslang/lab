@@ -8,6 +8,8 @@ import random
 import string
 
 import numpy as np
+import matplotlib as mplib
+import matplotlib.pyplot as plt
 import deepmind_lab
 import gym
 from gym.envs.registration import register
@@ -111,7 +113,7 @@ class L2NActionMapper(object):
 
 class ActionMapper(object):
     ACTION_SPACE_INC = np.array([
-        [  25.0 ,-25.0 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        [  50.0 ,-50.0 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  1   , -1   ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
@@ -134,7 +136,7 @@ class ActionMapper(object):
         >>> cv = np.zeros(am.DEEPMIND_ACTION_DIM)
         >>> cv = am.to_deepmind_action_space(0, cv)
         >>> np.allclose(cv
-        ...             , [2.5, 0, 0, 0, 0, 0, 0])
+        ...             , [25, 0, 0, 0, 0, 0, 0])
         True
         >>> cv = am.to_deepmind_action_space(1, cv)
         >>> np.allclose(cv
@@ -142,7 +144,7 @@ class ActionMapper(object):
         True
         >>> cv = am.to_deepmind_action_space(2, cv)
         >>> np.allclose(cv
-        ...             , [0, 0, 0, 0.1, 0, 0, 0])
+        ...             , [0, 0, 0, 0.5, 0, 0, 0])
         True
         >>> cv = am.to_deepmind_action_space(3, cv)
         >>> np.allclose(cv
@@ -150,10 +152,10 @@ class ActionMapper(object):
         True
         >>> ad = ActionMapper('discrete')
         >>> np.allclose(ad.to_deepmind_action_space(0, cv)
-        ...             , [25, 0, 0, 0, 0, 0, 0])
+        ...             , [50, 0, 0, 0, 0, 0, 0])
         True
         >>> np.allclose(ad.to_deepmind_action_space(1, cv)
-        ...             , [-25, 0, 0, 0, 0, 0, 0])
+        ...             , [-50, 0, 0, 0, 0, 0, 0])
         True
         >>> np.allclose(ad.to_deepmind_action_space(2, cv)
         ...             , [0, 0, 0, 1.0, 0, 0, 0])
@@ -371,18 +373,126 @@ class LogMethodCalls(object):
         else:
             object.__setattr__(self, attr, val)
 
+def wall_coordinates_from_string(entity_layer_lines, size=(100, 100)):
+    height = len(entity_layer_lines)
+    width = max(len(l) for l in entity_layer_lines)
+    wall_coords = []
+    for row, line in enumerate(entity_layer_lines):
+        row_inv = height - row - 1
+        for col, char in enumerate(line):
+            if char == "*":
+                yield (col * size[0], row_inv * size[1])
+
+class TopView(object):
+    def __init__(self, assets_top_dir=None, level_script=None, draw_fq=20):
+        self.poses2D = np.empty((0,3)) # x,y,yaw
+        self._initialized = False
+        self._ax = None
+        self.draw_fq = draw_fq
+        self.assets_top_dir = assets_top_dir
+        self.level_script = level_script
+        self.block_size = np.asarray((100, 100))
+        self.map_height = None
+        self.map_width = None
+        self._goal_loc = None
+        self._goal_drawn = False
+
+    def _entity_file(self):
+        return os.path.join(
+            self.assets_top_dir
+            , "assets/game_scripts/{}.entityLayer".format(self.level_script))
+
+    def add_pose(self, pose):
+        self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
+
+    def _goal_patch(self, coord):
+        goal_size = self.block_size * 0.67
+        goal_pos_offset = (self.block_size - goal_size) / 2
+        return mplib.patches.Rectangle( coord+goal_pos_offset,
+            goal_size[0], goal_size[1] , color='g' , fill=True)
+
+    def add_goal(self, goal_loc):
+        self._goal_loc = goal_loc
+
+    def _draw_goal(self, ax):
+        if not self._goal_drawn:
+            goal_loc = self._goal_loc
+            xyblocks = np.asarray((goal_loc[1] - 1, self.map_height - goal_loc[0]))
+            xy = xyblocks * self.block_size
+            ax.add_patch(self._goal_patch(xy))
+            self._goal_drawn = True
+        
+    def _wall_patch(self, coord):
+        return mplib.patches.Rectangle(
+                coord, self.block_size[0], self.block_size[1]
+                , fill=True)
+
+    def _draw_map(self, ax):
+        with open(self._entity_file()) as ef:
+            entity_layer_lines = ef.readlines()
+        
+        self.map_height = height = len(entity_layer_lines)
+        self.map_width = width = max(len(l) for l in entity_layer_lines)
+        ax.set_xlim(0, width*self.block_size[0])
+        ax.set_ylim(0, height*self.block_size[1])
+        for coord in wall_coordinates_from_string(entity_layer_lines
+                                                 , size=self.block_size):
+            ax.add_patch(self._wall_patch(coord))
+
+    def _make_axes(self):
+        fig = plt.figure()
+        ax = fig.gca() if fig.axes else fig.add_subplot(1,1,1)#[0, 0, 1, 1])
+        return ax
+
+    def get_axes(self):
+        if not self._initialized:
+            self._ax = self._make_axes()
+            self._reset_axes(self._ax)
+            self._initialized = True
+        return self._ax
+
+    def _draw(self):
+        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b-')
+        self._draw_goal(self.get_axes())
+        plt.draw()
+        plt.show(block=False)
+        self.poses2D = self.poses2D[-1, :]
+
+    def draw(self):
+        if self.poses2D.shape[0] % self.draw_fq == 0:
+            self._draw() 
+
+    def _reset_axes(self, ax):
+        ax.clear()
+        ax.axis('equal')
+        if os.path.exists(self._entity_file()):
+            self._draw_map(ax)
+        else:
+            print("File not found {}".format(self._entity_file()))
+        
+
+    def reset(self):
+        self.poses2D = np.empty((0,3))
+        self._reset_axes(self.get_axes())
+        self._goal_drawn = False
+
+
 class DeepmindLab(gym.Env):
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['human', 'file', 'top']}
     RGB_OBS_TYPE = 'RGB_INTERLACED'
     VELT_OBS_TYPE = 'VEL.TRANS'
     VELR_OBS_TYPE = 'VEL.ROT'
     RGBD_OBS_TYPE = 'RGBD'
+    POSE_OBS_TYPE = 'POSE'
+    GOAL_OBS_TYPE = 'GOAL.LOC'
     def __init__(self, level_script, config, action_mapper
                  , enable_velocity=False
                  , enable_depth=False
                  , additional_observation_types = []):
-        self.observation_types = [self.RGB_OBS_TYPE] \
-                                 + additional_observation_types
+        self.observation_types = [self.RGB_OBS_TYPE
+                                  , self.POSE_OBS_TYPE
+                                  , self.GOAL_OBS_TYPE] \
+                                  + additional_observation_types
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
         self.level_script = level_script
@@ -418,6 +528,7 @@ class DeepmindLab(gym.Env):
         self._last_obs = self._obs_space.make_null()
         self._last_info = {}
         self._img_save_index = 0
+        self._top_view = TopView(self._curr_mod_dir, self.level_script)
 
     def _null_observations(self):
         obs = {}
@@ -459,6 +570,8 @@ class DeepmindLab(gym.Env):
     def _observations(self):
         if self._dl_env.is_running():
             obs = self._dl_env.observations()
+            self._top_view.add_pose(obs[self.POSE_OBS_TYPE])
+            self._top_view.add_goal(obs[self.GOAL_OBS_TYPE])
         else:
             obs = self._null_observations()
 
@@ -500,6 +613,7 @@ class DeepmindLab(gym.Env):
         # Reset the velociries
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
+        self._top_view.reset()
         obs, _ = self._observations()
         return obs
 
@@ -507,12 +621,20 @@ class DeepmindLab(gym.Env):
         if close:
             return
 
+        if self._last_obs is None:
+            return
         import cv2
-        if self._last_obs is not None:
+        if mode == 'human':
             im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
             cv2.imshow("c",im)
-            cv2.imwrite(self._next_image_file(), im)
             cv2.waitKey(1)
+            self._top_view.draw()
+        elif mode == 'file':
+            cv2.imwrite(self._next_image_file(), im)
+        elif mode == 'top':
+            self._top_view.draw()
+        else:
+            raise ValueError("bad mode: {}".format(mode))
 
     def _seed(self, seed=None):
         if seed is not None:
