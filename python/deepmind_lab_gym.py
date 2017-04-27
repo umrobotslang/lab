@@ -373,71 +373,47 @@ class LogMethodCalls(object):
         else:
             object.__setattr__(self, attr, val)
 
-def wall_coordinates_from_string(entity_layer_lines, size=(100, 100)):
-    height = len(entity_layer_lines)
-    width = max(len(l) for l in entity_layer_lines)
-    wall_coords = []
-    for row, line in enumerate(entity_layer_lines):
-        row_inv = height - row - 1
-        for col, char in enumerate(line):
-            if char == "*":
-                yield (col * size[0], row_inv * size[1])
+class EntityMap(object):
+    def __init__(self, entity_layer_file):
+        self.entity_layer_file = entity_layer_file
+        self._entity_layer_lines = None
+        self._width = None
+    
+    def entity_layer_lines(self):
+        if self._entity_layer_lines is None: 
+            with open(self.entity_layer_file) as ef:
+                self._entity_layer_lines = ef.readlines()
+        return self._entity_layer_lines
+
+    def wall_coordinates_from_string(self, size=(100, 100)):
+        wall_coords = []
+        for row, line in enumerate(self.entity_layer_lines()):
+            row_inv = self.height() - row - 1
+            for col, char in enumerate(line):
+                if char == "*":
+                    yield (col * size[0], row_inv * size[1])
+
+    def height(self):
+        return len(self.entity_layer_lines())
+
+    def width(self):
+        if self._width is None:
+            self._width = max(len(l) for l in self.entity_layer_lines())
+        return self._width
 
 class TopView(object):
     def __init__(self, assets_top_dir=None, level_script=None, draw_fq=20):
-        self.poses2D = np.empty((0,3)) # x,y,yaw
-        self._initialized = False
         self._ax = None
         self.draw_fq = draw_fq
         self.assets_top_dir = assets_top_dir
         self.level_script = level_script
         self.block_size = np.asarray((100, 100))
-        self.map_height = None
-        self.map_width = None
-        self._goal_loc = None
-        self._goal_drawn = False
-
-    def _entity_file(self):
-        return os.path.join(
-            self.assets_top_dir
-            , "assets/game_scripts/{}.entityLayer".format(self.level_script))
-
-    def add_pose(self, pose):
-        self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
-
-    def _goal_patch(self, coord):
-        goal_size = self.block_size * 0.67
-        goal_pos_offset = (self.block_size - goal_size) / 2
-        return mplib.patches.Rectangle( coord+goal_pos_offset,
-            goal_size[0], goal_size[1] , color='g' , fill=True)
-
-    def add_goal(self, goal_loc):
-        self._goal_loc = goal_loc
-
-    def _draw_goal(self, ax):
-        if not self._goal_drawn:
-            goal_loc = self._goal_loc
-            xyblocks = np.asarray((goal_loc[1] - 1, self.map_height - goal_loc[0]))
-            xy = xyblocks * self.block_size
-            ax.add_patch(self._goal_patch(xy))
-            self._goal_drawn = True
+        self._entity_map = EntityMap(self._entity_file())
+        self._top_view_episode_map = TopViewEpisodeMap(self)
+        self._entity_file_available = os.path.exists(self._entity_file())
         
-    def _wall_patch(self, coord):
-        return mplib.patches.Rectangle(
-                coord, self.block_size[0], self.block_size[1]
-                , fill=True)
-
-    def _draw_map(self, ax):
-        with open(self._entity_file()) as ef:
-            entity_layer_lines = ef.readlines()
-        
-        self.map_height = height = len(entity_layer_lines)
-        self.map_width = width = max(len(l) for l in entity_layer_lines)
-        ax.set_xlim(0, width*self.block_size[0])
-        ax.set_ylim(0, height*self.block_size[1])
-        for coord in wall_coordinates_from_string(entity_layer_lines
-                                                 , size=self.block_size):
-            ax.add_patch(self._wall_patch(coord))
+    def supported(self):
+        return self._entity_file_available
 
     def _make_axes(self):
         fig = plt.figure()
@@ -445,37 +421,107 @@ class TopView(object):
         return ax
 
     def get_axes(self):
-        if not self._initialized:
+        if self._ax is None:
             self._ax = self._make_axes()
-            self._reset_axes(self._ax)
-            self._initialized = True
         return self._ax
 
-    def _draw(self):
-        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b-')
-        self._draw_goal(self.get_axes())
-        plt.draw()
-        plt.show(block=False)
-        self.poses2D = self.poses2D[-1, :]
+    def _entity_file(self):
+        return os.path.join(
+            self.assets_top_dir
+            , "assets/game_scripts/{}.entityLayer".format(self.level_script))
+    
+    def add_pose(self, pose):
+        if self.supported():
+            self._top_view_episode_map.add_pose(pose)
+
+    def add_goal(self, goal_loc):
+        if self.supported():
+            self._top_view_episode_map.add_goal(goal_loc)
+
+    def draw(self):
+        if self.supported():
+            self._top_view_episode_map.draw()
+    
+    def reset(self):
+        if self.supported():
+            self._top_view_episode_map = TopViewEpisodeMap(self)
+
+class TopViewEpisodeMap(object):
+    def __init__(self, top_view):
+        self._top_view = top_view
+        self._entity_map = top_view._entity_map
+        self.poses2D = np.empty((0,3)) # x,y,yaw
+        self._goal_loc = None
+        self._drawn_once = False
+
+    def add_pose(self, pose):
+        self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
+
+    def add_goal(self, goal_loc):
+        self._goal_loc = goal_loc
 
     def draw(self):
         if self.poses2D.shape[0] % self.draw_fq == 0:
             self._draw() 
 
-    def _reset_axes(self, ax):
-        ax.clear()
-        ax.axis('equal')
-        if os.path.exists(self._entity_file()):
-            self._draw_map(ax)
-        else:
-            print("File not found {}".format(self._entity_file()))
+    def map_height(self):
+        return self._entity_map.height()
+
+    def map_width(self):
+        return self._entity_map.width()
         
+    def wall_coordinates_from_string(self, **kwargs):
+        return self._entity_map.wall_coordinates_from_string(**kwargs)
+    
+    @property
+    def block_size(self):
+        return self._top_view.block_size
+    
+    def get_axes(self):
+        return self._top_view.get_axes()
 
-    def reset(self):
-        self.poses2D = np.empty((0,3))
-        self._reset_axes(self.get_axes())
-        self._goal_drawn = False
+    def _goal_patch(self, coord):
+        goal_size = self.block_size * 0.67
+        goal_pos_offset = (self.block_size - goal_size) / 2
+        return mplib.patches.Rectangle( coord+goal_pos_offset,
+            goal_size[0], goal_size[1] , color='g' , fill=True)
+    
+    def _draw_goal(self, ax):
+        goal_loc = self._goal_loc
+        xyblocks = np.asarray((goal_loc[1] - 1, self.map_height() - goal_loc[0]))
+        xy = xyblocks * self.block_size
+        ax.add_patch(self._goal_patch(xy))
+        self._goal_drawn = True
+        
+    def _wall_patch(self, coord):
+        return mplib.patches.Rectangle(
+                coord, self.block_size[0], self.block_size[1]
+                , fill=True)
 
+    def _draw_map(self, ax):
+        height = self.map_height()
+        width = self.map_width()
+        ax.set_xlim(0, width*self.block_size[0])
+        ax.set_ylim(0, height*self.block_size[1])
+        for coord in self.wall_coordinates_from_string(size=self.block_size):
+            ax.add_patch(self._wall_patch(coord))
+
+    def draw(self):
+        self._draw_once()
+        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b-')
+        plt.draw()
+        plt.show(block=False)
+        self.poses2D = self.poses2D[-1, :]
+        
+    def _draw_once(self):
+        if not self._drawn_once:
+            ax = self._top_view.get_axes()
+            ax.clear()
+            ax.axis('equal')
+            self._draw_map(ax)
+            self._draw_goal(ax)
+            self._drawn_once = True
+        
 
 class DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human', 'file', 'top']}
@@ -489,9 +535,7 @@ class DeepmindLab(gym.Env):
                  , enable_velocity=False
                  , enable_depth=False
                  , additional_observation_types = []):
-        self.observation_types = [self.RGB_OBS_TYPE
-                                  , self.POSE_OBS_TYPE
-                                  , self.GOAL_OBS_TYPE] \
+        self.observation_types = [self.RGB_OBS_TYPE] \
                                   + additional_observation_types
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
@@ -508,6 +552,10 @@ class DeepmindLab(gym.Env):
             self.observation_types += [self.RGBD_OBS_TYPE]
 
         self._curr_mod_dir = os.path.dirname(os.path.dirname(__file__) or '.')
+        self._top_view = TopView(self._curr_mod_dir, self.level_script)
+        if self._top_view.supported():
+            self.observation_types += [self.POSE_OBS_TYPE
+                                       , self.GOAL_OBS_TYPE]
         with ChDirCtxt(self._curr_mod_dir):
             dlenv = deepmind_lab.Lab(level_script
                                             , self.observation_types
@@ -528,7 +576,6 @@ class DeepmindLab(gym.Env):
         self._last_obs = self._obs_space.make_null()
         self._last_info = {}
         self._img_save_index = 0
-        self._top_view = TopView(self._curr_mod_dir, self.level_script)
 
     def _null_observations(self):
         obs = {}
@@ -570,8 +617,9 @@ class DeepmindLab(gym.Env):
     def _observations(self):
         if self._dl_env.is_running():
             obs = self._dl_env.observations()
-            self._top_view.add_pose(obs[self.POSE_OBS_TYPE])
-            self._top_view.add_goal(obs[self.GOAL_OBS_TYPE])
+            if self._top_view.supported():
+                self._top_view.add_pose(obs[self.POSE_OBS_TYPE])
+                self._top_view.add_goal(obs[self.GOAL_OBS_TYPE])
         else:
             obs = self._null_observations()
 
