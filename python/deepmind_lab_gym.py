@@ -702,7 +702,8 @@ class DeepmindLab(gym.Env):
             if fig:
                 FigureCanvasAgg(fig).print_figure(
                     os.path.join(os.path.dirname(imfile),
-                                "top_view_{}".format(os.path.basename(imfile))))
+                                "top_view_{}".format(os.path.basename(imfile)))
+                    , dpi=80)
         elif mode == 'return':
             return (im, fig)
         else:
