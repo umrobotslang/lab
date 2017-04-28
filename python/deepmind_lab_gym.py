@@ -8,8 +8,10 @@ import random
 import string
 
 import numpy as np
+import cv2
 import matplotlib as mplib
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.backends import pylab_setup
 import deepmind_lab
 import gym
 from gym.envs.registration import register
@@ -17,6 +19,16 @@ import logging
 from collections import namedtuple
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+### Calls a function only once and remembers the return value
+_called_once = dict()
+def call_once(func, *args, **kwargs):
+    key = "{}({},{})".format(func, args, kwargs)
+    if key not in _called_once:
+        global _called_once
+        _called_once[key] = ret = func(*args, **kwargs)
+        return ret
+    return _called_once[key]
 
 ActionMapperParams = namedtuple('ActionMapperParams', ['inc_mat', 'rel_mask_mat'])
 
@@ -416,8 +428,10 @@ class TopView(object):
         return self._entity_file_available
 
     def _make_axes(self):
-        fig = plt.figure()
-        ax = fig.gca() if fig.axes else fig.add_subplot(1,1,1)#[0, 0, 1, 1])
+        fig = mplib.figure.Figure(figsize=(4,4))
+        ax = fig.gca() if fig.axes else fig.add_axes([0, 0, 1, 1])
+        ax.set_xticks([])
+        ax.set_yticks([])
         return ax
 
     def get_axes(self):
@@ -441,6 +455,7 @@ class TopView(object):
     def draw(self):
         if self.supported():
             self._top_view_episode_map.draw()
+            return self.get_axes().figure
     
     def reset(self):
         if self.supported():
@@ -508,23 +523,23 @@ class TopViewEpisodeMap(object):
 
     def draw(self):
         self._draw_once()
-        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b-')
-        plt.draw()
-        plt.show(block=False)
-        self.poses2D = self.poses2D[-1, :]
+        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b,')
+        self.poses2D = self.poses2D[-1:, :]
         
     def _draw_once(self):
         if not self._drawn_once:
             ax = self._top_view.get_axes()
             ax.clear()
             ax.axis('equal')
+            ax.set_xlim(0, self.map_width())
+            ax.set_ylim(0, self.map_height())
             self._draw_map(ax)
             self._draw_goal(ax)
             self._drawn_once = True
         
 
 class DeepmindLab(gym.Env):
-    metadata = {'render.modes': ['human', 'file', 'top']}
+    metadata = {'render.modes': ['human', 'file', 'return']}
     RGB_OBS_TYPE = 'RGB_INTERLACED'
     VELT_OBS_TYPE = 'VEL.TRANS'
     VELR_OBS_TYPE = 'VEL.ROT'
@@ -671,16 +686,25 @@ class DeepmindLab(gym.Env):
 
         if self._last_obs is None:
             return
-        import cv2
+        im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
+        fig = self._top_view.draw()
         if mode == 'human':
-            im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
             cv2.imshow("c",im)
             cv2.waitKey(1)
-            self._top_view.draw()
+            if fig:
+                backend_mod, _, _, _ = call_once(pylab_setup)
+                figManager = backend_mod.new_figure_manager_given_figure(1, fig)
+                figManager.canvas.draw()
+                backend_mod.show(block=False)
         elif mode == 'file':
-            cv2.imwrite(self._next_image_file(), im)
-        elif mode == 'top':
-            self._top_view.draw()
+            imfile = self._next_image_file()
+            cv2.imwrite(imfile, im)
+            if fig:
+                FigureCanvasAgg(fig).print_figure(
+                    os.path.join(os.path.dirname(imfile),
+                                "top_view_{}".format(os.path.basename(imfile))))
+        elif mode == 'return':
+            return (im, fig)
         else:
             raise ValueError("bad mode: {}".format(mode))
 
