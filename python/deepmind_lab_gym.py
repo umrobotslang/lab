@@ -429,6 +429,9 @@ class TopView(object):
 
     def _make_axes(self):
         fig = mplib.figure.Figure(figsize=(4,4))
+        # TODO: axes width/height are assumed to be in 1:1 ratio
+        # and expected to be handled in by set_aspect later. This is
+        # problematic because we depend on matplotlib magic
         ax = fig.gca() if fig.axes else fig.add_axes([0, 0, 1, 1])
         return ax
 
@@ -524,6 +527,8 @@ class TopViewEpisodeMap(object):
         if not self._drawn_once:
             ax = self._top_view.get_axes()
             ax.clear()
+            # Do not use ax.axis('equal') because it sets adjustable='datalim'
+            # which cases xlim/ylim to change later.
             ax.set_aspect('equal', adjustable='box')
             ax.set_autoscale_on(False)
             ax.autoscale_view(tight=True)
