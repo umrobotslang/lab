@@ -24,8 +24,8 @@ logger.setLevel(logging.DEBUG)
 _called_once = dict()
 def call_once(func, *args, **kwargs):
     key = "{}({},{})".format(func, args, kwargs)
+    global _called_once
     if key not in _called_once:
-        global _called_once
         _called_once[key] = ret = func(*args, **kwargs)
         return ret
     return _called_once[key]
@@ -410,7 +410,7 @@ class EntityMap(object):
 
     def width(self):
         if self._width is None:
-            self._width = max(len(l) for l in self.entity_layer_lines())
+            self._width = max(len(l) for l in self.entity_layer_lines()) - 1
         return self._width
 
 class TopView(object):
@@ -430,8 +430,6 @@ class TopView(object):
     def _make_axes(self):
         fig = mplib.figure.Figure(figsize=(4,4))
         ax = fig.gca() if fig.axes else fig.add_axes([0, 0, 1, 1])
-        ax.set_xticks([])
-        ax.set_yticks([])
         return ax
 
     def get_axes(self):
@@ -514,10 +512,6 @@ class TopViewEpisodeMap(object):
                 , fill=True)
 
     def _draw_map(self, ax):
-        height = self.map_height()
-        width = self.map_width()
-        ax.set_xlim(0, width*self.block_size[0])
-        ax.set_ylim(0, height*self.block_size[1])
         for coord in self.wall_coordinates_from_string(size=self.block_size):
             ax.add_patch(self._wall_patch(coord))
 
@@ -530,13 +524,14 @@ class TopViewEpisodeMap(object):
         if not self._drawn_once:
             ax = self._top_view.get_axes()
             ax.clear()
-            ax.axis('equal')
-            ax.set_xlim(0, self.map_width())
-            ax.set_ylim(0, self.map_height())
+            ax.set_aspect('equal', adjustable='box')
+            ax.set_autoscale_on(False)
+            ax.autoscale_view(tight=True)
+            ax.set_xlim(0, self.map_width() * self.block_size[0])
+            ax.set_ylim(0, self.map_height() * self.block_size[1])
             self._draw_map(ax)
             self._draw_goal(ax)
             self._drawn_once = True
-        
 
 class DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human', 'file', 'return']}
@@ -591,6 +586,8 @@ class DeepmindLab(gym.Env):
         self._last_obs = self._obs_space.make_null()
         self._last_info = {}
         self._img_save_index = 0
+        self._render_fig_manager = None
+        self._render_backend_mod = None
 
     def _null_observations(self):
         obs = {}
@@ -680,6 +677,18 @@ class DeepmindLab(gym.Env):
         obs, _ = self._observations()
         return obs
 
+    def _render_mplib_fig(self, fig):
+        if self._render_fig_manager is None:
+            # Chooses the backend_mod based on matplotlib configuration
+            self._render_backend_mod = pylab_setup()[0]
+            mplib.interactive(True)
+            self._render_fig_manager = \
+                self._render_backend_mod.new_figure_manager_given_figure(1, fig)
+        self._render_fig_manager.canvas.figure = fig
+        self._render_fig_manager.canvas.draw()
+        self._render_backend_mod.show(block=False)
+        return self._render_fig_manager
+
     def _render(self, mode='human', close=False):
         if close:
             return
@@ -688,14 +697,15 @@ class DeepmindLab(gym.Env):
             return
         im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
         fig = self._top_view.draw()
-        if mode == 'human':
-            cv2.imshow("c",im)
-            cv2.waitKey(1)
-            if fig:
-                backend_mod, _, _, _ = call_once(pylab_setup)
-                figManager = backend_mod.new_figure_manager_given_figure(1, fig)
-                figManager.canvas.draw()
-                backend_mod.show(block=False)
+        if mode == 'return':
+            pass
+        elif mode == 'human':
+            skip_frame = self._img_save_index % (self.lab_config['fps'] // 10)
+            if not skip_frame:
+                cv2.imshow("c",im)
+                cv2.waitKey(1)
+            if fig and not skip_frame :
+                self._render_mplib_fig(fig)
         elif mode == 'file':
             imfile = self._next_image_file()
             cv2.imwrite(imfile, im)
@@ -704,10 +714,9 @@ class DeepmindLab(gym.Env):
                     os.path.join(os.path.dirname(imfile),
                                 "top_view_{}".format(os.path.basename(imfile)))
                     , dpi=80)
-        elif mode == 'return':
-            return (im, fig)
         else:
             raise ValueError("bad mode: {}".format(mode))
+        return (im, fig)
 
     def _seed(self, seed=None):
         if seed is not None:
