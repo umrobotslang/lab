@@ -448,9 +448,8 @@ class _DeepmindLab(gym.Env):
 
     def _null_observations(self):
         obs = {}
-        for oname in [self.observation_types
-                      + self.additional_observation_types]:
-            ospec = self._obs_spec[oname]
+        for oname in self.observation_types + self.additional_observation_types:
+            ospec = self.observation_spec()[oname]
             obs[oname] = (np.zeros(ospec['shape'], ospec['dtype'])
                           if oname != self.RGB_OBS_TYPE
                           else self._obs_space.make_null())
@@ -587,7 +586,7 @@ class TopViewDeepmindLab(gym.Wrapper):
         else:
             warnings.warn("Top view not supported because "
                           + "{0}.entityLevel file not found".format(
-                              self.level_script))
+                              env.level_script))
         super(TopViewDeepmindLab, self).__init__(env=env)
         
     def _step(self, action):
