@@ -6,19 +6,22 @@ import itertools
 import getpass
 import random
 import string
+import warnings
 
 import numpy as np
 import cv2
-import matplotlib as mplib
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.backends import pylab_setup
 import deepmind_lab
 import gym
 from gym.envs.registration import register
 import logging
 from collections import namedtuple
+
+from top_view_renderer import TopView, MatplotlibVisualizer
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+curr_mod_dir = os.path.dirname(
+    os.path.abspath(os.path.dirname(__file__) or '.'))
 
 ### Calls a function only once and remembers the return value
 _called_once = dict()
@@ -385,173 +388,20 @@ class LogMethodCalls(object):
         else:
             object.__setattr__(self, attr, val)
 
-class EntityMap(object):
-    def __init__(self, entity_layer_file):
-        self.entity_layer_file = entity_layer_file
-        self._entity_layer_lines = None
-        self._width = None
-    
-    def entity_layer_lines(self):
-        if self._entity_layer_lines is None: 
-            with open(self.entity_layer_file) as ef:
-                self._entity_layer_lines = ef.readlines()
-        return self._entity_layer_lines
 
-    def wall_coordinates_from_string(self, size=(100, 100)):
-        wall_coords = []
-        for row, line in enumerate(self.entity_layer_lines()):
-            row_inv = self.height() - row - 1
-            for col, char in enumerate(line):
-                if char == "*":
-                    yield (col * size[0], row_inv * size[1])
-
-    def height(self):
-        return len(self.entity_layer_lines())
-
-    def width(self):
-        if self._width is None:
-            self._width = max(len(l) for l in self.entity_layer_lines()) - 1
-        return self._width
-
-class TopView(object):
-    def __init__(self, assets_top_dir=None, level_script=None, draw_fq=20):
-        self._ax = None
-        self.draw_fq = draw_fq
-        self.assets_top_dir = assets_top_dir
-        self.level_script = level_script
-        self.block_size = np.asarray((100, 100))
-        self._entity_map = EntityMap(self._entity_file())
-        self._top_view_episode_map = TopViewEpisodeMap(self)
-        self._entity_file_available = os.path.exists(self._entity_file())
-        
-    def supported(self):
-        return self._entity_file_available
-
-    def _make_axes(self):
-        fig = mplib.figure.Figure(figsize=(4,4))
-        # TODO: axes width/height are assumed to be in 1:1 ratio
-        # and expected to be handled in by set_aspect later. This is
-        # problematic because we depend on matplotlib magic
-        ax = fig.gca() if fig.axes else fig.add_axes([0, 0, 1, 1])
-        return ax
-
-    def get_axes(self):
-        if self._ax is None:
-            self._ax = self._make_axes()
-        return self._ax
-
-    def _entity_file(self):
-        return os.path.join(
-            self.assets_top_dir
-            , "assets/game_scripts/{}.entityLayer".format(self.level_script))
-    
-    def add_pose(self, pose):
-        if self.supported():
-            self._top_view_episode_map.add_pose(pose)
-
-    def add_goal(self, goal_loc):
-        if self.supported():
-            self._top_view_episode_map.add_goal(goal_loc)
-
-    def draw(self):
-        if self.supported():
-            self._top_view_episode_map.draw()
-            return self.get_axes().figure
-    
-    def reset(self):
-        if self.supported():
-            self._top_view_episode_map = TopViewEpisodeMap(self)
-
-class TopViewEpisodeMap(object):
-    def __init__(self, top_view):
-        self._top_view = top_view
-        self._entity_map = top_view._entity_map
-        self.poses2D = np.empty((0,3)) # x,y,yaw
-        self._goal_loc = None
-        self._drawn_once = False
-
-    def add_pose(self, pose):
-        self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
-
-    def add_goal(self, goal_loc):
-        self._goal_loc = goal_loc
-
-    def draw(self):
-        if self.poses2D.shape[0] % self.draw_fq == 0:
-            self._draw() 
-
-    def map_height(self):
-        return self._entity_map.height()
-
-    def map_width(self):
-        return self._entity_map.width()
-        
-    def wall_coordinates_from_string(self, **kwargs):
-        return self._entity_map.wall_coordinates_from_string(**kwargs)
-    
-    @property
-    def block_size(self):
-        return self._top_view.block_size
-    
-    def get_axes(self):
-        return self._top_view.get_axes()
-
-    def _goal_patch(self, coord):
-        goal_size = self.block_size * 0.67
-        goal_pos_offset = (self.block_size - goal_size) / 2
-        return mplib.patches.Rectangle( coord+goal_pos_offset,
-            goal_size[0], goal_size[1] , color='g' , fill=True)
-    
-    def _draw_goal(self, ax):
-        goal_loc = self._goal_loc
-        xyblocks = np.asarray((goal_loc[1] - 1, self.map_height() - goal_loc[0]))
-        xy = xyblocks * self.block_size
-        ax.add_patch(self._goal_patch(xy))
-        self._goal_drawn = True
-        
-    def _wall_patch(self, coord):
-        return mplib.patches.Rectangle(
-                coord, self.block_size[0], self.block_size[1]
-                , fill=True)
-
-    def _draw_map(self, ax):
-        for coord in self.wall_coordinates_from_string(size=self.block_size):
-            ax.add_patch(self._wall_patch(coord))
-
-    def draw(self):
-        self._draw_once()
-        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b,')
-        self.poses2D = self.poses2D[-1:, :]
-        
-    def _draw_once(self):
-        if not self._drawn_once:
-            ax = self._top_view.get_axes()
-            ax.clear()
-            # Do not use ax.axis('equal') because it sets adjustable='datalim'
-            # which cases xlim/ylim to change later.
-            ax.set_aspect('equal', adjustable='box')
-            ax.set_autoscale_on(False)
-            ax.autoscale_view(tight=True)
-            ax.set_xlim(0, self.map_width() * self.block_size[0])
-            ax.set_ylim(0, self.map_height() * self.block_size[1])
-            self._draw_map(ax)
-            self._draw_goal(ax)
-            self._drawn_once = True
-
-class DeepmindLab(gym.Env):
+class _DeepmindLab(gym.Env):
     metadata = {'render.modes': ['human', 'file', 'return']}
     RGB_OBS_TYPE = 'RGB_INTERLACED'
     VELT_OBS_TYPE = 'VEL.TRANS'
     VELR_OBS_TYPE = 'VEL.ROT'
-    RGBD_OBS_TYPE = 'RGBD'
+    RGBD_OBS_TYPE = 'RGBD_INTERLACED'
     POSE_OBS_TYPE = 'POSE'
     GOAL_OBS_TYPE = 'GOAL.LOC'
     def __init__(self, level_script, config, action_mapper
                  , enable_velocity=False
                  , enable_depth=False
                  , additional_observation_types = []):
-        self.observation_types = [self.RGB_OBS_TYPE] \
-                                  + additional_observation_types
+        self.observation_types = [self.RGB_OBS_TYPE]
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
         self.level_script = level_script
@@ -564,39 +414,42 @@ class DeepmindLab(gym.Env):
                                        , self.VELR_OBS_TYPE]
 
         if self.enable_depth:
-            self.observation_types += [self.RGBD_OBS_TYPE]
+            self.observation_types.remove(self.RGB_OBS_TYPE)
+            self.observation_types.append(self.RGBD_OBS_TYPE)
 
-        self._curr_mod_dir = os.path.dirname(os.path.dirname(__file__) or '.')
-        self._top_view = TopView(self._curr_mod_dir, self.level_script)
-        if self._top_view.supported():
-            self.observation_types += [self.POSE_OBS_TYPE
-                                       , self.GOAL_OBS_TYPE]
-        with ChDirCtxt(self._curr_mod_dir):
-            dlenv = deepmind_lab.Lab(level_script
-                                            , self.observation_types
-                                            , {k: str(v)
-                                               for k, v in config.items()})
-        # Wraps all the callable methods so that they are called from
-        # the current module directory
-        self._dl_env = CallMethodsWithCtxt(dlenv
-                                           , ChDirCtxt(self._curr_mod_dir))
-        self._dl_env.reset()
-
-        self._action_space = ActionSpace(self._dl_env.action_spec(), config
-                                         , action_mapper)
+        self.curr_mod_dir = curr_mod_dir
+        self._dl_env = None
+        self._action_space = None
+        self._obs_space = None
+        self._obs_spec = None
         self._current_velocities = action_mapper.initial_deepmind_velocities()
-        self._obs_spec = dict([(o['name'], o)
-                               for o in self._dl_env.observation_spec()])
-        self._obs_space = ObservationSpace(self._obs_spec[self.RGB_OBS_TYPE])
-        self._last_obs = self._obs_space.make_null()
+        self._last_obs = None
         self._last_info = {}
-        self._img_save_index = 0
-        self._render_fig_manager = None
-        self._render_backend_mod = None
+        self._step_source = None
+        self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
+
+    def _dm_lab_env(self):
+        # Delayed initialization of lab env so that one can override
+        # various parameters
+        if self._dl_env is None:
+            with ChDirCtxt(curr_mod_dir):
+                observation_types = self.observation_types \
+                                            + self.additional_observation_types
+                dlenv = deepmind_lab.Lab(self.level_script
+                                         , observation_types
+                                         , {k: str(v)
+                                            for k, v in self.lab_config.items()})
+            # Wraps all the callable methods so that they are called from
+            # the current module directory
+            self._dl_env = CallMethodsWithCtxt(dlenv
+                                            , ChDirCtxt(curr_mod_dir))
+            self._dl_env.reset()
+        return self._dl_env
 
     def _null_observations(self):
         obs = {}
-        for oname in self.observation_types:
+        for oname in [self.observation_types
+                      + self.additional_observation_types]:
             ospec = self._obs_spec[oname]
             obs[oname] = (np.zeros(ospec['shape'], ospec['dtype'])
                           if oname != self.RGB_OBS_TYPE
@@ -604,27 +457,41 @@ class DeepmindLab(gym.Env):
         return obs
 
     def _next_image_file(self):
-        filename = '/tmp/{user}/{klass}/{level_script}/{index:04d}.png'.format(
+        filename = self.img_save_file_template.format(
             user=getpass.getuser()
             , klass=self.__class__.__name__
             , level_script = self.level_script
-            , index=self._img_save_index)
-        if self._img_save_index == 0:
-            if not os.path.exists(os.path.dirname(filename)):
-                os.makedirs(os.path.dirname(filename))
-        self._img_save_index += 1
-        self._img_save_index = self._img_save_index % 10000
+            , index=self._step_source.get_current_step() % 100000)
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
         return filename
 
-    def _configure(self, *args, **kwargs):
-        pass
+    def _configure(self, step_source, *args, **kwargs):
+        self._step_source = step_source
+        try:
+            _ = step_source.get_current_step
+        except AttributeError:
+            raise ValueError("Need to be able to call model.get_current_step")
 
     @property
     def action_space(self):
+        if self._action_space is None:
+            self._action_space = ActionSpace(self._dm_lab_env().action_spec()
+                                             , self.lab_config
+                                             , self.action_mapper)
         return self._action_space
+
+    def observation_spec(self):
+        if self._obs_spec is None:
+            self._obs_spec = dict(
+                [(o['name'], o) for o in self._dm_lab_env().observation_spec()])
+        return self._obs_spec
 
     @property
     def observation_space(self):
+        if self._obs_space is None:
+            self._obs_space = ObservationSpace(
+                self.observation_spec()[self.RGB_OBS_TYPE])
         return self._obs_space
 
     @property
@@ -632,20 +499,20 @@ class DeepmindLab(gym.Env):
         return [-1, 100]
 
     def _observations(self):
-        if self._dl_env.is_running():
-            obs = self._dl_env.observations()
-            if self._top_view.supported():
-                self._top_view.add_pose(obs[self.POSE_OBS_TYPE])
-                self._top_view.add_goal(obs[self.GOAL_OBS_TYPE])
+        if self._dm_lab_env().is_running():
+            obs = self._dm_lab_env().observations()
         else:
             obs = self._null_observations()
 
-        self._last_obs = obs[self.RGB_OBS_TYPE]
+        if self.enable_depth:
+            self._last_obs = obs[self.RGBD_OBS_TYPE][:, :, :3]
+            self._last_info['depth'] = obs[self.RGBD_OBS_TYPE][:, :, 3]
+        else:
+            self._last_obs = obs[self.RGB_OBS_TYPE]
+
         if self.enable_velocity:
             self._last_info['vel'] = np.hstack((obs[self.VELT_OBS_TYPE]
                                                 , obs[self.VELR_OBS_TYPE]))
-        if self.enable_depth:
-            self._last_info['depth'] = obs[self.RGBD_OBS_TYPE][3]
         for ot in self.additional_observation_types:
             self._last_info[ot] = obs[ot]
 
@@ -662,10 +529,10 @@ class DeepmindLab(gym.Env):
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action, self._current_velocities)
         self._current_velocities = deepmind_lab_actions
-        reward = self._dl_env.step(deepmind_lab_actions , num_steps=1)
-        episode_over = (not self._dl_env.is_running())
+        reward = self._dm_lab_env().step(deepmind_lab_actions , num_steps=1)
+        episode_over = (not self._dm_lab_env().is_running())
         observations, info = self._observations()
-        
+
         # output checking
         assert isinstance(reward, numbers.Number), \
             'Reward outside numbers'
@@ -674,25 +541,12 @@ class DeepmindLab(gym.Env):
         return observations, reward, episode_over, info
 
     def _reset(self):
-        self._dl_env.reset()
+        self._dm_lab_env().reset()
         # Reset the velociries
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
-        self._top_view.reset()
         obs, _ = self._observations()
         return obs
-
-    def _render_mplib_fig(self, fig):
-        if self._render_fig_manager is None:
-            # Chooses the backend_mod based on matplotlib configuration
-            self._render_backend_mod = pylab_setup()[0]
-            mplib.interactive(True)
-            self._render_fig_manager = \
-                self._render_backend_mod.new_figure_manager_given_figure(1, fig)
-        self._render_fig_manager.canvas.figure = fig
-        self._render_fig_manager.canvas.draw()
-        self._render_backend_mod.show(block=False)
-        return self._render_fig_manager
 
     def _render(self, mode='human', close=False):
         if close:
@@ -701,31 +555,85 @@ class DeepmindLab(gym.Env):
         if self._last_obs is None:
             return
         im = cv2.cvtColor(self._last_obs, cv2.COLOR_RGB2BGR)
-        fig = self._top_view.draw()
         if mode == 'return':
             pass
         elif mode == 'human':
-            skip_frame = self._img_save_index % (self.lab_config['fps'] // 10)
-            if not skip_frame:
-                cv2.imshow("c",im)
-                cv2.waitKey(1)
-            if fig and not skip_frame :
-                self._render_mplib_fig(fig)
+            cv2.imshow("c",im)
+            cv2.waitKey(1)
         elif mode == 'file':
+            warnings.warn("""mode = file is deprecated. Use mode =
+            return and write on your own write to file logic.  You may
+            want to use class MatplotlibVisualizer to render or
+            print_figure""", warnings.DeprecationWarning)
             imfile = self._next_image_file()
             cv2.imwrite(imfile, im)
-            if fig:
-                FigureCanvasAgg(fig).print_figure(
-                    os.path.join(os.path.dirname(imfile),
-                                "top_view_{}".format(os.path.basename(imfile)))
-                    , dpi=80)
         else:
             raise ValueError("bad mode: {}".format(mode))
-        return (im, fig)
+        return im
 
     def _seed(self, seed=None):
         if seed is not None:
             np.random.seed(seed)
+
+class TopViewDeepmindLab(gym.Wrapper):
+    def __init__(self, env=None):
+        assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
+        self._top_view = TopView(env.curr_mod_dir, env.level_script)
+        if self._top_view.supported():
+            self.old_additional_observation_types = \
+                env.additional_observation_types
+            env.additional_observation_types += [
+                env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
+        else:
+            warnings.warn("Top view not supported because "
+                          + "{0}.entityLevel file not found".format(
+                              self.level_script))
+        super(TopViewDeepmindLab, self).__init__(env=env)
+        
+    def _step(self, action):
+        obs, reward, done, info = self.env._step(action)
+        if self._top_view.supported():
+            self._top_view.add_pose(info[self.env.POSE_OBS_TYPE])
+            self._top_view.add_goal(info[self.env.GOAL_OBS_TYPE])
+            for obs_type in (self.env.POSE_OBS_TYPE, self.env.GOAL_OBS_TYPE):
+                if obs_type not in self.old_additional_observation_types:
+                    del info[obs_type]
+                
+        return obs, reward, done, info
+
+    def _reset(self):
+        obs = self.env._reset()
+        self._top_view.reset()
+        return obs
+
+    def _render(self, mode='human', close=False):
+        if close:
+            return
+        im = self.env._render(mode=mode, close=close)
+        fig = self._top_view.draw()
+        if mode == 'return':
+            pass # returns (im, fig)
+        elif mode == 'human':
+            if fig:
+                self._top_view.render(fig)
+        elif mode == 'file':
+            if fig:
+                dpi = self.env.lab_config['height'] / fig.get_size_inches()[0]
+                self._top_view.print_figure(
+                    fig
+                    , os.path.join(os.path.dirname(imfile),
+                                "top_view_{}".format(os.path.basename(imfile)))
+                    , dpi=dpi)
+        else:
+            raise ValueError("bad mode: {}".format(mode))
+        return (im, fig)
+
+    def __getattr__(self, attr):
+        return getattr(self.env, attr)
+
+class DeepmindLab(TopViewDeepmindLab):
+    def __init__(self, *args, **kwargs):
+        super(DeepmindLab, self).__init__(env=_DeepmindLab(*args, **kwargs))
 
 ActionMapperDiscrete = ActionMapper("discrete")
 ActionMapperAcceleration = ActionMapper("acceleration")
@@ -751,3 +659,50 @@ def register_and_make(*args, **kwargs):
     entry_point_name = "DeepmindLab" + name
     env_id = register_gym_env(entry_point_name, args, kwargs)
     return gym.make(env_id)
+
+if __name__ == '__main__':
+    class A(object):
+        def get_current_step(self):
+            return 1
+
+    # level_script = "seekavoid_arena_01"
+    # env = DeepmindLab(level_script
+    #                   , dict(height=336, width=336, fps=60)
+    #                   , ActionMapperDiscrete
+    #                   , enable_velocity = True
+    #                   , enable_depth = False)
+    # env.configure(A())
+    # for _ in range(100):
+    #     obs, reward, done, info = env.step(env.action_space.sample())
+    #     im, fig = env.render(mode='human')
+    #     assert fig is None
+    #     cv2.imwrite("/tmp/{user}_{level_script}_test.png".format(
+    #         user=getpass.getuser()
+    #         , level_script=level_script)
+    #         , im)
+
+    # obs = env.reset()
+    level_script = "small_star_map_random_goal_01"
+    env = DeepmindLab(level_script
+                      , dict(height=336, width=336, fps=60)
+                      , ActionMapperDiscrete
+                      , enable_velocity = True
+                      , enable_depth = False
+                      , additional_observation_types = [_DeepmindLab.GOAL_OBS_TYPE])
+    env.configure(A())
+    
+    mplibvis = MatplotlibVisualizer()
+    for _ in range(100):
+        obs, reward, done, info = env.step(env.action_space.sample())
+        im, fig = env.render(mode='human')
+        im_filename = "/tmp/{user}_{level_script}_test.png".format(
+            user=getpass.getuser()
+            , level_script=level_script)
+        print("Writing to filename : {}".format(im_filename))
+        cv2.imwrite(im_filename , im)
+        fig_filename = "/tmp/{user}_{level_script}_top_view_test.png".format(
+                                  user=getpass.getuser()
+                                  , level_script=level_script)
+        print("Writing to filename : {}".format(fig_filename))
+        mplibvis.print_figure(fig , fig_filename , dpi=84)
+    obs = env.reset()
