@@ -10,6 +10,7 @@ import string
 import numpy as np
 import cv2
 import matplotlib as mplib
+mplib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
 import deepmind_lab
