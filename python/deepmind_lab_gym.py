@@ -71,6 +71,12 @@ class L2NActionMapper(object):
     """ 
     """
     DEEPMIND_ACTION_DIM = 7
+    ACTIONS = namedtuple('ACTIONS'
+                         , """ROT_LEFT ROT_RIGHT 
+                         ACC_ROT_LEFT ACC_ROT_RIGHT
+                         ACC_STRAFE_LEFT ACC_STRAFE_RIGHT
+                         ACC_MOVE_FORWARD ACC_MOVE_BACK""".split())(
+                             *range(8))
     def __init__(self, inc_mat, rel_mask_mat):
         assert self.DEEPMIND_ACTION_DIM == inc_mat.shape[0]
         assert self.DEEPMIND_ACTION_DIM == rel_mask_mat.shape[0]
@@ -140,6 +146,10 @@ class ActionMapper(object):
     # Move left, move right, move back, move forward
     INPUT_ACTION_SIZE = 4 
     DEEPMIND_ACTION_DIM = 7
+    ACTIONS = namedtuple('ACTIONS'
+                         , """ROT_LEFT ROT_RIGHT 
+                         MOVE_FORWARD MOVE_BACK""".split())(
+                             *range(INPUT_ACTION_SIZE))
     def __init__(self, mm_type):
         assert self.DEEPMIND_ACTION_DIM == self.ACTION_SPACE_INC.shape[0]
         assert self.INPUT_ACTION_SIZE == self.ACTION_SPACE_INC.shape[1]
@@ -200,21 +210,7 @@ class ActionMapper(object):
         return np.zeros(self.DEEPMIND_ACTION_DIM)
 
 class ActionSpace(gym.Space):
-    ACT_LOOK_YAW   = 'LOOK_LEFT_RIGHT_PIXELS_PER_FRAME'
-    ACT_LOOK_PITCH = 'LOOK_DOWN_UP_PIXELS_PER_FRAME'
-    ACT_MOVE_Y     = 'STRAFE_LEFT_RIGHT'
-    ACT_MOVE_X     = 'MOVE_BACK_FORWARD'
-    ACT_FIRE       = 'FIRE'
-    ACT_JUMP       = 'JUMP'
-    ACT_CROUCH     = 'CROUCH'
-    ACTION_SET     = [ACT_LOOK_YAW, ACT_LOOK_PITCH, ACT_MOVE_Y,
-                      ACT_MOVE_X, ACT_FIRE, ACT_JUMP, ACT_CROUCH]
-
     def __init__(self, action_spec, config, action_mapper):
-        assert all(a['name'] == act
-                   for a, act in zip(action_spec, self.ACTION_SET)), \
-                       "Unexpected action spec {}".format(action_spec)
-
         self.action_spec = action_spec
         self.frame_width = config['width']
         self.frame_height = config['height']
@@ -225,6 +221,9 @@ class ActionSpace(gym.Space):
         self.maxs = np.array([a['max'] for a in self.action_spec])
 
         self._action_mapper = action_mapper
+
+    def actions(self):
+        return self._action_mapper.ACTIONS
 
     def size(self):
         """ size of action space """
