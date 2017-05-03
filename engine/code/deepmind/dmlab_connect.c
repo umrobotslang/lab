@@ -104,6 +104,7 @@ typedef struct GameContext_s {
   int step;
   double total_engine_time_msec;  // This is step * engine_frame_period_msec.
   double score;
+  bool noclip;
 } GameContext;
 
 
@@ -139,6 +140,9 @@ static void load_map(GameContext* gc) {
     Com_Frame();
   }
   ctx->hooks.add_bots(ctx->userdata);
+  if (gc->noclip) {
+    CL_ForwardCommandToServer(va("noclip ON"));
+  }
   printf("Map loaded: '%s'\n", next_map);
   fflush(stdout);
 }
@@ -267,6 +271,8 @@ static int dmlab_setting(void* context, const char* key, const char* value) {
     if (quote) {
       Q_strcat(gc->command_line, sizeof(gc->command_line), "\"");
     }
+  } else if (strcmp(key, "noclip") == 0) {
+    gc->noclip = true;
   } else {
     ctx->hooks.add_setting(ctx->userdata, key, value);
   }
