@@ -173,6 +173,9 @@ class TopViewEpisodeMap(object):
         self.poses2D = self.poses2D[-1:, :]
         
     def _draw_once(self):
+        if self._goal_loc is None:
+            # Do not draw yet, the goal loc is not avaliable
+            return
         if not self._drawn_once:
             ax = self._top_view.get_axes()
             ax.clear()
