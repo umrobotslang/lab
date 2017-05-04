@@ -427,6 +427,12 @@ class _DeepmindLab(gym.Env):
         self._step_source = None
         self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
 
+    def unset_dl_env(self):
+        self._dl_env = None
+
+    def environment_name(self):
+        return self._dm_lab_env().environment_name()
+
     def _dm_lab_env(self):
         # Delayed initialization of lab env so that one can override
         # various parameters
@@ -576,7 +582,8 @@ class _DeepmindLab(gym.Env):
 class TopViewDeepmindLab(gym.Wrapper):
     def __init__(self, env=None):
         assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
-        self._top_view = TopView(env.curr_mod_dir, env.level_script)
+        super(TopViewDeepmindLab, self).__init__(env=env)
+        self._top_view = TopView(env.curr_mod_dir, env.environment_name())
         if self._top_view.supported():
             self.old_additional_observation_types = \
                 env.additional_observation_types
@@ -585,7 +592,8 @@ class TopViewDeepmindLab(gym.Wrapper):
         else:
             warnings.warn("Top view not supported because "
                           + "{0}.entityLevel file not found".format(
-                              env.level_script))
+                              env.environment_name()))
+        env.unset_dl_env()
         super(TopViewDeepmindLab, self).__init__(env=env)
         
     def _step(self, action):
@@ -608,6 +616,12 @@ class TopViewDeepmindLab(gym.Wrapper):
         if close:
             return
         im = self.env._render(mode=mode, close=close)
+        self._top_view.set_entity_layer(self.env.environment_name())
+        if not self._top_view.supported():
+            warnings.warn("Top view not supported because "
+                    + "{0}.entityLevel file not found".format(
+                        self.env.environment_name()))
+
         fig = self._top_view.draw()
         if mode == 'return':
             pass # returns (im, fig)

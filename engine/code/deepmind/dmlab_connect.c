@@ -105,6 +105,7 @@ typedef struct GameContext_s {
   double total_engine_time_msec;  // This is step * engine_frame_period_msec.
   double score;
   bool noclip;
+  char latest_map[MAX_STRING_CHARS];
 } GameContext;
 
 
@@ -132,6 +133,7 @@ static int first_start(GameContext* gc) {
 static void load_map(GameContext* gc) {
   DeepmindContext* ctx = gc->dm_ctx;
   const char* next_map = ctx->hooks.next_map(ctx->userdata);
+  strcpy(gc->latest_map, next_map);
   Cmd_ExecuteString(va("devmap %s", next_map));
   Cvar_Set("fixedtime", va("%d", gc->engine_frame_period_msec));
   Com_Frame();
@@ -318,7 +320,8 @@ static int dmlab_start(void* context, int episode_id, int seed) {
 }
 
 static const char* dmlab_environment_name(void* context) {
-  return "deepmind_lab";
+  GameContext* gc = context;
+  return gc->latest_map;
 }
 
 static int dmlab_action_discrete_count(void* context) {

@@ -10,11 +10,12 @@ function make_map.getpid()
   return pid
 end
 
-local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', make_map.getpid())
+--local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', make_map.getpid())
+local LEVEL_DATA = string.format('/tmp/dmlab_level_data_%d', 0)
 make_map.proxy_mt.__gc = function (proxy)
-   local cmd = 'rm -rf ' .. LEVEL_DATA .. '/baselab'
-   print("executing " .. cmd)
-   os.remove(cmd)
+   --local cmd = 'rm -rf ' .. LEVEL_DATA .. '/baselab'
+   --print("executing " .. cmd)
+   --os.remove(cmd)
 end
 
 -- See definitions in pickups.lua
@@ -23,8 +24,9 @@ local pickups = {
     L = 'lemon_reward',
     S = 'strawberry_reward',
     F = 'fungi_reward',
-    W = 'Watermelon',
+    W = 'watermelon_goal',
     G = 'goal',
+    M = 'Mango',
 }
 
 function make_map.makeMap(mapName, mapEntityLayer, mapVariationsLayer)

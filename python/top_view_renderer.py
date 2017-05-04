@@ -67,6 +67,9 @@ class TopView(object):
         self._top_view_episode_map = TopViewEpisodeMap(self)
         self._mplib_visualizer = MatplotlibVisualizer()
 
+    def set_entity_layer(self, entity_layer):
+        self.level_script = entity_layer
+
     def render(self, fig):
         self._mplib_visualizer.render(fig)
 

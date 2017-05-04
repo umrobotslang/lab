@@ -33,7 +33,7 @@ function factory.createLevelApi(kwargs)
   
   function api:start(episode, seed, params)
     api._time_remaining = kwargs.episodeLengthSeconds
-    random.seed(seed + 13)
+    random.seed(seed)
     local height, width = maze:size()
     local possibleGoalLocations = {}
     for r = 1,height do

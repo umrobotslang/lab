@@ -248,6 +248,10 @@ static PyObject* Lab_is_running(LabObject* self) {
   }
 }
 
+static PyObject* Lab_environment_name(LabObject* self) {
+    return PyString_FromString(self->env_c_api->environment_name(self->context));
+}
+
 static PyObject* Lab_step(LabObject* self, PyObject* args, PyObject* kwds) {
   PyObject* action_obj = NULL;
   int num_steps = 1;
@@ -446,6 +450,7 @@ static PyMethodDef LabObject_methods[] = {
     {"observations", (PyCFunction)Lab_observations, METH_NOARGS,
      "Get the observations"},
     {"close", (PyCFunction)Lab_close, METH_NOARGS, "Close the environment"},
+    {"environment_name", (PyCFunction)Lab_environment_name, METH_NOARGS, "Return current map name" },
     {NULL} /* Sentinel */
 };
 
