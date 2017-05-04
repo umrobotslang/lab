@@ -10,6 +10,26 @@ local tensor = require 'dmlab.system.tensor'
 local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
 local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
+local function parsePossibleGoalLocations(maze)
+    local height, width = maze:size()
+    local possibleGoalLocations = {}
+    for r = 1,height do
+        for c = 1,width do
+            if maze:getEntityCell(r, c) == "G" then
+                possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
+                logger:debug(string.format("Found G at (%d, %d)", r, c))
+            end
+        end
+    end
+    local goalLocationKeySet = {}
+    for i = 1,#possibleGoalLocations do
+       local r,c = unpack(possibleGoalLocations[i])
+       local rc_key = string.format("%d %d", r, c)
+       logger:debug("Inserting key : " .. rc_key)
+       goalLocationKeySet[rc_key] = true
+    end
+    return possibleGoalLocations, goalLocationKeySet
+end
 
 --[[ Creates a Nav Maze Random Goal.
 Keyword arguments:
@@ -25,6 +45,7 @@ function factory.createLevelApi(kwargs)
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
+  local possibleGoalLocations, goalLocationKeySet = parsePossibleGoalLocations(maze)
   local api = {}
 
   function api:createPickup(class_name)
@@ -35,16 +56,6 @@ function factory.createLevelApi(kwargs)
     api._time_remaining = kwargs.episodeLengthSeconds
     random.seed(seed)
     local height, width = maze:size()
-    local possibleGoalLocations = {}
-    for r = 1,height do
-        for c = 1,width do
-            if maze:getEntityCell(r, c) == "G" then
-                possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
-                logger:debug(string.format("Found G at (%d, %d)", r, c))
-            end
-        end
-    end
-
     if next(possibleGoalLocations) ~= nil then
         local chosen_goal_index = random.uniformInt(
             1, #possibleGoalLocations)
@@ -67,8 +78,8 @@ function factory.createLevelApi(kwargs)
     maze:visitFill{cell = api._goal, func = function(row, col, distance)
       logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
       -- Axis is flipped in DeepMind Lab.
-      row = height - row + 1
-      local key = ''.. (col * 100 - 50) .. ' ' .. (row * 100 - 50)
+      local key = ''.. (col * 100 - 50) .. ' ' .. (
+         (height - row + 1) * 100 - 50)
 
       if distance == 0 then
         goal_location = key
@@ -76,8 +87,13 @@ function factory.createLevelApi(kwargs)
       if distance > 0 then
         fruit_locations[#fruit_locations + 1] = key
       end
-      if distance > kwargs.minSpawnGoalDistance then
-          logger:debug(string.format("possible spawn location :(%d, %d): ", row, col)
+      local direct_key = string.format("%d %d", row, col)
+      logger:debug("Checking key " .. direct_key)
+      if distance > kwargs.minSpawnGoalDistance and
+         goalLocationKeySet[direct_key]
+      then
+        logger:debug(
+            string.format("possible spawn location :(%d, %d): ", row, col)
                     .. key)
         all_spawn_locations[#all_spawn_locations + 1] = key
       end
