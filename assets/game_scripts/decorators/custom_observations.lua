@@ -45,7 +45,7 @@ function custom_observations.decorate(api)
     custom_observations.add_spec('VEL.TRANS', 'Doubles', {3}, velocity)
     custom_observations.add_spec('VEL.ROT', 'Doubles', {3}, angularVelocity)
     custom_observations.add_spec('POSE', 'Doubles', {6}, pose)
-    return init and init(params)
+    return init and init(api, params)
   end
 
   local customObservationSpec = api.customObservationSpec

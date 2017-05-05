@@ -17,8 +17,9 @@ local episodeLengthSeconds = 20
 local maze = maze_gen.MazeGeneration{entity = entityLayer}
 local map_height, map_width = maze:size()
 local api = {}
+
 function api:init(params)
-  if params.spawn_origin then
+  if params and params.spawn_origin then
     api._info_player_start = {
        classname = "info_player_start"
        , origin = params.spawn_origin .. ' 30' }
@@ -28,7 +29,7 @@ function api:init(params)
     end
   end
 
-  if params.goal_loc then
+  if params and params.goal_loc then
       local coords = {}
       for x in params.goal_loc:gmatch("%S+") do
           coords[#coords + 1] = tonumber(x)
@@ -50,7 +51,7 @@ function api:updateSpawnVars(spawnVars)
   if spawnVars.classname == "info_player_start" then
      return api._info_player_start or spawnVars
   elseif spawnVars.classname == "goal" then
-      if spawnVars.origin == api._goal_loc.origin then
+      if api._goal_loc and spawnVars.origin == api._goal_loc.origin then
           return api._goal_loc
       else
           return
