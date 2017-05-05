@@ -50,7 +50,8 @@ static void UI_CreditMenu_Draw_deepmind( void ) {
 
 	// Deepmind Evaluation
 	static const char *names[] = {
-		"DeepMind Team",
+		"Robotslang Team",
+		"Deepmind Team",
 		NULL
 	};
 
@@ -64,7 +65,7 @@ static void UI_CreditMenu_Draw_deepmind( void ) {
 		y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	}
 
-	UI_DrawString( 320, 459, "www.deepmind.com", UI_CENTER|UI_SMALLFONT, color_blue );
+	UI_DrawString( 320, 459, "robotslang.eecs.umich.edu", UI_CENTER|UI_SMALLFONT, color_blue );
 }
 
 
@@ -81,6 +82,9 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 	//  probably incomplete.
 	// (These are in alphabetical order, for the defense of everyone's egos.)
 	static const char *names[] = {
+		"Vikas Dhiman",
+		"Shurjo Banerjee",
+		"...",
 		"Tim Angus",
 		"James Canete",
 		"Vincent Cojot",

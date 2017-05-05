@@ -73,6 +73,18 @@ function helpers.dir(obj,level)
   return s
 end
 
+local BLOCKSIZE = 100
+function helpers.text_row_col_to_map_xy(row, col, height)
+  -- Axis is flipped in DeepMind Lab.
+  return ((col - 0.5) * BLOCKSIZE), ((height - row + 0.5) * BLOCKSIZE)
+end
+
+function helpers.map_xy_to_text_row_col(x, y, height)
+  -- Axis is flipped in DeepMind Lab.
+  return (height - math.floor(y/BLOCKSIZE)), math.floor(x/BLOCKSIZE) + 1
+end
+
+
 local Logger = {}
 Logger.DEBUG = 3
 Logger.NONE = 0

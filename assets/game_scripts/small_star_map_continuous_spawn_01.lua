@@ -1,5 +1,5 @@
 local random = require 'common.random'
-local factory = require 'factories.text_random_spawn_factory'
+local factory = require 'factories.text_continuous_spawn_factory'
 
 -- Requirements for entityLayer while makeMap
 -- (Handled by entityLayer:gsub("[GAP ]", "P", 1):gsub("[GAP ]", "A"))

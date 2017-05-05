@@ -72,17 +72,12 @@ function factory.createLevelApi(kwargs)
     return pickups.defaults[class_name]
   end
 
-  local BLOCKSIZE = 100
+  local height, width = maze:size()
   local function text_row_col_to_map_xy(row, col)
-    local height, width = maze:size()
-    -- Axis is flipped in DeepMind Lab.
-    return ((col - 0.5) * BLOCKSIZE), ((height - row + 0.5) * BLOCKSIZE)
+      return helpers.text_row_col_to_map_xy(row, col, height)
   end
-
   local function map_xy_to_text_row_col(x, y)
-    local height, width = maze:size()
-    -- Axis is flipped in DeepMind Lab.
-    return (height - math.floor(y/BLOCKSIZE)), math.floor(x/BLOCKSIZE) + 1
+      return helpers.map_xy_to_text_row_col(x, y, height)
   end
 
   local function text_row_col_to_map_key(row, col)
