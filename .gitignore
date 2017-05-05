@@ -3,3 +3,4 @@ build
 deepmind_module_install
 *.pyc
 *.swp
+TAGS
