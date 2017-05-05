@@ -14,10 +14,10 @@ function api:start(episode, seed)
   local entityLevel = [[
 *********
 **G   F**
+****A****
 **** ****
 **** ****
-**** ****
-**** ****
+****A****
 **** ****
 **P   S**
 *********
@@ -48,11 +48,12 @@ function api:createPickup(className)
 end
 
 function api:nextMap()
-    if (api.mapName == "i_maze_goal") then
-        api.mapName = "i_maze_fungi"
-    else
-        api.mapName = "i_maze_goal"
-    end
+    api.mapName = "i_maze_fungi"
+    --if (api.mapName == "i_maze_goal") then
+    --    api.mapName = "i_maze_fungi"
+    --else
+    --    api.mapName = "i_maze_fungi"
+    --end
     return api.mapName
 end
 

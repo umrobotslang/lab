@@ -567,6 +567,16 @@
 }
 
 {
+  "classname" "apple_reward"
+  "origin" "450 650 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "450 350 30"
+}
+
+{
   "classname" "info_player_start"
   "origin" "250 150 30"
 }
