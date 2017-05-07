@@ -85,6 +85,29 @@ function helpers.map_xy_to_text_row_col(x, y, height)
 end
 
 
+function helpers.parsePossibleGoalLocations(maze, intpairkey)
+    local height, width = maze:size()
+    local possibleGoalLocations = {}
+    for r = 1,height do
+        for c = 1,width do
+            if maze:getEntityCell(r, c) == "G" then
+                possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
+                --print(string.format("Found G at (%d, %d)", r, c))
+            end
+        end
+    end
+    local otherGoalLocations = {}
+    for i = 1,#possibleGoalLocations do
+       local r,c = unpack(possibleGoalLocations[i])
+       local rc_key = intpairkey(r, c)
+       local pgl = { unpack(possibleGoalLocations) }
+       table.remove(pgl, i)
+       otherGoalLocations[rc_key] = pgl
+    end
+    return possibleGoalLocations, otherGoalLocations
+end
+
+
 local Logger = {}
 Logger.DEBUG = 3
 Logger.NONE = 0

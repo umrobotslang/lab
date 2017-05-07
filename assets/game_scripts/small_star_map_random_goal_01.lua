@@ -44,6 +44,7 @@ end
 
 return factory.createLevelApi{
     mapName = mapName
+    , blankMapName = 'small_blank_map_all_goal_01'
     , entityLayer = entityLayer
     , episodeLengthSeconds = 20
     , scatteredRewardDensity = 0.2

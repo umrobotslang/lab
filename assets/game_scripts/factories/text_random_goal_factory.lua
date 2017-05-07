@@ -1,34 +1,17 @@
 local maze_gen = require 'dmlab.system.maze_generation'
-local game = require 'dmlab.system.game'
 local random = require 'common.random'
 local pickups = require 'common.pickups'
 local helpers = require 'common.helpers'
 local custom_observations = require 'decorators.custom_observations'
 local timeout = require 'decorators.timeout'
 local tensor = require 'dmlab.system.tensor'
+local pursuit_test_mode = require 'decorators.pursuit_test_mode'
 
 local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
 local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
-local function parsePossibleGoalLocations(maze)
-    local height, width = maze:size()
-    local possibleGoalLocations = {}
-    for r = 1,height do
-        for c = 1,width do
-            if maze:getEntityCell(r, c) == "G" then
-                possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
-                logger:debug(string.format("Found G at (%d, %d)", r, c))
-            end
-        end
-    end
-    local goalLocationKeySet = {}
-    for i = 1,#possibleGoalLocations do
-       local r,c = unpack(possibleGoalLocations[i])
-       local rc_key = string.format("%d %d", r, c)
-       logger:debug("Inserting key : " .. rc_key)
-       goalLocationKeySet[rc_key] = true
-    end
-    return possibleGoalLocations, goalLocationKeySet
+local function intpairkey(r, c)
+   return string.format("%d %d", r, c)
 end
 
 --[[ Creates a Nav Maze Random Goal.
@@ -45,15 +28,29 @@ function factory.createLevelApi(kwargs)
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
-  local possibleGoalLocations, goalLocationKeySet = parsePossibleGoalLocations(maze)
+  local possibleGoalLocations, otherGoalLocations = helpers.parsePossibleGoalLocations(maze, intpairkey)
+
+  local height, width = maze:size()
+  local function text_row_col_to_map_xy(row, col)
+      return helpers.text_row_col_to_map_xy(row, col, height)
+  end
+  local function map_xy_to_text_row_col(x, y)
+      return helpers.map_xy_to_text_row_col(x, y, height)
+  end
+
+  local function text_row_col_to_map_key(row, col)
+    local x, y = text_row_col_to_map_xy(row, col)
+    local key = x .. ' ' .. y
+    return key
+  end
+
   local api = {}
 
   function api:createPickup(class_name)
     return pickups.defaults[class_name]
   end
-  
-  function api:start(episode, seed, params)
-    api._time_remaining = kwargs.episodeLengthSeconds
+
+  function api:start(episode, seed)
     random.seed(seed)
     local height, width = maze:size()
     if next(possibleGoalLocations) ~= nil then
@@ -65,7 +62,7 @@ function factory.createLevelApi(kwargs)
         api._goal = {random.uniformInt(1, height),
                     random.uniformInt(1, width)}
     end
-    
+
     -- Add custom obsevations
     api._obs_value = {}
     api._obs_value[ goal_location_custom_obs.name ] =
@@ -78,8 +75,7 @@ function factory.createLevelApi(kwargs)
     maze:visitFill{cell = api._goal, func = function(row, col, distance)
       logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
       -- Axis is flipped in DeepMind Lab.
-      local key = ''.. (col * 100 - 50) .. ' ' .. (
-         (height - row + 1) * 100 - 50)
+      local key = text_row_col_to_map_key(row, col, intpairkey)
 
       if distance == 0 then
         goal_location = key
@@ -90,7 +86,7 @@ function factory.createLevelApi(kwargs)
       local direct_key = string.format("%d %d", row, col)
       logger:debug("Checking key " .. direct_key)
       if distance > kwargs.minSpawnGoalDistance and
-         goalLocationKeySet[direct_key]
+         otherGoalLocations[direct_key]
       then
         logger:debug(
             string.format("possible spawn location :(%d, %d): ", row, col)
@@ -108,13 +104,6 @@ function factory.createLevelApi(kwargs)
     api._all_spawn_locations = all_spawn_locations
   end
 
-  function api:pickup(spawn_id)
-    api._count = api._count + 1
-    if api._count == api._finish_count then
-      game:finishMap()
-    end
-  end
-
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
     if classname == 'apple_reward' or classname == 'goal' then
@@ -129,11 +118,6 @@ function factory.createLevelApi(kwargs)
       return api._newSpawnVarsPlayerStart
     end
     return spawnVars
-  end
-
-  function api:hasEpisodeFinished(time_seconds)
-    api._time_remaining = kwargs.episodeLengthSeconds - time_seconds
-    return api._time_remaining <= 0
   end
 
   function api:nextMap()
@@ -164,7 +148,6 @@ function factory.createLevelApi(kwargs)
         classname = 'goal',
         origin = api._goal_location .. ' 20'
     }
-
     return kwargs.mapName
   end
 
@@ -185,6 +168,8 @@ function factory.createLevelApi(kwargs)
 
   custom_observations.decorate(api)
   timeout.decorate(api, kwargs.episodeLengthSeconds)
+  pursuit_test_mode.decorate(api,
+    { blankMapName = kwargs.blankMapName })
   return api
 end
 

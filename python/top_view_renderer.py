@@ -45,8 +45,8 @@ class MatplotlibVisualizer(object):
     def render(self, fig):
         if self._render_fig_manager is None:
             # Chooses the backend_mod based on matplotlib configuration
-            self._render_backend_mod = pylab_setup()[0]
             mplib.interactive(True)
+            self._render_backend_mod = pylab_setup()[0]
             self._render_fig_manager = \
                 self._render_backend_mod.new_figure_manager_given_figure(1, fig)
         self._render_fig_manager.canvas.figure = fig
@@ -122,6 +122,7 @@ class TopViewEpisodeMap(object):
         self.poses2D = np.empty((0,3)) # x,y,yaw
         self._goal_loc = None
         self._drawn_once = False
+        self._added_goal_patch = None
 
     def add_pose(self, pose):
         self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
@@ -159,13 +160,14 @@ class TopViewEpisodeMap(object):
         goal_loc = self._goal_loc
         xyblocks = np.asarray((goal_loc[1] - 1, self.map_height() - goal_loc[0]))
         xy = xyblocks * self.block_size
-        ax.add_patch(self._goal_patch(xy))
-        self._goal_drawn = True
+        if self._added_goal_patch:
+            self._added_goal_patch.remove()
+        self._added_goal_patch = ax.add_patch(self._goal_patch(xy))
         
     def _wall_patch(self, coord):
         return mplib.patches.Rectangle(
                 coord, self.block_size[0], self.block_size[1]
-                , fill=True)
+                , fill=True, facecolor='cyan', edgecolor='lightcyan')
 
     def _draw_map(self, ax):
         for coord in self.wall_coordinates_from_string(size=self.block_size):
@@ -173,13 +175,13 @@ class TopViewEpisodeMap(object):
 
     def draw(self):
         self._draw_once()
-        self.get_axes().plot(self.poses2D[:, 0], self.poses2D[:, 1], 'b,')
+        ax = self.get_axes()
+        if self._goal_loc is not None:
+            self._draw_goal(ax)
+        ax.plot(self.poses2D[:, 0], self.poses2D[:, 1], 'r,')
         self.poses2D = self.poses2D[-1:, :]
         
     def _draw_once(self):
-        if self._goal_loc is None:
-            # Do not draw yet, the goal loc is not avaliable
-            return
         if not self._drawn_once:
             ax = self._top_view.get_axes()
             ax.clear()
@@ -190,8 +192,9 @@ class TopViewEpisodeMap(object):
             ax.autoscale_view(tight=True)
             ax.set_xlim(0, self.map_width() * self.block_size[0])
             ax.set_ylim(0, self.map_height() * self.block_size[1])
+            ax.set_xticks([])
+            ax.set_yticks([])
             self._draw_map(ax)
-            self._draw_goal(ax)
             self._drawn_once = True
 
 if __name__ == '__main__':

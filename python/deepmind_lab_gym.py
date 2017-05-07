@@ -591,8 +591,8 @@ class TopViewDeepmindLab(gym.Wrapper):
                 env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
         else:
             warnings.warn("Top view not supported because "
-                          + "{0}.entityLevel file not found".format(
-                              env.environment_name()))
+                          + "{0} file not found".format(
+                              self._top_view._entity_file()))
         env.unset_dl_env()
         super(TopViewDeepmindLab, self).__init__(env=env)
         
@@ -619,8 +619,8 @@ class TopViewDeepmindLab(gym.Wrapper):
         self._top_view.set_entity_layer(self.env.environment_name())
         if not self._top_view.supported():
             warnings.warn("Top view not supported because "
-                    + "{0}.entityLevel file not found".format(
-                        self.env.environment_name()))
+                    + "{0} file not found".format(
+                        self._top_view._entity_file()))
 
         fig = self._top_view.draw()
         if mode == 'return':

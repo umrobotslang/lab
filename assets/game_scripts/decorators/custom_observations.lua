@@ -59,7 +59,11 @@ function custom_observations.decorate(api)
 
   local customObservation = api.customObservation
   function api:customObservation(name)
-    return obs[name] and obs[name]() or customObservation(api, name)
+    cobs = obs[name] and obs[name]() or customObservation(api, name)
+    if name == 'POSE' then
+	api.last_pose = cobs
+    end
+    return cobs
   end
 end
 
