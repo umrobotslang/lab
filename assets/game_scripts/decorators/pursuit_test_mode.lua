@@ -19,7 +19,7 @@ end
 
 function Pursuit:onNextFrame()
     local map_finished = false
-    if self.num_steps == self.test_mode.localization_phase_steps then
+    if self.test_mode and self.num_steps == self.test_mode.localization_phase_steps then
         map_finished = true
         game:finishMap()
     end
@@ -31,11 +31,15 @@ function Pursuit:onNextFrame()
 end
 
 function Pursuit:justEndedLocalizationPhase()
-    return self.num_steps == (self.test_mode.localization_phase_steps + 1)
+    return self.test_mode and self.num_steps == (self.test_mode.localization_phase_steps + 1)
 end
 
 function Pursuit:isLocalizationPhase()
-    return self.test_mode and (self.num_steps <= self.test_mode.localization_phase_steps)
+   if not self.test_mode then
+      return true
+    else
+       return (self.num_steps <= self.test_mode.localization_phase_steps)
+    end
 end
 
 function Pursuit:nextMap()
