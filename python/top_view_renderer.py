@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 import matplotlib as mplib
-mplib.use('Agg')
+#mplib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
 
@@ -35,6 +35,67 @@ class EntityMap(object):
         if self._width is None:
             self._width = max(len(l) for l in self.entity_layer_lines()) - 1
         return self._width
+
+def euclidean(x):
+    return np.sqrt(np.sum(x**2))
+
+def distance_to_edge(vertex_pair, pt):
+    assert len(vertex_pair) == 2, "Expect a pair"
+    assert vertex_pair[0].shape == (2,), "Expect 2D point {}".format(vertex_pair[0])
+    normal = (vertex_pair[1] - vertex_pair[0]).dot([[0, -1],
+                                                    [1,  0]])
+    normal = normal / euclidean(normal)
+    h = - normal.dot(vertex_pair[0])
+    if h > 0:
+        # to ensure that normal.dot(x) == -h = distance from origin
+        # normal is away from origin and towards the plane?
+        normal = - normal
+        h = -h
+    # Equation of edge is normal.dot(x) + h = 0  where h is -ve
+    # Signed distance from plane that is +ve when away from origin
+    proj_dist = normal.dot(pt) + h
+    proj_pt = pt - proj_dist * normal
+    # The vectors have to change direction 
+    costheta = (proj_pt - vertex_pair[0]).dot(proj_pt - vertex_pair[1])
+    # assert np.allclose(costheta, 0) or np.allclose(costheta, 2*np.pi), \
+    #     "The proj_pt is on line joining vertex_pair. costheta {}".format(
+    #         costheta)
+    if costheta > 0:
+        # projected point is outside the vertex_pair
+        # print("Computing distance from points {}".format(vertex_pair))
+        return min(euclidean(pt-x) for x in vertex_pair)
+    else:
+        # projected point is within the vertex pair
+        # print("Computing distance from edge {}".format(vertex_pair))
+        return abs(proj_dist)
+
+class DistanceTransform(object):
+    def __init__(self):
+        self._entity_map = None
+        self._wall_left_bottom = None
+
+    def set_wall_coordinates(self, wall_left_bottom):
+        # Each point is a numpy array
+        self._wall_left_bottom = wall_left_bottom
+
+    def distance(self, point, block_size):
+        top_n = 4
+        closest_wall_left_bottom = sorted(
+            self._wall_left_bottom
+            , key = lambda x :
+            euclidean(point - (x + np.asarray(block_size)/2))
+        )[:top_n]
+        four_corners = lambda mid: (  mid + [0, 0]
+                                    , mid + [block_size[0], 0]
+                                    , mid + [0, block_size[1]]
+                                    , mid + block_size )
+        # Each := (v1, v2)
+        closed_edges = [
+            sorted(four_corners(np.asarray(w))
+                                , key = lambda x : euclidean(point - x))[:2]
+            for w in closest_wall_left_bottom]
+        return min( distance_to_edge(e, point)
+                    for e in closed_edges )
 
 
 class MatplotlibVisualizer(object):
