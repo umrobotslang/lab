@@ -7,6 +7,7 @@ import getpass
 import random
 import string
 import warnings
+import inspect
 
 import numpy as np
 import cv2
@@ -427,7 +428,8 @@ class _DeepmindLab(gym.Env):
         self._step_source = None
         self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
 
-    def unset_dl_env(self):
+    def force_unset_dl_env(self):
+        "Assumes you know what you are doing"
         self._dl_env = None
 
     def environment_name(self):
@@ -580,7 +582,10 @@ class _DeepmindLab(gym.Env):
             np.random.seed(seed)
 
 class TopViewDeepmindLab(gym.Wrapper):
-    def __init__(self, env=None):
+    def __init__(self, env=None
+                 , wall_penalty_scale=0
+                 , wall_penalty_max=0
+                 , wall_penalty_max_dist=1):
         assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
         super(TopViewDeepmindLab, self).__init__(env=env)
         self._top_view = TopView(env.curr_mod_dir, env.environment_name())
@@ -589,22 +594,39 @@ class TopViewDeepmindLab(gym.Wrapper):
                 env.additional_observation_types
             env.additional_observation_types += [
                 env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
+            # Need to call undering dl_env with
+            # updated additional_observation_types
+            env.force_unset_dl_env()
+            super(TopViewDeepmindLab, self).__init__(env=env)
         else:
             warnings.warn("Top view not supported because "
                           + "{0} file not found".format(
                               self._top_view._entity_file()))
-        env.unset_dl_env()
-        super(TopViewDeepmindLab, self).__init__(env=env)
+        self.wall_penalty_max = wall_penalty_max
+        self.wall_penalty_max_inv_dist = 1.0
+        self.wall_penalty_min_inv_dist = 1.0 / wall_penalty_max_dist
+
+    def _wall_penalty(self, point):
+        if self.wall_penalty_max:
+            dist = self._top_view.distance(point)
+            wmax = self.wall_penalty_max
+            inv_max = self.wall_penalty_max_inv_dist
+            inv_min = self.wall_penalty_min_inv_dist
+            inv_dist = max(min(1.0/(dist or 1), inv_max), inv_min)
+            penalty = (inv_dist -inv_min) * (wmax - 0) / (inv_max - inv_min) + 0
+        return 0
         
     def _step(self, action):
         obs, reward, done, info = self.env._step(action)
         if self._top_view.supported():
-            self._top_view.add_pose(info[self.env.POSE_OBS_TYPE])
+            pose = info[self.env.POSE_OBS_TYPE]
+            reward = reward - self._wall_penalty(pose[:2])
+            self._top_view.add_pose(pose, reward=reward)
             self._top_view.add_goal(info[self.env.GOAL_OBS_TYPE])
             for obs_type in (self.env.POSE_OBS_TYPE, self.env.GOAL_OBS_TYPE):
                 if obs_type not in self.old_additional_observation_types:
                     del info[obs_type]
-                
+
         return obs, reward, done, info
 
     def _reset(self):
@@ -645,7 +667,13 @@ class TopViewDeepmindLab(gym.Wrapper):
 
 class DeepmindLab(TopViewDeepmindLab):
     def __init__(self, *args, **kwargs):
-        super(DeepmindLab, self).__init__(env=_DeepmindLab(*args, **kwargs))
+        P = type(self).mro()[1]
+        wrapper_kwargs = {
+            k : kwargs.pop(k)
+            for k in inspect.getargspec(P.__init__).args[2:]
+            if k in kwargs }
+        wrapper_kwargs.update(dict(env=_DeepmindLab(*args, **kwargs)))
+        P.__init__(self, **wrapper_kwargs)
 
 ActionMapperDiscrete = ActionMapper("discrete")
 ActionMapperAcceleration = ActionMapper("acceleration")

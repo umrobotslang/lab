@@ -8,36 +8,10 @@ import matplotlib as mplib
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
 
-class EntityMap(object):
-    def __init__(self, entity_layer_file):
-        self.entity_layer_file = entity_layer_file
-        self._entity_layer_lines = None
-        self._width = None
-    
-    def entity_layer_lines(self):
-        if self._entity_layer_lines is None: 
-            with open(self.entity_layer_file) as ef:
-                self._entity_layer_lines = ef.readlines()
-        return self._entity_layer_lines
-
-    def wall_coordinates_from_string(self, size=(100, 100)):
-        wall_coords = []
-        for row, line in enumerate(self.entity_layer_lines()):
-            row_inv = self.height() - row - 1
-            for col, char in enumerate(line):
-                if char == "*":
-                    yield (col * size[0], row_inv * size[1])
-
-    def height(self):
-        return len(self.entity_layer_lines())
-
-    def width(self):
-        if self._width is None:
-            self._width = max(len(l) for l in self.entity_layer_lines()) - 1
-        return self._width
 
 def euclidean(x):
     return np.sqrt(np.sum(x**2))
+
 
 def distance_to_edge(vertex_pair, pt):
     assert len(vertex_pair) == 2, "Expect a pair"
@@ -69,6 +43,7 @@ def distance_to_edge(vertex_pair, pt):
         # print("Computing distance from edge {}".format(vertex_pair))
         return abs(proj_dist)
 
+
 class DistanceTransform(object):
     def __init__(self):
         self._entity_map = None
@@ -78,6 +53,14 @@ class DistanceTransform(object):
         # Each point is a numpy array
         self._wall_left_bottom = wall_left_bottom
 
+    @staticmethod
+    def four_corners_of_wall(mid, block_size):
+        four_corners = (  mid + [0, 0]
+                          , mid + [block_size[0], 0]
+                          , mid + [0, block_size[1]]
+                          , mid + block_size )
+        return four_corners
+
     def distance(self, point, block_size):
         top_n = 4
         closest_wall_left_bottom = sorted(
@@ -85,17 +68,62 @@ class DistanceTransform(object):
             , key = lambda x :
             euclidean(point - (x + np.asarray(block_size)/2))
         )[:top_n]
-        four_corners = lambda mid: (  mid + [0, 0]
-                                    , mid + [block_size[0], 0]
-                                    , mid + [0, block_size[1]]
-                                    , mid + block_size )
         # Each := (v1, v2)
         closed_edges = [
-            sorted(four_corners(np.asarray(w))
+            sorted(self.four_corners_of_wall(np.asarray(w), block_size)
                                 , key = lambda x : euclidean(point - x))[:2]
             for w in closest_wall_left_bottom]
         return min( distance_to_edge(e, point)
                     for e in closed_edges )
+
+
+class EntityMap(object):
+    def __init__(self, entity_layer_file
+                 , distance_transform=DistanceTransform()):
+        self.entity_layer_file = entity_layer_file
+        self._entity_layer_lines = None
+        self._width = None
+        self._distance_transform = distance_transform
+        self._wall_coordinates = None
+        self._wall_coordinates_block_size = None
+
+    def entity_layer_lines(self):
+        if self._entity_layer_lines is None:
+            with open(self.entity_layer_file) as ef:
+                self._entity_layer_lines = ef.readlines()
+        return self._entity_layer_lines
+
+    def _wall_coordinates_from_string(self, size):
+        wall_coords = []
+        for row, line in enumerate(self.entity_layer_lines()):
+            row_inv = self.height() - row - 1
+            for col, char in enumerate(line):
+                if char == "*":
+                    yield (col * size[0], row_inv * size[1])
+
+    def wall_coordinates_from_string(self, size=np.asarray((100, 100))):
+        if not self._wall_coordinates:
+            self._wall_coordinates_block_size = size
+            self._wall_coordinates = list(
+                self._wall_coordinates_from_string(size))
+        assert np.all(self._wall_coordinates_block_size == size), \
+            "But you said block_size = {} earlier, ".format(self._wall_coordinates_block_size) \
+            + "Now you are saying {}".format(size) \
+            + "I don't know what to do; you indecisive caller!!"
+        return self._wall_coordinates
+
+    def height(self):
+        return len(self.entity_layer_lines())
+
+    def width(self):
+        if self._width is None:
+            self._width = max(len(l) for l in self.entity_layer_lines()) - 1
+        return self._width
+
+    def distance(self, point, block_size):
+        self._distance_transform.set_wall_coordinates(
+            self.wall_coordinates_from_string(block_size) )
+        return self._distance_transform.distance(point, block_size)
 
 
 class MatplotlibVisualizer(object):
@@ -132,12 +160,15 @@ class TopView(object):
     def set_entity_layer(self, entity_layer):
         self.level_script = entity_layer
 
+    def distance(self, point):
+        return self._entity_map.distance(point, self.block_size)
+
     def render(self, fig):
         self._mplib_visualizer.render(fig)
 
     def print_figure(self, fig, filename, dpi):
         self._mplib_visualizer.print_figure(fig, filename, dpi)
-        
+
     def supported(self):
         return os.path.exists(self._entity_file())
 
@@ -158,10 +189,10 @@ class TopView(object):
         return os.path.join(
             self.assets_top_dir
             , "assets/game_scripts/{}.entityLayer".format(self.level_script))
-    
-    def add_pose(self, pose):
+
+    def add_pose(self, pose, reward=0):
         if self.supported():
-            self._top_view_episode_map.add_pose(pose)
+            self._top_view_episode_map.add_pose(pose, reward=reward)
 
     def add_goal(self, goal_loc):
         if self.supported():
@@ -171,7 +202,7 @@ class TopView(object):
         if self.supported():
             self._top_view_episode_map.draw()
             return self.get_axes().figure
-    
+
     def reset(self):
         if self.supported():
             self._top_view_episode_map = TopViewEpisodeMap(self)
@@ -181,33 +212,38 @@ class TopViewEpisodeMap(object):
         self._top_view = top_view
         self._entity_map = top_view._entity_map
         self.poses2D = np.empty((0,3)) # x,y,yaw
+        self.rewards = []
         self._goal_loc = None
         self._drawn_once = False
         self._added_goal_patch = None
 
-    def add_pose(self, pose):
+    def add_pose(self, pose, reward=0):
         self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
+        self.rewards.append(reward)
 
     def add_goal(self, goal_loc):
         self._goal_loc = goal_loc
 
+    def last_pose(self):
+        return self.poses2D[-1, :]
+
     def draw(self):
         if self.poses2D.shape[0] % self.draw_fq == 0:
-            self._draw() 
+            self._draw()
 
     def map_height(self):
         return self._entity_map.height()
 
     def map_width(self):
         return self._entity_map.width()
-        
+
     def wall_coordinates_from_string(self, **kwargs):
         return self._entity_map.wall_coordinates_from_string(**kwargs)
-    
+
     @property
     def block_size(self):
         return self._top_view.block_size
-    
+
     def get_axes(self):
         return self._top_view.get_axes()
 
@@ -216,7 +252,7 @@ class TopViewEpisodeMap(object):
         goal_pos_offset = (self.block_size - goal_size) / 2
         return mplib.patches.Rectangle( coord+goal_pos_offset,
             goal_size[0], goal_size[1] , color='g' , fill=True)
-    
+
     def _draw_goal(self, ax):
         goal_loc = self._goal_loc
         xyblocks = np.asarray((goal_loc[1] - 1, self.map_height() - goal_loc[0]))
@@ -224,7 +260,7 @@ class TopViewEpisodeMap(object):
         if self._added_goal_patch:
             self._added_goal_patch.remove()
         self._added_goal_patch = ax.add_patch(self._goal_patch(xy))
-        
+
     def _wall_patch(self, coord):
         return mplib.patches.Rectangle(
                 coord, self.block_size[0], self.block_size[1]
@@ -239,9 +275,10 @@ class TopViewEpisodeMap(object):
         ax = self.get_axes()
         if self._goal_loc is not None:
             self._draw_goal(ax)
-        ax.plot(self.poses2D[:, 0], self.poses2D[:, 1], 'r,')
+        ax.scatter(self.poses2D[:, 0], self.poses2D[:, 1]
+                   , c=self.rewards, cmap='YlGnBu', marker='.')
         self.poses2D = self.poses2D[-1:, :]
-        
+
     def _draw_once(self):
         if not self._drawn_once:
             ax = self._top_view.get_axes()
