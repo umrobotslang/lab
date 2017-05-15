@@ -1,6 +1,7 @@
 import os
 import getpass
 import logging
+import heapq
 
 import numpy as np
 import matplotlib as mplib
@@ -63,18 +64,19 @@ class DistanceTransform(object):
 
     def distance(self, point, block_size):
         top_n = 4
-        closest_wall_left_bottom = sorted(
-            self._wall_left_bottom
-            , key = lambda x :
-            euclidean(point - (x + np.asarray(block_size)/2))
-        )[:top_n]
+        closest_wall_left_bottom = heapq.nsmallest(
+            top_n
+            , self._wall_left_bottom
+            , key = lambda x : euclidean(point - (x + block_size/2))
+        )
         # Each := (v1, v2)
         closed_edges = [
-            sorted(self.four_corners_of_wall(np.asarray(w), block_size)
-                                , key = lambda x : euclidean(point - x))[:2]
+            heapq.nsmallest(
+                2
+                , self.four_corners_of_wall(np.asarray(w), block_size)
+                , key = lambda x : euclidean(point - x))
             for w in closest_wall_left_bottom]
-        return min( distance_to_edge(e, point)
-                    for e in closed_edges )
+        return min( distance_to_edge(e, point) for e in closed_edges )
 
 
 class EntityMap(object):

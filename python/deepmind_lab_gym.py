@@ -319,47 +319,6 @@ class ChDirCtxt(object):
     def __exit__(self, *args):
         os.chdir(self.old_dir)
 
-class CallMethodsWithCtxt(object):
-    """
-    Call methods of a given object with a given context
-    """
-    def __init__(self, obj, ctxt):
-        self._call_method_with_ctxt_obj = obj
-        self._call_method_with_ctxt_ctxt = ctxt
-
-    def __getattr__(self, attr):
-        val = getattr(self._call_method_with_ctxt_obj, attr)
-        if callable(val):
-            # Define a function that calls the
-            # val function within the context
-            def wrap(*args, **kwargs):
-                with self._call_method_with_ctxt_ctxt:
-                    return val(*args, **kwargs)
-            # Return the wrapped function instead
-            return wrap
-        else:
-            # if the original value was not a callable (function or
-            # class or bultin) return it as it is.
-            return val
-
-    def __setattr__(self, attr, val):
-        if attr not in ['_call_method_with_ctxt_obj'
-                        , '_call_method_with_ctxt_ctxt']:
-            setattr(self._call_method_with_ctxt_obj, attr, val)
-        else:
-            # https://docs.python.org/2/reference/datamodel.html#object.__setattr__
-            #
-            # If __setattr__() wants to assign to an instance
-            # attribute, it should not simply execute self.name =
-            # value - this would cause a recursive call to
-            # itself. Instead, it should insert the value in the
-            # dictionary of instance attributes, e.g.,
-            # self.__dict__[name] = value. For new-style classes,
-            # rather than accessing the instance dictionary, it should
-            # call the base class method with the same name, for
-            # example, object.__setattr__(self, name, value).
-            object.__setattr__(self, attr, val)
-
 class LogMethodCalls(object):
     def __init__(self, obj):
         self._LogMethodCalls_obj = obj
@@ -435,10 +394,16 @@ class _DeepmindLab(gym.Env):
     def environment_name(self):
         return self._dm_lab_env().environment_name()
 
+    def _dm_lab_reset(self):
+        with self._chdir_mod_ctxt:
+            self._dm_lab_env().reset()
+        
     def _dm_lab_env(self):
         # Delayed initialization of lab env so that one can override
         # various parameters
         if self._dl_env is None:
+            # While loading the map the directory should be changed because
+            # that's when the maps get loaded.
             with ChDirCtxt(curr_mod_dir):
                 observation_types = self.observation_types \
                                             + self.additional_observation_types
@@ -448,9 +413,9 @@ class _DeepmindLab(gym.Env):
                                             for k, v in self.lab_config.items()})
             # Wraps all the callable methods so that they are called from
             # the current module directory
-            self._dl_env = CallMethodsWithCtxt(dlenv
-                                            , ChDirCtxt(curr_mod_dir))
-            self._dl_env.reset()
+            self._dl_env = dlenv
+            self._chdir_mod_ctxt = ChDirCtxt(curr_mod_dir)
+            self._dm_lab_reset()
         return self._dl_env
 
     def _null_observations(self):
@@ -547,7 +512,7 @@ class _DeepmindLab(gym.Env):
         return observations, reward, episode_over, info
 
     def _reset(self):
-        self._dm_lab_env().reset()
+        self._dm_lab_reset()
         # Reset the velociries
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
