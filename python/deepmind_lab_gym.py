@@ -398,9 +398,9 @@ class _DeepmindLab(gym.Env):
         with self._chdir_mod_ctxt:
             self._dm_lab_env().reset()
 
-    def _dm_lab_observations(self):
+    def _dm_lab_step(self, *args, **kwargs):
         with self._chdir_mod_ctxt:
-            return self._dm_lab_env().observations()
+            return self._dm_lab_env().step(*args, **kwargs)
 
     def _dm_lab_env(self):
         # Delayed initialization of lab env so that one can override
@@ -475,7 +475,7 @@ class _DeepmindLab(gym.Env):
 
     def _observations(self):
         if self._dm_lab_env().is_running():
-            obs = self._dm_lab_observations()
+            obs = self._dm_lab_env().observations()
         else:
             obs = self._null_observations()
 
@@ -504,7 +504,7 @@ class _DeepmindLab(gym.Env):
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action, self._current_velocities)
         self._current_velocities = deepmind_lab_actions
-        reward = self._dm_lab_env().step(deepmind_lab_actions , num_steps=1)
+        reward = self._dm_lab_step(deepmind_lab_actions , num_steps=1)
         episode_over = (not self._dm_lab_env().is_running())
         observations, info = self._observations()
 
