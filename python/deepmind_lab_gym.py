@@ -552,21 +552,31 @@ class TopViewDeepmindLab(gym.Wrapper):
                  , wall_penalty_max=0
                  , wall_penalty_max_dist=1):
         assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
-        super(TopViewDeepmindLab, self).__init__(env=env)
-        self._top_view = TopView(env.curr_mod_dir, env.environment_name())
-        if self._top_view.supported():
-            self.old_additional_observation_types = \
-                env.additional_observation_types
-            env.additional_observation_types += [
-                env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
-            # Need to call undering dl_env with
-            # updated additional_observation_types
-            env.force_unset_dl_env()
+
+        self.old_additional_observation_types = \
+            env.additional_observation_types
+        needed_obs_types = [env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
+        env.additional_observation_types += needed_obs_types
+        obs_not_supported = False
+        try:
             super(TopViewDeepmindLab, self).__init__(env=env)
-        else:
-            warnings.warn("Top view not supported because "
-                          + "{0} file not found".format(
+            self._top_view = TopView(env.curr_mod_dir, env.environment_name())
+        except ValueError, err:
+            the_right_kind_exception = any(
+                "Unknown observation" in err and obs in err
+                for obs in needed_obs_types)
+            if not the_right_kind_exception:
+                raise
+            assert not self._top_view.supported(), 'Entity file and GOAL.LOC both should be available'
+            warnings.warn("Top view not supported because"
+                          + " observation type '{}'".format(env.GOAL_OBS_TYPE)
+                          + " is not supported."
+                          + " entity_layer_file not there {}".format(
                               self._top_view._entity_file()))
+            env.additional_observation_types = self.old_additional_observation_types
+            # Reinitializing without top-view
+            super(type(self),  self).__init__(env=env)
+
         self.wall_penalty_max = wall_penalty_max
         self.wall_penalty_max_inv_dist = 1.0
         self.wall_penalty_min_inv_dist = 1.0 / wall_penalty_max_dist
@@ -579,7 +589,7 @@ class TopViewDeepmindLab(gym.Wrapper):
             inv_min = self.wall_penalty_min_inv_dist
             inv_dist = max(min(1.0/(dist or 1), inv_max), inv_min)
             penalty = (inv_dist -inv_min) * (wmax - 0) / (inv_max - inv_min) + 0
-        return 0
+        return penalty
         
     def _step(self, action):
         obs, reward, done, info = self.env._step(action)

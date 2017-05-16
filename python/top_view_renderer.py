@@ -5,6 +5,7 @@ import heapq
 
 import numpy as np
 import matplotlib as mplib
+import matplotlib.cm
 #mplib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
@@ -149,7 +150,7 @@ class MatplotlibVisualizer(object):
         FigureCanvasAgg(fig).print_figure(filename, dpi=dpi)
 
 class TopView(object):
-    def __init__(self, assets_top_dir=None, level_script=None, draw_fq=20):
+    def __init__(self, assets_top_dir=None, level_script=None, draw_fq=10):
         self._ax = None
         self.draw_fq = draw_fq
         self.assets_top_dir = assets_top_dir
@@ -218,6 +219,7 @@ class TopViewEpisodeMap(object):
         self._goal_loc = None
         self._drawn_once = False
         self._added_goal_patch = None
+        self._added_scatter = None
 
     def add_pose(self, pose, reward=0):
         self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
@@ -230,7 +232,7 @@ class TopViewEpisodeMap(object):
         return self.poses2D[-1, :]
 
     def draw(self):
-        if self.poses2D.shape[0] % self.draw_fq == 0:
+        if self.poses2D.shape[0] % self._top_view.draw_fq == 0:
             self._draw()
 
     def map_height(self):
@@ -272,14 +274,27 @@ class TopViewEpisodeMap(object):
         for coord in self.wall_coordinates_from_string(size=self.block_size):
             ax.add_patch(self._wall_patch(coord))
 
-    def draw(self):
+    def normalized_rewards(self):
+        rew = np.asarray(self.rewards)
+        min_, max_ =  np.min(rew), min(0.5, np.max(rew))
+        if max_ != min_:
+            rew = (rew - min_) / (max_ - min_)
+        return rew
+
+    def _draw(self):
         self._draw_once()
         ax = self.get_axes()
         if self._goal_loc is not None:
             self._draw_goal(ax)
-        ax.scatter(self.poses2D[:, 0], self.poses2D[:, 1]
-                   , c=self.rewards, cmap='YlGnBu', marker='.')
-        self.poses2D = self.poses2D[-1:, :]
+
+        if self._added_scatter:
+            self._added_scatter.remove()
+        self._added_scatter = ax.scatter(self.poses2D[:, 0], self.poses2D[:, 1]
+                                         , c=self.normalized_rewards()
+                                         , cmap='coolwarm'
+                                         , linewidths=0
+                                         , edgecolors=None
+                                         , marker='.')
 
     def _draw_once(self):
         if not self._drawn_once:
