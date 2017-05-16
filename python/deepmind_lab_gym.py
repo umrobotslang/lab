@@ -397,7 +397,11 @@ class _DeepmindLab(gym.Env):
     def _dm_lab_reset(self):
         with self._chdir_mod_ctxt:
             self._dm_lab_env().reset()
-        
+
+    def _dm_lab_observations(self):
+        with self._chdir_mod_ctxt:
+            return self._dm_lab_env().observations()
+
     def _dm_lab_env(self):
         # Delayed initialization of lab env so that one can override
         # various parameters
@@ -471,7 +475,7 @@ class _DeepmindLab(gym.Env):
 
     def _observations(self):
         if self._dm_lab_env().is_running():
-            obs = self._dm_lab_env().observations()
+            obs = self._dm_lab_observations()
         else:
             obs = self._null_observations()
 
