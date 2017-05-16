@@ -289,12 +289,15 @@ class TopViewEpisodeMap(object):
 
         if self._added_scatter:
             self._added_scatter.remove()
-        self._added_scatter = ax.scatter(self.poses2D[:, 0], self.poses2D[:, 1]
-                                         , c=self.normalized_rewards()
-                                         , cmap='coolwarm'
-                                         , linewidths=0
-                                         , edgecolors=None
-                                         , marker='.')
+
+        if self.poses2D.shape[0]:
+            self._added_scatter = ax.scatter(
+                self.poses2D[:, 0], self.poses2D[:, 1]
+                , c=self.normalized_rewards()
+                , cmap='coolwarm'
+                , linewidths=0
+                , edgecolors=None
+                , marker='.')
 
     def _draw_once(self):
         if not self._drawn_once:
