@@ -582,6 +582,7 @@ class TopViewDeepmindLab(gym.Wrapper):
         self.wall_penalty_min_inv_dist = 1.0 / wall_penalty_max_dist
 
     def _wall_penalty(self, point):
+        penalty = 0
         if self.wall_penalty_max:
             dist = self._top_view.distance(point)
             wmax = self.wall_penalty_max
