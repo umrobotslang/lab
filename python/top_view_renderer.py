@@ -5,8 +5,8 @@ import heapq
 
 import numpy as np
 import matplotlib as mplib
+mplib.use('Agg')
 import matplotlib.cm
-#mplib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
 
