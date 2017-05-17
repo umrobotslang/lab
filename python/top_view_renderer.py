@@ -268,7 +268,8 @@ class TopViewEpisodeMap(object):
     def _wall_patch(self, coord):
         return mplib.patches.Rectangle(
                 coord, self.block_size[0], self.block_size[1]
-                , fill=True, facecolor='cyan', edgecolor='lightcyan')
+                , fill=True, facecolor='cyan', edgecolor='lightcyan'
+                , alpha=0.3)
 
     def _draw_map(self, ax):
         for coord in self.wall_coordinates_from_string(size=self.block_size):
