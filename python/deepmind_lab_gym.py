@@ -8,6 +8,7 @@ import random
 import string
 import warnings
 import inspect
+import copy
 
 import numpy as np
 import cv2
@@ -65,6 +66,30 @@ L2NActMapParams_v0 = ActionMapperParams(
         , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.   ,  0.  ,  0.   ,  0.  ,  0.  ]
+    ])
+)
+
+ManhattanWorldActMap_v0 = ActionMapperParams(
+    # Look left, look right, acc left, acc right,
+    # acc left, acc right, acc back, acc forward
+    inc_mat = np.array([
+        [  426   , -426 ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  1   , -1.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+    ])
+    ,
+    rel_mask_mat = np.array([
+        [   0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
+        , [ 0.  ,  0. ,  0.  ,  0.  ]
     ])
 )
 
@@ -359,7 +384,8 @@ class _DeepmindLab(gym.Env):
     def __init__(self, level_script, config, action_mapper
                  , enable_velocity=False
                  , enable_depth=False
-                 , additional_observation_types = []):
+                 , additional_observation_types = []
+                 , init_game_seed=0):
         self.observation_types = [self.RGB_OBS_TYPE]
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
@@ -386,6 +412,7 @@ class _DeepmindLab(gym.Env):
         self._last_info = {}
         self._step_source = None
         self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
+        self.init_game_seed = init_game_seed
 
     def force_unset_dl_env(self):
         "Assumes you know what you are doing"
@@ -396,7 +423,7 @@ class _DeepmindLab(gym.Env):
 
     def _dm_lab_reset(self):
         with self._chdir_mod_ctxt:
-            self._dm_lab_env().reset()
+            self._dm_lab_env().reset(seed=self.init_game_seed)
 
     def _dm_lab_step(self, *args, **kwargs):
         with self._chdir_mod_ctxt:
@@ -496,6 +523,8 @@ class _DeepmindLab(gym.Env):
         return self._last_obs, self._last_info
 
     def _step(self, action):
+        if isinstance(action, tuple):
+            action, num_steps = action
         # Input checking
         if not self._action_space.contains(action):
             raise ValueError('Action out of action space')
@@ -504,7 +533,8 @@ class _DeepmindLab(gym.Env):
         deepmind_lab_actions = self._action_space.to_deepmind_action_space(
             action, self._current_velocities)
         self._current_velocities = deepmind_lab_actions
-        reward = self._dm_lab_step(deepmind_lab_actions , num_steps=1)
+        reward = self._dm_lab_step(deepmind_lab_actions
+                                   , num_steps=num_steps)
         episode_over = (not self._dm_lab_env().is_running())
         observations, info = self._observations()
 
@@ -549,6 +579,7 @@ class _DeepmindLab(gym.Env):
     def _seed(self, seed=None):
         if seed is not None:
             np.random.seed(seed)
+        self.init_game_seed = seed
 
 class TopViewDeepmindLab(gym.Wrapper):
     def __init__(self, env=None
@@ -558,7 +589,7 @@ class TopViewDeepmindLab(gym.Wrapper):
         assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
 
         self.old_additional_observation_types = \
-            env.additional_observation_types
+            copy.copy(env.additional_observation_types)
         needed_obs_types = [env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
         env.additional_observation_types += needed_obs_types
         obs_not_supported = False
@@ -567,19 +598,21 @@ class TopViewDeepmindLab(gym.Wrapper):
             self._top_view = TopView(env.curr_mod_dir, env.environment_name())
         except ValueError, err:
             the_right_kind_exception = any(
-                "Unknown observation" in err and obs in err
+                "Unknown observation" in str(err) and obs in str(err)
                 for obs in needed_obs_types)
             if not the_right_kind_exception:
+                print(" obs {} not in err".format(needed_obs_types))
                 raise
+            env.additional_observation_types = self.old_additional_observation_types
+            # Reinitializing without top-view
+            super(TopViewDeepmindLab,  self).__init__(env=env)
+            self._top_view = TopView(env.curr_mod_dir, env.environment_name())
             assert not self._top_view.supported(), 'Entity file and GOAL.LOC both should be available'
             warnings.warn("Top view not supported because"
                           + " observation type '{}'".format(env.GOAL_OBS_TYPE)
                           + " is not supported."
                           + " entity_layer_file not there {}".format(
                               self._top_view._entity_file()))
-            env.additional_observation_types = self.old_additional_observation_types
-            # Reinitializing without top-view
-            super(type(self),  self).__init__(env=env)
 
         self.wall_penalty_max = wall_penalty_max
         self.wall_penalty_max_inv_dist = 1.0
@@ -659,6 +692,8 @@ ActionMapperDiscrete = ActionMapper("discrete")
 ActionMapperAcceleration = ActionMapper("acceleration")
 L2NActionMapper_v0 = L2NActionMapper(L2NActMapParams_v0.inc_mat
                                      , L2NActMapParams_v0.rel_mask_mat)
+ManhattanWorldActionMapper_v0 = L2NActionMapper(ManhattanWorldActMap_v0.inc_mat
+                                        , ManhattanWorldActMap_v0.rel_mask_mat)
 
 def register_gym_env(entry_point_name, dl_args, dl_kwargs):
     globals()[entry_point_name] = \

@@ -232,7 +232,8 @@ class TopViewEpisodeMap(object):
         return self.poses2D[-1, :]
 
     def draw(self):
-        if self.poses2D.shape[0] % self._top_view.draw_fq == 0:
+        if self.poses2D.shape[0] == 1 \
+           or self.poses2D.shape[0] % self._top_view.draw_fq == 0:
             self._draw()
 
     def map_height(self):
