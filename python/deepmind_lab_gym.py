@@ -523,8 +523,12 @@ class _DeepmindLab(gym.Env):
         return self._last_obs, self._last_info
 
     def _step(self, action):
+        #FIXME: Bad way 
         if isinstance(action, tuple):
             action, num_steps = action
+        else:
+            num_steps = 1
+
         # Input checking
         if not self._action_space.contains(action):
             raise ValueError('Action out of action space')
