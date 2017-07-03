@@ -34,7 +34,7 @@ local entityLayer = entityLayer_01
 local variationsLayer = variationsLayer_01
 
 local mapName = 'small_star_map_random_goal_01'
-local create_new_map = false
+local create_new_map = false 
 if create_new_map then
     local make_map = require 'common.make_map'
     make_map.makeMap(mapName
@@ -47,5 +47,5 @@ return factory.createLevelApi{
     , blankMapName = 'small_blank_map_all_goal_01'
     , entityLayer = entityLayer
     , episodeLengthSeconds = 20
-    , scatteredRewardDensity = 0.2
+    , scatteredRewardDensity = 1.0 
 }

@@ -128,7 +128,7 @@ function factory.createLevelApi(kwargs)
     local spawn_row, spawn_col = map_xy_to_text_row_col(x, y)
     logger:debug("spawn_row: " .. spawn_row .. " spawn_col: " .. spawn_col)
     local candidate_goal_locations = otherGoalLocations[
-       intpairkey(spawn_row, spawn_col)]
+       intpairkey(spawn_row, spawn_col)] or possibleGoalLocations
     local goal_loc = candidate_goal_locations[
        random.uniformInt(1, #candidate_goal_locations)]
     

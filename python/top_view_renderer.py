@@ -210,6 +210,39 @@ class TopView(object):
         if self.supported():
             self._top_view_episode_map = TopViewEpisodeMap(self)
 
+
+"""
+Some terribly beautiful code
+"""
+
+
+def convert_one_hot(goal_loc):
+    """This function is completely hardcoded and terrible.
+       But also completely beautiful. """
+    one_hot = np.asarray([0, 0, 0, 0]) 
+    
+    if np.array_equal(goal_loc, np.asarray([2, 3])):
+        one_hot[0] = 1 
+    elif np.array_equal(goal_loc, np.asarray([3, 2])):
+        one_hot[1] = 1 
+    elif np.array_equal(goal_loc, np.asarray([6, 5])):
+        one_hot[2] = 1 
+    elif np.array_equal(goal_loc, np.asarray([5, 6])):
+        one_hot[3] = 1 
+    return one_hot
+
+def letter_label(goal_loc):
+    one_hot = convert_one_hot(goal_loc)
+
+    if 1 in one_hot:
+        return chr(ord('A') + np.argmax(one_hot))
+    else:
+        return '?'
+
+"""
+End of terribly beautiful code
+"""
+
 class TopViewEpisodeMap(object):
     def __init__(self, top_view):
         self._top_view = top_view
@@ -257,6 +290,14 @@ class TopViewEpisodeMap(object):
         goal_pos_offset = (self.block_size - goal_size) / 2
         return mplib.patches.Rectangle( coord+goal_pos_offset,
             goal_size[0], goal_size[1] , color='g' , fill=True)
+    
+    def _text_patch(self, coord):
+        goal_size = self.block_size * 0.67
+        goal_pos_offset = (self.block_size - goal_size) / 2
+        
+        return mplib.patches.Rectangle( coord+goal_pos_offset,
+            goal_size[0], goal_size[1] , color='g' , fill=True)
+
 
     def _draw_goal(self, ax):
         goal_loc = self._goal_loc
@@ -265,6 +306,8 @@ class TopViewEpisodeMap(object):
         if self._added_goal_patch:
             self._added_goal_patch.remove()
         self._added_goal_patch = ax.add_patch(self._goal_patch(xy))
+        l = self._added_goal_patch.xy
+        ax.text(l[0]+25, l[1]+20, letter_label(goal_loc), fontsize=10)
 
     def _wall_patch(self, coord):
         return mplib.patches.Rectangle(

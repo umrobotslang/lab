@@ -383,7 +383,7 @@ class _DeepmindLab(gym.Env):
     GOAL_OBS_TYPE = 'GOAL.LOC'
     def __init__(self, level_script, config, action_mapper
                  , enable_velocity=False
-                 , enable_depth=False
+                 , enable_depth=True
                  , additional_observation_types = []
                  , init_game_seed=0):
         self.observation_types = [self.RGB_OBS_TYPE]
