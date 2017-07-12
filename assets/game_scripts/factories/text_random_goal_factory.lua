@@ -106,16 +106,17 @@ function factory.createLevelApi(kwargs)
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
-    if classname == 'apple_reward' or classname == 'goal' then
+    -- logger:debug("Got : " .. helpers.dir(spawnVars))
+    if classname == 'apple_reward' or classname == 'goal' 
+        or classname == 'info_player_start' then
       local coords = {}
       for x in spawnVars.origin:gmatch("%S+") do
           coords[#coords + 1] = x
       end
       local origin_2D = coords[1] .. " " .. coords[2]
       local updated_spawn_vars = api._newSpawnVars[origin_2D]
+      -- logger:debug("Updated : " .. helpers.dir(updated_spawn_vars))
       return updated_spawn_vars
-    elseif classname == 'info_player_start' then
-      return api._newSpawnVarsPlayerStart
     end
     return spawnVars
   end
@@ -138,7 +139,7 @@ function factory.createLevelApi(kwargs)
     local spawn_location = api._all_spawn_locations[
                                 random.uniformInt(1, #api._all_spawn_locations)]
     logger:debug("Chosen spawn location: " .. spawn_location)
-    api._newSpawnVarsPlayerStart = {
+    api._newSpawnVars[spawn_location] = {
         classname = 'info_player_start',
         origin = spawn_location .. ' 30'
     }
