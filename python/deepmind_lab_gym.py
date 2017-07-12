@@ -554,8 +554,8 @@ class _DeepmindLab(gym.Env):
         # Reset the velociries
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
-        obs, _ = self._observations()
-        return obs
+        obs, info = self._observations()
+        return obs, info
 
     def _render(self, mode='human', close=False):
         if close:
