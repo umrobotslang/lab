@@ -386,6 +386,9 @@ class _DeepmindLab(gym.Env):
                  , enable_depth=True
                  , additional_observation_types = []
                  , init_game_seed=0):
+        # init_game_seed should be random (is messing with experiments)
+        init_game_seed = int(1e7*random.random())
+
         self.observation_types = [self.RGB_OBS_TYPE]
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
@@ -517,6 +520,9 @@ class _DeepmindLab(gym.Env):
                                                 , obs[self.VELR_OBS_TYPE]))
         for ot in self.additional_observation_types:
             self._last_info[ot] = obs[ot]
+        
+        # Store current environment name
+        self._last_info['env_name'] = self.environment_name()
 
         assert self._obs_space.contains(self._last_obs), \
             'Observations outside observation space'
@@ -551,10 +557,13 @@ class _DeepmindLab(gym.Env):
 
     def _reset(self):
         self._dm_lab_reset()
-        # Reset the velociries
+        # Reset the velocities
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
         obs, info = self._observations()
+
+        # Return env name (we often switch between new envs)
+        info['env_name'] = self.environment_name()
         return obs, info
 
     def _render(self, mode='human', close=False):
@@ -648,7 +657,7 @@ class TopViewDeepmindLab(gym.Wrapper):
 
     def _reset(self):
         obs = self.env._reset()
-        self._top_view.reset()
+        self._top_view = TopView(self.env.curr_mod_dir, self.env.environment_name())
         return obs
 
     def _render(self, mode='human', close=False):

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import getpass
 import logging
@@ -9,7 +10,7 @@ mplib.use('Agg')
 import matplotlib.cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
-
+import sys
 
 def euclidean(x):
     return np.sqrt(np.sum(x**2))
@@ -207,6 +208,8 @@ class TopView(object):
             return self.get_axes().figure
 
     def reset(self):
+        print("Current entity layer", file=sys.stderr)
+        print(self.level_script, file=sys.stderr)
         if self.supported():
             self._top_view_episode_map = TopViewEpisodeMap(self)
 
@@ -237,7 +240,7 @@ def letter_label(goal_loc):
     if 1 in one_hot:
         return chr(ord('A') + np.argmax(one_hot))
     else:
-        return '?'
+        return 'G'
 
 """
 End of terribly beautiful code

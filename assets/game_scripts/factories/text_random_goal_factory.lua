@@ -29,6 +29,7 @@ function factory.createLevelApi(kwargs)
   kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
   local possibleGoalLocations, otherGoalLocations = helpers.parsePossibleGoalLocations(maze, intpairkey)
+  local possibleAppleLocations, otherAppleLocations = helpers.parsePossibleAppleLocations(maze, intpairkey)
 
   local height, width = maze:size()
   local function text_row_col_to_map_xy(row, col)
@@ -86,7 +87,7 @@ function factory.createLevelApi(kwargs)
       local direct_key = string.format("%d %d", row, col)
       logger:debug("Checking key " .. direct_key)
       if distance > kwargs.minSpawnGoalDistance and
-         otherGoalLocations[direct_key]
+         otherAppleLocations[direct_key]
       then
         logger:debug(
             string.format("possible spawn location :(%d, %d): ", row, col)

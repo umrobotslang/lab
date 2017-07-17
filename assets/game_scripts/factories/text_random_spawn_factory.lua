@@ -23,13 +23,45 @@ Keyword arguments:
 *   `scatteredRewardDensity` (number, default 0.1) - Density of rewards.
 ]]
 
+local open = io.open
+-- v. bad practice (hardcoding file basepath)
+local mapdirectory = "/z/home/shurjo/implicit-mapping/deepmind-lab/assets/game_scripts/"
+
+local function read_file(path)
+    local file = open(path, "rb") -- r read mode and b binary mode
+    if not file then return nil end
+    local content = file:read "*a" -- *a or *all reads the whole file
+    file:close()
+    return content
+end
+
+local function getEntityLayer(mapname)
+  local filename = mapdirectory .. mapname .. ".entityLayer"
+  return read_file(filename);
+end
+
 function factory.createLevelApi(kwargs)
   kwargs.scatteredRewardDensity = kwargs.scatteredRewardDensity or 0.1
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
-  local possibleGoalLocations, otherGoalLocations = helpers.parsePossibleGoalLocations(maze, intpairkey)
-  local possibleAppleLocations, otherAppleLocations = helpers.parsePossibleAppleLocations(maze, intpairkey)
+  
+  local possibleGoalLocations_all = {}, otherGoalLocations_all = {}
+  local possibleAppleLocations_all = {}, otherAppleLocations_all = {}
+  for i = 1,kwargs.numMaps do
+    possibleGoalLocations_all[i]  = nil
+    otherGoalLocations_all[i]     = nil
+    possibleAppleLocations_all[i] = nil
+    otherAppleLocations_all[i]    = nil
+  end
+  
+  local possibleGoalLocations, otherGoalLocations   
+  local possibleAppleLocations, otherAppleLocations 
+
+  --Flag to help with next map loading
+  --Starting at true = start with a random episode (not 000)
+  local ignore_first_reset = true
+  local episode_has_finished_flag = true
 
   local height, width = maze:size()
   local function text_row_col_to_map_xy(row, col)
@@ -51,60 +83,20 @@ function factory.createLevelApi(kwargs)
     return pickups.defaults[class_name]
   end
 
+  
   function api:start(episode, seed)
     random.seed(seed)
-    local height, width = maze:size()
-    if next(possibleGoalLocations) ~= nil then
-        local chosen_goal_index = random.uniformInt(
-            1, #possibleGoalLocations)
-        local goal_location = possibleGoalLocations[chosen_goal_index]
-        api._goal = goal_location
-    else
-        api._goal = {random.uniformInt(1, height),
-                    random.uniformInt(1, width)}
-    end
-
-    -- Add custom obsevations
-    api._obs_value = {}
-    api._obs_value[ goal_location_custom_obs.name ] =
-        tensor.DoubleTensor{api._goal[1], api._goal[2]}
-
-    local goal_location
-    local all_spawn_locations = {}
-    local fruit_locations = {}
-    local fruit_locations_reverse = {}
-    maze:visitFill{cell = api._goal, func = function(row, col, distance)
-      logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
-      -- Axis is flipped in DeepMind Lab.
-      local key = text_row_col_to_map_key(row, col, intpairkey)
-
-      if distance == 0 then
-        goal_location = key
-      end
-      if distance > 0 then
-        fruit_locations[#fruit_locations + 1] = key
-      end
-      local direct_key = string.format("%d %d", row, col)
-      logger:debug("Checking key " .. direct_key)
-      if distance > kwargs.minSpawnGoalDistance and
-         otherAppleLocations[direct_key]
-      then
-        logger:debug(
-            string.format("possible spawn location :(%d, %d): ", row, col)
-                    .. key)
-        all_spawn_locations[#all_spawn_locations + 1] = key
-      end
-    end}
-    helpers.shuffleInPlace(fruit_locations)
-    api._goal_location = goal_location
-    api._fruit_locations = fruit_locations
-
-    if #all_spawn_locations == 0 then
-        error("Unable to find any spawn location, consider decreasing minSpawnGoalDistance")
-    end
-    api._all_spawn_locations = all_spawn_locations
   end
 
+  function api:hasEpisodeFinished(time_seconds)
+    api._time_remaining = kwargs.episodeLengthSeconds - time_seconds
+    api._hasEpisodeFinished = api._time_remaining <=0 
+    if api._hasEpisodeFinished then
+        episode_has_finished_flag = true 
+    end
+    return api._hasEpisodeFinished
+  end
+  
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
     -- logger:debug("Got : " .. helpers.dir(spawnVars))
@@ -123,8 +115,97 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:nextMap()
+     
+    -- Select next mapname
+    local nextMapName
+    if ignore_first_reset or episode_has_finished_flag then
+        if ignore_first_reset then
+            ignore_first_reset = false
+        elseif episode_has_finished_flag then
+            episode_has_finished_flag = false
+        end
+        
+        -- For new map name, reset possible locations
+        local chosenMap = random.uniformInt(1, kwargs.numMaps)
+        nextMapName = string.format('%s_%03d', kwargs.mapdir, chosenMap)
+        
+        maze = maze_gen.MazeGeneration{entity = getEntityLayer(nextMapName)}
+        possibleGoalLocations, otherGoalLocations = 
+           helpers.parsePossibleGoalLocations(maze, intpairkey)
+        possibleAppleLocations, otherAppleLocations = 
+           helpers.parsePossibleAppleLocations(maze, intpairkey)
+    
+    else
+        nextMapName = kwargs.mapName 
+    end
+
+    --maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
+    --possibleGoalLocations, otherGoalLocations = 
+    --   helpers.parsePossibleGoalLocations(maze, intpairkey)
+    --possibleAppleLocations, otherAppleLocations = 
+    --   helpers.parsePossibleAppleLocations(maze, intpairkey)
+    
+    -- Choose corresponding goal location    
+    local height, width = maze:size()
+    if next(possibleGoalLocations) ~= nil then
+        local chosen_goal_index = random.uniformInt(
+            1, #possibleGoalLocations)
+        local goal_location = possibleGoalLocations[chosen_goal_index]
+        api._goal = goal_location
+    else
+        api._goal = {random.uniformInt(1, height),
+                    random.uniformInt(1, width)}
+    end
+
+    --Episode finishing flags
+    api._hasEpisodeFinished = false
+    
+    -- Add custom obsevations
+    api._obs_value = {}
+    api._obs_value[ goal_location_custom_obs.name ] =
+        tensor.DoubleTensor{api._goal[1], api._goal[2]}
+
+    --Create goal and apple locations
+    local goal_location
+    local all_spawn_locations = {}
+    local fruit_locations = {}
+    local fruit_locations_reverse = {}
+    maze:visitFill{cell = api._goal, func = function(row, col, distance)
+      logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
+      -- Axis is flipped in DeepMind Lab.
+      local key = text_row_col_to_map_key(row, col, intpairkey)
+
+      if distance == 0 then
+        goal_location = key
+      end
+      if distance > 0 then
+        fruit_locations[#fruit_locations + 1] = key
+      end
+      local direct_key = string.format("%d %d", row, col)
+      logger:debug("Checking key " .. direct_key)
+      if distance > kwargs.minSpawnGoalDistance and
+         otherAppleLocations[direct_key] and 
+         row > 1 and row < height and
+         col > 1 and col < width
+      then
+        logger:debug(
+            string.format("possible spawn location :(%d, %d): ", row, col)
+                    .. key)
+        all_spawn_locations[#all_spawn_locations + 1] = key
+      end
+    end}
+    helpers.shuffleInPlace(fruit_locations)
+    api._goal_location = goal_location
+    api._fruit_locations = fruit_locations
+
+    if #all_spawn_locations == 0 then
+        error("Unable to find any spawn location, consider decreasing minSpawnGoalDistance")
+    end
+    api._all_spawn_locations = all_spawn_locations
     api._newSpawnVars = {}
 
+
+    -- Chose fruit locations based on input probability
     local maxFruit = math.floor(kwargs.scatteredRewardDensity *
                                 #api._fruit_locations + 0.5)
     for i, fruit_location in ipairs(api._fruit_locations) do
@@ -137,6 +218,7 @@ function factory.createLevelApi(kwargs)
       }
     end
 
+    -- Choose a spawn location
     local spawn_location = api._all_spawn_locations[
                                 random.uniformInt(1, #api._all_spawn_locations)]
     logger:debug("Chosen spawn location: " .. spawn_location)
@@ -145,16 +227,15 @@ function factory.createLevelApi(kwargs)
         origin = spawn_location .. ' 30'
     }
 
+    -- Choose a goal location
     logger:debug("Chosen goal location: " .. api._goal_location)
     api._newSpawnVars[api._goal_location] = {
         classname = 'goal',
         origin = api._goal_location .. ' 20'
     }
     
-    --local chosenMap = random.uniformInt(0, kwargs.numMaps-1)
-    --local nextMapName = string.format('random_map_%03d', chosenMap)
-    --print(nextMapName)
-    return kwargs.mapName 
+    -- Return the chosen mapname
+    return nextMapName
   end
 
   -- Add GOAL.LOC to the observation specs
