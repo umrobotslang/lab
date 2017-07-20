@@ -670,13 +670,14 @@ class TopViewDeepmindLab(gym.Wrapper):
                     + "{0} file not found".format(
                         self._top_view._entity_file()))
 
-        fig = self._top_view.draw()
         if mode == 'return':
-            pass # returns (im, fig)
+            fig = self._top_view.draw()
         elif mode == 'human':
+            fig = self._top_view.draw()
             if fig:
                 self._top_view.render(fig)
         elif mode == 'file':
+            fig = self._top_view.draw()
             if fig:
                 dpi = self.env.lab_config['height'] / fig.get_size_inches()[0]
                 self._top_view.print_figure(

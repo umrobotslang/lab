@@ -12,34 +12,34 @@ local factory = require 'factories.text_random_spawn_factory'
 -- 3. Apples will be replace with Apple at scatteredRewardDensity probability
 local entityLayer_01 = [[
 *************
-*P*AAAAAAAAA*
-*A*A*A*****A*
-*A*A*AAAAA*A*
-*A*A*****A***
-*A*AAAAA*AAA*
-*A**A**A***A*
+*PAA*AAG*AAA*
+*A*A*A***AAA*
+*A*A*AAA*AAA*
+*A*A*A*A*A*A*
+*A*AAA*AAA*A*
+***A*A*****A*
 *AAAAA*AAAAA*
-*A***A***A*A*
-*AAAAA*AAA*A*
-*A*****A***A*
-*AAAAAAAAA*G*
+*A*****A*****
+*A*AAA*A*AAA*
+*A*A*A*A*A*A*
+*AAA*AAAAA*A*
 *************
 ]]
 
 local variationsLayer_01 = [[
-FFFFZZZZZAAAA
-FFFFZZZZZAAAA
-RRRRDZZZZAAAA
-RRRDDDZZZAAAA
-RRDDDDGZZAAAA
-RDDDDGGGGAAAA
-DDDDGGGGGGAAA
-DDDGGGGGGGJJJ
-DDGGGGGGGJJJJ
-DGGGGGGGGJJJJ
-IIIIIIIIIJJJJ
-IIIIIIIIIJJJJ
-IIIIIIIIIJJJJ
+ZZZZZZAAAAAAA
+ZZZZZZAAAAAAA
+ZZZZZZZAAAAAA
+KZZZZZZAAAAAA
+KKZZZZZAAAAAA
+KKKZZZZZAAAAA
+KKKKZZZXXXXXX
+KKKBBBXXXXXXX
+KBBBBBXXXXXXX
+BBBBBBTXXXXXR
+WWWWWWTTXXXRR
+WWWWWWTTTXRRR
+WWWWWWTTTTRRR
 ]]
 
 local entityLayer = entityLayer_01

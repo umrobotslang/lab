@@ -47,7 +47,7 @@ return factory.createLevelApi{
     , blankMapName = 'random_mazes_050_intra_5x5_030_blank_name'
     , entityLayer = entityLayer
     , episodeLengthSeconds = 30 
-    , scatteredRewardDensity = 0.25
+    , scatteredRewardDensity = 0.50
     , minSpawnGoalDistance = 0
     , numMaps = numMaps
     , mapdir = 'random_mazes_050_intra_5x5'

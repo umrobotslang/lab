@@ -44,10 +44,13 @@ function factory.createLevelApi(kwargs)
   kwargs.scatteredRewardDensity = kwargs.scatteredRewardDensity or 0.1
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
   kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
-  local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
   
-  local possibleGoalLocations_all = {}, otherGoalLocations_all = {}
-  local possibleAppleLocations_all = {}, otherAppleLocations_all = {}
+  local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
+  local possibleGoalLocations_all = {}
+  local otherGoalLocations_all = {}
+  local possibleAppleLocations_all = {}
+  local otherAppleLocations_all = {}
+
   for i = 1,kwargs.numMaps do
     possibleGoalLocations_all[i]  = nil
     otherGoalLocations_all[i]     = nil
@@ -128,22 +131,29 @@ function factory.createLevelApi(kwargs)
         -- For new map name, reset possible locations
         local chosenMap = random.uniformInt(1, kwargs.numMaps)
         nextMapName = string.format('%s_%03d', kwargs.mapdir, chosenMap)
+
+        -- Store nextMapName in current mapname for future reloading
+        kwargs.mapName = nextMapName
+       
+        -- Store array of locations pertaining to specific entityMaps
+        if not possibleGoalLocations_all[chosenMap] then
+            maze = maze_gen.MazeGeneration{entity = getEntityLayer(nextMapName)}
+            possibleGoalLocations_all[chosenMap], otherGoalLocations_all[chosenMap] = 
+                helpers.parsePossibleGoalLocations(maze, intpairkey)
+            possibleAppleLocations_all[chosenMap], otherAppleLocations_all[chosenMap] = 
+                helpers.parsePossibleAppleLocations(maze, intpairkey)
+        end
         
-        maze = maze_gen.MazeGeneration{entity = getEntityLayer(nextMapName)}
-        possibleGoalLocations, otherGoalLocations = 
-           helpers.parsePossibleGoalLocations(maze, intpairkey)
-        possibleAppleLocations, otherAppleLocations = 
-           helpers.parsePossibleAppleLocations(maze, intpairkey)
+        -- Use array to reload spawn and fruit points
+        possibleGoalLocations = possibleGoalLocations_all[chosenMap]
+        otherGoalLocations = otherGoalLocations_all[chosenMap]
+        possibleAppleLocations = possibleAppleLocations_all[chosenMap]
+        otherAppleLocations = otherAppleLocations_all[chosenMap]
+
     
     else
         nextMapName = kwargs.mapName 
     end
-
-    --maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
-    --possibleGoalLocations, otherGoalLocations = 
-    --   helpers.parsePossibleGoalLocations(maze, intpairkey)
-    --possibleAppleLocations, otherAppleLocations = 
-    --   helpers.parsePossibleAppleLocations(maze, intpairkey)
     
     -- Choose corresponding goal location    
     local height, width = maze:size()

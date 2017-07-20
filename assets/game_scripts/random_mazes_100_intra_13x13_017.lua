@@ -12,34 +12,34 @@ local factory = require 'factories.text_random_spawn_factory'
 -- 3. Apples will be replace with Apple at scatteredRewardDensity probability
 local entityLayer_01 = [[
 *************
-*PAAAAAA*AAA*
-*A*A*A*A**AA*
-*A*A*AAA*AAA*
-*A*A*A*A*A*A*
-*AAA*AAAAA*A*
-*A*****A**A**
-*AAA*AAA*GAA*
-***A**A****A*
-*AAA*AAA*AAA*
-*AA**A*A*A***
+*PAAAAAAAAAA*
+*AA****A***A*
+*A*AAA*AAA*A*
+*AA**A***A*A*
+*AAAAAAAAA*A*
+**AA*A*A*A***
+*A*AAA*A*AAG*
+*A***A***A*A*
+*AAAAA*AAA*A*
+*AA****A***A*
 *AAAAA*AAAAA*
 *************
 ]]
 
 local variationsLayer_01 = [[
-XXXXEEEEEUUUU
-XXXXEEEEEUUUU
-XXXXEEEEEUUUU
-XXXXEEEEEUUUU
-XXXXEEEEEUUUU
-AXXXEEEEEUUUU
-AAHHEEEEEUUUU
-AAHHHEEEGGGGG
-AAHHHHEEGGGGG
-ANNNNNNNGGGGG
-WWNNNNNNGGGGG
-WWWNNNNNGGGGG
-WWWWNNNNNGGGG
+SSSSSSDDDDDDD
+SSSSSSDDDDDDD
+SSSSSDDDDDDDD
+XXXXXDDDDDDDD
+XXXXXRRRRRRRR
+BXXXXRRRRRRRR
+BBXXXURRRRRRR
+BBBXUUURRRRCC
+BBBEUUUURRCCC
+BBEEEUUUUCCCC
+BEEEEEUUCCCCC
+EEEEEEECCCCCC
+EEEEEEECCCCCC
 ]]
 
 local entityLayer = entityLayer_01
@@ -50,7 +50,7 @@ local numMaps = 100
 local chosenMap = random.uniformInt(0, numMaps-1)
 local nextMapName = mapName--string.format('random_map_%03d', chosenMap)
 
-local create_new_map = true
+local create_new_map = false
 if create_new_map then
     local make_map = require 'common.make_map'
     make_map.makeMap(mapName
@@ -62,7 +62,7 @@ return factory.createLevelApi{
     mapName = mapName
     , blankMapName = 'random_mazes_100_intra_13x13_017_blank_name'
     , entityLayer = entityLayer
-    , episodeLengthSeconds = 0.1 
+    , episodeLengthSeconds = 30 
     , scatteredRewardDensity = 0.25
     , minSpawnGoalDistance = 0
     , numMaps = numMaps

@@ -11,6 +11,7 @@ import matplotlib.cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends import pylab_setup
 import sys
+import math
 
 def euclidean(x):
     return np.sqrt(np.sum(x**2))
@@ -208,8 +209,6 @@ class TopView(object):
             return self.get_axes().figure
 
     def reset(self):
-        print("Current entity layer", file=sys.stderr)
-        print(self.level_script, file=sys.stderr)
         if self.supported():
             self._top_view_episode_map = TopViewEpisodeMap(self)
 
@@ -256,6 +255,7 @@ class TopViewEpisodeMap(object):
         self._drawn_once = False
         self._added_goal_patch = None
         self._added_scatter = None
+        self._added_arrow = None
 
     def add_pose(self, pose, reward=0):
         self.poses2D = np.vstack((self.poses2D, (pose[0], pose[1], pose[4])))
@@ -338,14 +338,25 @@ class TopViewEpisodeMap(object):
         if self._added_scatter:
             self._added_scatter.remove()
 
+        if self._added_arrow:
+            self._added_arrow.remove()
+
         if self.poses2D.shape[0]:
             self._added_scatter = ax.scatter(
                 self.poses2D[:, 0], self.poses2D[:, 1]
-                , c=self.normalized_rewards()
+                , c=self.normalized_rewards()[:]
                 , cmap='coolwarm'
                 , linewidths=0
                 , edgecolors=None
                 , marker='.')
+        
+        if self.poses2D.shape[0]:
+            _x   = self.poses2D[-1, 0]
+            _y   = self.poses2D[-1, 1]
+            _yaw = self.poses2D[-1, 2]
+            _dx = 15*math.cos(_yaw)
+            _dy = 15*math.sin(_yaw)
+            self._added_arrow = ax.arrow(_x, _y, _dx, _dy, head_width=15, head_length=15, fc='k', ec='k')
 
     def _draw_once(self):
         if not self._drawn_once:

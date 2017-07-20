@@ -54,7 +54,7 @@ pickups.defaults = {
       name = 'Goal',
       class_name = 'goal',
       model_name = 'models/goal_object_02.md3',
-      quantity = 10,
+      quantity = 100,
       type = pickups.type.kGoal
   },
   goal_mango = {
