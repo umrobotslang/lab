@@ -25,7 +25,21 @@ Keyword arguments:
 
 local open = io.open
 -- v. bad practice (hardcoding file basepath)
-local mapdirectory = "/z/home/shurjo/implicit-mapping/deepmind-lab/assets/game_scripts/"
+
+function os.capture(cmd, raw)
+  local f = assert(io.popen(cmd, 'r'))
+  local s = assert(f:read('*a'))
+  f:close()
+  if raw then return s end
+  s = string.gsub(s, '^%s+', '')
+  s = string.gsub(s, '%s+$', '')
+  s = string.gsub(s, '[\n\r]+', ' ')
+  return s
+end
+
+local pwd = os.capture("pwd", true)
+local i,j = string.find(pwd, "deepmind%-lab")
+local mapdirectory = string.sub(pwd, 1, j) .."/assets/game_scripts/"
 
 local function read_file(path)
     local file = open(path, "rb") -- r read mode and b binary mode
