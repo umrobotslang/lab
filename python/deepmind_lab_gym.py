@@ -598,9 +598,11 @@ class TopViewDeepmindLab(gym.Wrapper):
     def __init__(self, env=None
                  , wall_penalty_scale=0
                  , wall_penalty_max=0
-                 , wall_penalty_max_dist=1):
-        assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
+                 , wall_penalty_max_dist=1
+                 , method="3D"):
 
+        assert isinstance(env, _DeepmindLab), "Depends on env = _DeepmindLab"
+        self.method = method
         self.old_additional_observation_types = \
             copy.copy(env.additional_observation_types)
         needed_obs_types = [env.POSE_OBS_TYPE , env.GOAL_OBS_TYPE]
@@ -608,7 +610,9 @@ class TopViewDeepmindLab(gym.Wrapper):
         obs_not_supported = False
         try:
             super(TopViewDeepmindLab, self).__init__(env=env)
-            self._top_view = TopView(env.curr_mod_dir, env.environment_name())
+            self._top_view = TopView(assets_top_dir=env.curr_mod_dir, 
+                                     level_script=env.environment_name(),
+                                     method=self.method)
         except ValueError, err:
             the_right_kind_exception = any(
                 "Unknown observation" in str(err) and obs in str(err)
@@ -619,7 +623,9 @@ class TopViewDeepmindLab(gym.Wrapper):
             env.additional_observation_types = self.old_additional_observation_types
             # Reinitializing without top-view
             super(TopViewDeepmindLab,  self).__init__(env=env)
-            self._top_view = TopView(env.curr_mod_dir, env.environment_name())
+            self._top_view = TopView(assets_top_dir=env.curr_mod_dir, 
+                                     level_script=env.environment_name(),
+                                     method=self.method)
             assert not self._top_view.supported(), 'Entity file and GOAL.LOC both should be available'
             warnings.warn("Top view not supported because"
                           + " observation type '{}'".format(env.GOAL_OBS_TYPE)
@@ -657,7 +663,9 @@ class TopViewDeepmindLab(gym.Wrapper):
 
     def _reset(self):
         obs = self.env._reset()
-        self._top_view = TopView(self.env.curr_mod_dir, self.env.environment_name())
+        self._top_view = TopView(assets_top_dir=self.env.curr_mod_dir, 
+                                 level_script=self.env.environment_name(),
+                                 method=self.method)
         return obs
 
     def _render(self, mode='human', close=False):
