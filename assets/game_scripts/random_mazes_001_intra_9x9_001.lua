@@ -58,5 +58,5 @@ return factory.createLevelApi{
     , scatteredRewardDensity = 0.50
     , minSpawnGoalDistance = 0
     , numMaps = numMaps
-    , mapdir = 'random_mazes_001_intra_9x9'
+    , mapdir = 'random_mazes_050_intra_9x9'
 }
