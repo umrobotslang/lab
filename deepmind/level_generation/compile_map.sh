@@ -40,6 +40,7 @@
 set -e
 
 readonly MAPBASE="${1}"
+readonly PK3BASE="${2}"
 
 readonly BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly Q3MP="${BASE}/../../q3map2/q3map2"
@@ -85,9 +86,12 @@ ${BSPC} -optimize -forcesidesvisible -bsp2aas "${MAPBASE}.map" -output "${DIR}"
 mkdir -p -- "${DIR}/maps"
 cp -t "${DIR}/maps" -- "${DIR}/${MPB}.bsp" "${DIR}/${MPB}.aas"
 
-rm -f -- "${DIR}/${MPB}.pk3"
-(cd -- "${DIR}" && zip "${MPB}.pk3" -- "maps/${MPB}.bsp" "maps/${MPB}.aas")
+if [ -z "$PK3BASE" ]; then
+    PK3BASE="${MPB}"
+    rm -f -- "${DIR}/${PK3BASE}.pk3"
+fi
+(cd -- "${DIR}" && zip -u "${PK3BASE}.pk3" -- "maps/${MPB}.bsp" "maps/${MPB}.aas")
 
 # Done!
 
-echo "Created map pack ${DIR}/${MPB}.pk3"
+echo "Created map pack ${DIR}/${PK3BASE}.pk3"
