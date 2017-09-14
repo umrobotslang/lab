@@ -63,9 +63,13 @@ function factory.createLevelApi(kwargs)
     local x, y = text_row_col_to_map_xy(row, col)
     local key = x .. ' ' .. y
     return key
-  end
-
+end
+  
   function api:start(episode, seed, params)
+    print("Fucking params")
+    print(params)
+    print("Fucking params")
+      
     api._time_remaining = kwargs.episodeLengthSeconds
     random.seed(seed)
 

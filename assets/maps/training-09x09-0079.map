@@ -1,0 +1,1369 @@
+{
+  "classname" "worldspawn"
+  "light" "100"
+  "worldtype" "2"
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 701 0 ) ( 32 701 0 ) ( 0 701 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 799 0 ) ( 0 799 32 ) ( 32 799 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 0 700 32 ) ( 32 700 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 800 0 ) ( 32 800 0 ) ( 0 800 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 0 600 32 ) ( 32 600 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 32 700 0 ) ( 0 700 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 701 0 0 ) ( 701 0 32 ) ( 701 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 0 600 32 ) ( 32 600 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 32 700 0 ) ( 0 700 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 0 600 32 ) ( 32 600 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 32 700 0 ) ( 0 700 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 0 600 32 ) ( 32 600 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 700 0 ) ( 32 700 0 ) ( 0 700 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 599 0 ) ( 0 599 32 ) ( 32 599 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 599 0 ) ( 0 599 32 ) ( 32 599 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 501 0 ) ( 32 501 0 ) ( 0 501 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 200 0 0 ) ( 200 32 0 ) ( 200 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 300 0 0 ) ( 300 0 32 ) ( 300 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 599 0 ) ( 0 599 32 ) ( 32 599 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 501 0 ) ( 32 501 0 ) ( 0 501 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 599 0 ) ( 0 599 32 ) ( 32 599 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 501 0 ) ( 32 501 0 ) ( 0 501 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 599 0 ) ( 0 599 32 ) ( 32 599 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 599 0 0 ) ( 599 32 0 ) ( 599 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 701 0 0 ) ( 701 0 32 ) ( 701 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 0 500 32 ) ( 32 500 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 600 0 ) ( 32 600 0 ) ( 0 600 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 199 0 0 ) ( 199 32 0 ) ( 199 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 599 0 0 ) ( 599 32 0 ) ( 599 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 501 0 0 ) ( 501 0 32 ) ( 501 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 701 0 0 ) ( 701 0 32 ) ( 701 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 0 400 32 ) ( 32 400 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 500 0 ) ( 32 500 0 ) ( 0 500 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 199 0 0 ) ( 199 32 0 ) ( 199 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 399 0 ) ( 0 399 32 ) ( 32 399 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 301 0 0 ) ( 301 0 32 ) ( 301 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 399 0 ) ( 0 399 32 ) ( 32 399 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 301 0 ) ( 32 301 0 ) ( 0 301 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 599 0 0 ) ( 599 32 0 ) ( 599 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 301 0 ) ( 32 301 0 ) ( 0 301 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 701 0 0 ) ( 701 0 32 ) ( 701 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 0 300 32 ) ( 32 300 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 400 0 ) ( 32 400 0 ) ( 0 400 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 199 0 0 ) ( 199 32 0 ) ( 199 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 399 0 0 ) ( 399 32 0 ) ( 399 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 301 0 0 ) ( 301 0 32 ) ( 301 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 701 0 0 ) ( 701 0 32 ) ( 701 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 0 200 32 ) ( 32 200 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 300 0 ) ( 32 300 0 ) ( 0 300 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 199 0 0 ) ( 199 32 0 ) ( 199 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 101 0 0 ) ( 101 0 32 ) ( 101 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 100 0 0 ) ( 100 32 0 ) ( 100 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 200 0 0 ) ( 200 0 32 ) ( 200 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 301 0 0 ) ( 301 0 32 ) ( 301 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 300 0 0 ) ( 300 32 0 ) ( 300 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 400 0 0 ) ( 400 0 32 ) ( 400 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 199 0 ) ( 0 199 32 ) ( 32 199 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 400 0 0 ) ( 400 32 0 ) ( 400 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 500 0 0 ) ( 500 0 32 ) ( 500 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 199 0 ) ( 0 199 32 ) ( 32 199 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 500 0 0 ) ( 500 32 0 ) ( 500 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 600 0 0 ) ( 600 0 32 ) ( 600 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 199 0 ) ( 0 199 32 ) ( 32 199 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 600 0 0 ) ( 600 32 0 ) ( 600 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 700 0 0 ) ( 700 0 32 ) ( 700 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 799 0 0 ) ( 799 32 0 ) ( 799 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 101 0 ) ( 32 101 0 ) ( 0 101 32 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/lg_style_01_wall_green 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 0 ) ( 32 0 0 ) ( 0 32 0 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 1 ) ( 0 32 1 ) ( 32 0 1 ) map/lab_games/lg_style_01_floor_orange 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    ( 700 0 0 ) ( 700 32 0 ) ( 700 0 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 800 0 0 ) ( 800 0 32 ) ( 800 32 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 100 0 ) ( 0 100 32 ) ( 32 100 0 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 200 0 ) ( 32 200 0 ) ( 0 200 32 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 99 ) ( 32 0 99 ) ( 0 32 99 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+    ( 0 0 100 ) ( 0 32 100 ) ( 32 0 100 ) map/lab_games/fake_sky 0 0 0 0.0976562 0.0976562 0 0 0
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style02_008
+      ( 3 3 0 0 0 )
+      (
+        ( ( 686.478 102 13.5216 0 1 ) ( 686.478 102 50 0 0.5 ) ( 686.478 102 86.4784 0 0 ) )
+        ( ( 650 102 13.5216 0.5 1 ) ( 650 102 50 0.5 0.5 ) ( 650 102 86.4784 0.5 0 ) )
+        ( ( 613.522 102 13.5216 1 1 ) ( 613.522 102 50 1 0.5 ) ( 613.522 102 86.4784 1 0 ) )
+      )
+    }
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style01_013
+      ( 3 3 0 0 0 )
+      (
+        ( ( 302 324.449 24.4493 0 1 ) ( 302 324.449 50 0 0.5 ) ( 302 324.449 75.5507 0 0 ) )
+        ( ( 302 350 24.4493 0.5 1 ) ( 302 350 50 0.5 0.5 ) ( 302 350 75.5507 0.5 0 ) )
+        ( ( 302 375.551 24.4493 1 1 ) ( 302 375.551 50 1 0.5 ) ( 302 375.551 75.5507 1 0 ) )
+      )
+    }
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style01_017
+      ( 3 3 0 0 0 )
+      (
+        ( ( 598 564.284 35.7156 0 1 ) ( 598 564.284 50 0 0.5 ) ( 598 564.284 64.2844 0 0 ) )
+        ( ( 598 550 35.7156 0.5 1 ) ( 598 550 50 0.5 0.5 ) ( 598 550 64.2844 0.5 0 ) )
+        ( ( 598 535.716 35.7156 1 1 ) ( 598 535.716 50 1 0.5 ) ( 598 535.716 64.2844 1 0 ) )
+      )
+    }
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style01_010
+      ( 3 3 0 0 0 )
+      (
+        ( ( 372.376 102 27.6244 0 1 ) ( 372.376 102 50 0 0.5 ) ( 372.376 102 72.3756 0 0 ) )
+        ( ( 350 102 27.6244 0.5 1 ) ( 350 102 50 0.5 0.5 ) ( 350 102 72.3756 0.5 0 ) )
+        ( ( 327.624 102 27.6244 1 1 ) ( 327.624 102 50 1 0.5 ) ( 327.624 102 72.3756 1 0 ) )
+      )
+    }
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style04_008
+      ( 3 3 0 0 0 )
+      (
+        ( ( 476.514 502 23.4863 0 1 ) ( 476.514 502 50 0 0.5 ) ( 476.514 502 76.5137 0 0 ) )
+        ( ( 450 502 23.4863 0.5 1 ) ( 450 502 50 0.5 0.5 ) ( 450 502 76.5137 0.5 0 ) )
+        ( ( 423.486 502 23.4863 1 1 ) ( 423.486 502 50 1 0.5 ) ( 423.486 502 76.5137 1 0 ) )
+      )
+    }
+  }
+  {
+    patchDef2
+    {
+      decal/lab_games/dec_img_style01_006
+      ( 3 3 0 0 0 )
+      (
+        ( ( 623.363 198 23.3628 0 1 ) ( 623.363 198 50 0 0.5 ) ( 623.363 198 76.6372 0 0 ) )
+        ( ( 650 198 23.3628 0.5 1 ) ( 650 198 50 0.5 0.5 ) ( 650 198 76.6372 0.5 0 ) )
+        ( ( 676.637 198 23.3628 1 1 ) ( 676.637 198 50 1 0.5 ) ( 676.637 198 76.6372 1 0 ) )
+      )
+    }
+  }
+}
+
+{
+  "classname" "light"
+  "light" "90"
+  "origin" "150 750 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "65"
+  "origin" "350 750 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "50"
+  "origin" "550 750 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "60"
+  "origin" "750 750 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "60"
+  "origin" "150 550 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "90"
+  "origin" "350 550 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "50"
+  "origin" "550 550 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "80"
+  "origin" "750 550 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "60"
+  "origin" "150 350 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "95"
+  "origin" "350 350 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "80"
+  "origin" "550 350 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "90"
+  "origin" "750 350 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "85"
+  "origin" "150 150 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "65"
+  "origin" "350 150 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "55"
+  "origin" "550 150 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "light"
+  "light" "75"
+  "origin" "750 150 70"
+  "spawnflags" "0"
+  "style" "0"
+}
+
+{
+  "classname" "info_player_start"
+  "origin" "150 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "250 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "350 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "450 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "550 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "650 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 750 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 650 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "150 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "250 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "350 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "450 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "550 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 550 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "150 450 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "550 450 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 450 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "150 350 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "350 350 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "450 350 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "550 350 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 350 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "150 250 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "350 250 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 250 30"
+}
+
+{
+  "classname" "goal"
+  "origin" "150 150 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "350 150 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "450 150 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "550 150 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "650 150 30"
+}
+
+{
+  "classname" "apple_reward"
+  "origin" "750 150 30"
+}
+

@@ -820,17 +820,20 @@ ASSETS = [
     "assets/q3config.cfg",
 ] + glob(["assets/game_scripts/**/*.lua"])
 
-MAPS = glob(["assets/maps/*.map"])
+TRAIN_OR_TRAIN_MAPS = glob(["assets/maps/t*.map"])
+OTHER_MAPS = glob(["assets/maps/*.map"], exclude = ["assets/maps/t*.map"])
 
 genrule(
-    name = "map_assets",
-    srcs = MAPS,
+    name = "allmaps_assets",
+    srcs = TRAIN_OR_TRAIN_MAPS,
     outs = ["baselab/allmaps.pk3"],
+    #cmd = "cp -t $(@D)/ $(SRCS); " +
+    #      "for s in $(SRCS); do " +
+    #      "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
+    #      "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
+    #      "done",
     cmd = "cp -t $(@D)/ $(SRCS); " +
-          "for s in $(SRCS); do " +
-          "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
-          "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
-          "done",
+          "cp /z/tmp/dhiman/deepmind-lab-sep-13-2017/build/execroot/deepmind-lab/bazel-out/local-fastbuild/genfiles/baselab/allmaps.pk3 $@",
     tools = [
         "//:bspc",
         "//deepmind/level_generation:compile_map_sh",
@@ -839,9 +842,9 @@ genrule(
 )
 
 genrule(
-    name = "map_assets_pk3_per_map",
-    srcs = MAPS,
-    outs = ["baselab/" + f[12:-3] + "pk3" for f in MAPS],
+    name = "map_assets",
+    srcs = OTHER_MAPS,
+    outs = ["baselab/" + f[12:-3] + "pk3" for f in OTHER_MAPS],
     cmd = "cp -t $(@D)/baselab $(SRCS); " +
           "for s in $(SRCS); do " +
           "  BM=$$(basename $${s}); M=$${BM/.map/}; " +

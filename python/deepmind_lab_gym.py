@@ -163,7 +163,7 @@ class ActionMapper(object):
         [  50.0 ,-50.0 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  1   , -1   ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  3   , -3   ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
@@ -385,7 +385,16 @@ class _DeepmindLab(gym.Env):
                  , enable_velocity=False
                  , enable_depth=True
                  , additional_observation_types = []
-                 , init_game_seed=0):
+                 , init_game_seed=0
+                 , apple_prob = 0.25
+                 , num_maps = 1
+                 , rows = 9
+                 , cols = 9
+                 , mode = "training"
+                 , episode_length_seconds=30
+                 , worker_id = -1
+                 , entitydir="/z/home/shurjo/implicit-mapping/maps"):
+        
         # init_game_seed should be random (is messing with experiments)
         init_game_seed = int(1e7*random.random())
 
@@ -417,6 +426,16 @@ class _DeepmindLab(gym.Env):
         self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
         self.init_game_seed = init_game_seed
 
+        # Additional params to be fed in to simulation
+        self.apple_prob = apple_prob
+        self.num_maps = num_maps
+        self.rows = rows
+        self.cols = cols
+        self.mode = mode
+        self.episode_length_seconds = episode_length_seconds
+        self.entitydir = entitydir
+        self.worker_id = worker_id
+
     def force_unset_dl_env(self):
         "Assumes you know what you are doing"
         self._dl_env = None
@@ -425,8 +444,9 @@ class _DeepmindLab(gym.Env):
         return self._dm_lab_env().environment_name()
 
     def _dm_lab_reset(self):
+        init_game_seed = int(1e7*random.random())
         with self._chdir_mod_ctxt:
-            self._dm_lab_env().reset(seed=self.init_game_seed)
+            self._dm_lab_env().reset(init_game_seed)
 
     def _dm_lab_step(self, *args, **kwargs):
         with self._chdir_mod_ctxt:
@@ -439,12 +459,23 @@ class _DeepmindLab(gym.Env):
             # While loading the map the directory should be changed because
             # that's when the maps get loaded.
             with ChDirCtxt(curr_mod_dir):
+                input_dict = {k:str(v) for k,v in self.lab_config.items()}
+
+                # More config params
+                input_dict['apple_prob'] = str(self.apple_prob)
+                input_dict['num_maps'] = str(self.num_maps)
+                input_dict['rows'] = str(self.rows)
+                input_dict['cols'] = str(self.cols)
+                input_dict['mode'] = self.mode
+                input_dict['episode_length_seconds'] = str(self.episode_length_seconds)
+                input_dict['entitydir'] = self.entitydir
+                input_dict['worker_id'] = str(self.worker_id)
+
                 observation_types = self.observation_types \
                                             + self.additional_observation_types
                 dlenv = deepmind_lab.Lab(self.level_script
                                          , observation_types
-                                         , {k: str(v)
-                                            for k, v in self.lab_config.items()})
+                                         , input_dict)
             # Wraps all the callable methods so that they are called from
             # the current module directory
             self._dl_env = dlenv
@@ -566,7 +597,7 @@ class _DeepmindLab(gym.Env):
         info['env_name'] = self.environment_name()
         return obs, info
 
-    def _render(self, mode='human', close=False):
+    def _render(self, mode='return', close=False):
         if close:
             return
 
@@ -576,8 +607,9 @@ class _DeepmindLab(gym.Env):
         if mode == 'return':
             pass
         elif mode == 'human':
-            cv2.imshow("c",im)
-            cv2.waitKey(1)
+            #cv2.imshow("c",im)
+            #cv2.waitKey(1)
+            pass
         elif mode == 'file':
             warnings.warn("""mode = file is deprecated. Use mode =
             return and write on your own write to file logic.  You may

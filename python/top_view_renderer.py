@@ -179,7 +179,7 @@ class TopView(object):
         return os.path.exists(self._entity_file())
 
     def _make_axes(self):
-        fig = mplib.figure.Figure(figsize=(4,4))
+        fig = mplib.figure.Figure(figsize=(4, 4))
         # TODO: axes width/height are assumed to be in 1:1 ratio
         # and expected to be handled in by set_aspect later. This is
         # problematic because we depend on matplotlib magic
@@ -192,9 +192,11 @@ class TopView(object):
         return self._ax
 
     def _entity_file(self):
-        return os.path.join(
-            self.assets_top_dir
-            , "assets/game_scripts/{}.entityLayer".format(self.level_script))
+        return os.path.join("/z/home/shurjo/implicit-mapping/maps/09x09/testing/entityLayers",
+                            "%s.entityLayer" %self.level_script[-4:])
+        #return os.path.join(
+        #    self.assets_top_dir
+        #    , "assets/game_scripts/{}.entityLayer".format(self.level_script))
 
     def add_pose(self, pose, reward=0):
         if self.supported():
