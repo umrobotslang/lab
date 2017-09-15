@@ -26,7 +26,7 @@ Keyword arguments:
 function factory.createLevelApi(kwargs)
   kwargs.scatteredRewardDensity = kwargs.scatteredRewardDensity or 0.1
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
-  kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 8
+  kwargs.minSpawnGoalDistance = kwargs.minSpawnGoalDistance or 3
   local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
   local possibleGoalLocations, otherGoalLocations = helpers.parsePossibleGoalLocations(maze, intpairkey)
   local possibleAppleLocations, otherAppleLocations = helpers.parsePossibleAppleLocations(maze, intpairkey)
@@ -35,6 +35,7 @@ function factory.createLevelApi(kwargs)
   local function text_row_col_to_map_xy(row, col)
       return helpers.text_row_col_to_map_xy(row, col, height)
   end
+
   local function map_xy_to_text_row_col(x, y)
       return helpers.map_xy_to_text_row_col(x, y, height)
   end
@@ -84,8 +85,8 @@ function factory.createLevelApi(kwargs)
       if distance > 0 then
         fruit_locations[#fruit_locations + 1] = key
       end
-      local direct_key = string.format("%d %d", row, col)
-      logger:debug("Checking key " .. direct_key)
+      local direct_key = intpairkey(row, col)
+      logger:debug(string.format("Checking key %s distance %f isdistance %s isapple %s", direct_key, distance,tostring(distance > kwargs.minSpawnGoalDistance), tostring(otherAppleLocations[direct_key] ~= nil)))
       if distance > kwargs.minSpawnGoalDistance and
          otherAppleLocations[direct_key]
       then

@@ -12,15 +12,15 @@ local factory = require 'factories.text_random_goal_factory'
 -- 3. Apples will be replace with Apple at scatteredRewardDensity probability
 local entityLayer_13 = [[
 *******AAAA
-*G*G  *AAAA
-* *** *AAAA
-* *A* *AAAA
-* *** *****
-*    P    *
-***** *** *
-AAAA* *A*G*
-AAAA* *****
-AAAA*    G*
+*G*GAA*AAAA
+*A***A*AAAA
+*A*A*A*AAAA
+*A***A*****
+*AAAAPAAAA*
+*****A***A*
+AAAA*A*A*G*
+AAAA*A*****
+AAAA*AAAAG*
 AAAA*******
 ]]
 
@@ -55,4 +55,5 @@ return factory.createLevelApi{
     , entityLayer = entityLayer
     , episodeLengthSeconds = 60
     , scatteredRewardDensity = 0.4
+    , minSpawnGoalDistance = 1
 }
