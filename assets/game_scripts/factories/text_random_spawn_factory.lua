@@ -11,7 +11,11 @@ local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
 local goal_found_custom_obs = { name = 'GOAL.FOUND', type = 'Doubles', shape = {1} }
 local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
+<<<<<<< HEAD
 local apple_location_custom_obs = { name = 'APPLES.LOC', type = 'Doubles', shape = {50, 2} }
+=======
+local apple_location_custom_obs = { name = 'APPLES.LOC', type = 'Doubles', shape = {100, 2} }
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
 
 local fruit_locations_list = {}
 
@@ -28,6 +32,7 @@ Keyword arguments:
 *   `scatteredRewardDensity` (number, default 0.1) - Density of rewards.
 ]]
 
+<<<<<<< HEAD
 function split(str, pat)
    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
    local fpat = "(.-)" .. pat
@@ -45,6 +50,37 @@ function split(str, pat)
       table.insert(t, cap)
    end
    return t
+=======
+local open = io.open
+-- v. bad practice (hardcoding file basepath)
+
+function os.capture(cmd, raw)
+  local f = assert(io.popen(cmd, 'r'))
+  local s = assert(f:read('*a'))
+  f:close()
+  if raw then return s end
+  s = string.gsub(s, '^%s+', '')
+  s = string.gsub(s, '%s+$', '')
+  s = string.gsub(s, '[\n\r]+', ' ')
+  return s
+end
+
+--local pwd = os.capture("pwd", true)
+--local i,j = string.find(pwd, "deepmind%-lab")
+--local mapdirectory = string.sub(pwd, 1, j) .."/assets/game_scripts/"
+
+local function read_file(path)
+    local file = open(path, "rb") -- r read mode and b binary mode
+    if not file then return nil end
+    local content = file:read "*a" -- *a or *all reads the whole file
+    file:close()
+    return content
+end
+
+local function getEntityLayer(chosenmap, entitydir)
+  local filename = string.format('%s/%04d.entityLayer', entitydir, chosenmap)
+  return read_file(filename);
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
 end
 
 function factory.createLevelApi(kwargs)
@@ -66,6 +102,10 @@ function factory.createLevelApi(kwargs)
   end
   
   local height, width
+<<<<<<< HEAD
+=======
+  local worker_id, test_one_map
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
   local possibleGoalLocations, otherGoalLocations   
   local possibleAppleLocations, otherAppleLocations 
   local possibleSpawnLocations, otherSpawnLocations 
@@ -90,15 +130,23 @@ function factory.createLevelApi(kwargs)
   local api = {}
 
   -- map name
+<<<<<<< HEAD
   -- map names and correspond map strings
   local mapnames
   local mapstrings
   local random_spawn_random_goal
 
+=======
+  local nummaps 
+  local mapname_prepend
+  local entitydir 
+  
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
   function api:init(params)
     -- initialize parameters from python
     height = tonumber(params["rows"])
     width = tonumber(params["cols"])
+<<<<<<< HEAD
     
     --Random spawn, random goal or fixed spawn, fixed goal
     random_spawn_random_goal = params["random_spawn_random_goal"] == "True"
@@ -109,6 +157,24 @@ function factory.createLevelApi(kwargs)
     
     -- Used to create nextMapNames
 	kwargs.scatteredRewardDensity = tonumber(params["apple_prob"])
+=======
+    mode = params["mode"]
+    
+    worker_id = tonumber(params['worker_id'])
+    test_one_map = worker_id > -1
+    if test_one_map then
+        worker_id = 0
+    end
+    -- Used to create nextMapNames
+    nummaps = tonumber(params["num_maps"])
+    local dims = string.format('%02dx%02d', height, width)
+    mode='training'
+    mapname_prepend = mode .. '-' .. dims 
+    entitydir = params["entitydir"] .. '/' .. dims .. '/' .. mode .. '/' .. 'entityLayers'
+    -- 
+    kwargs.scatteredRewardDensity = tonumber(params["apple_prob"])
+    
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
     kwargs.episodeLengthSeconds = tonumber(params["episode_length_seconds"])
     kwargs.minSpawnGoalDistance = 0
   end
@@ -132,7 +198,11 @@ function factory.createLevelApi(kwargs)
         v = 0
         fruit_locations_list[(tonumber(spawn_id)-2)*2-1] = 0
         fruit_locations_list[(tonumber(spawn_id)-2)*2]  = 0
+<<<<<<< HEAD
         api._obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(50, 2):apply(
+=======
+        api._obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(100, 2):apply(
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
                 function() v = v + 1 return fruit_locations_list[v] end)
     end
   end 
@@ -179,14 +249,27 @@ function factory.createLevelApi(kwargs)
         
         -- For new map name, reset possible locations
         local chosenMap
+<<<<<<< HEAD
         chosenMap = random.uniformInt(1, #mapnames)
         
         nextMapName = mapnames[chosenMap]
+=======
+        if test_one_map then
+            chosenMap = (worker_id % 100) + 1
+            worker_id = worker_id + 1
+        else
+            chosenMap = random.uniformInt(1, nummaps)
+        end
+        
+        nextMapName = string.format('%s-%04d', mapname_prepend, chosenMap)
+        --nextMapName = 'testing-09x09-0001'
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         
         -- Store nextMapName in current mapname for future reloading
         kwargs.mapName = nextMapName
         -- Store array of locations pertaining to specific entityMaps
         if not possibleGoalLocations_all[chosenMap] then
+<<<<<<< HEAD
             maze = maze_gen.MazeGeneration{entity = mapstrings[chosenMap]}
             
             if random_spawn_random_goal then
@@ -204,6 +287,14 @@ function factory.createLevelApi(kwargs)
                 possibleSpawnLocations_all[chosenMap], otherSpawnLocations_all[chosenMap] = 
                     helpers.parsePossibleSpawnLocations(maze, intpairkey)
             end
+=======
+            maze = maze_gen.MazeGeneration{entity = getEntityLayer(chosenMap, entitydir)}
+            
+            possibleGoalLocations_all[chosenMap], otherGoalLocations_all[chosenMap] = 
+                helpers.parseAllLocations(maze, intpairkey)
+            possibleAppleLocations_all[chosenMap], otherAppleLocations_all[chosenMap] = 
+                helpers.parseAllLocations(maze, intpairkey)
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         end
 
         -- Use array to reload spawn and fruit points
@@ -211,18 +302,34 @@ function factory.createLevelApi(kwargs)
         otherGoalLocations = otherGoalLocations_all[chosenMap]
         possibleAppleLocations = possibleAppleLocations_all[chosenMap]
         otherAppleLocations = otherAppleLocations_all[chosenMap]
+<<<<<<< HEAD
         possibleSpawnLocations = possibleSpawnLocations_all[chosenMap]
         otherSpawnLocations = otherSpawnLocations_all[chosenMap]
+=======
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         
         -- Set goal location
         local chosen_goal_index = random.uniformInt(
                                     1, #possibleGoalLocations)
         local goal_location = possibleGoalLocations[chosen_goal_index]
         api._goal = goal_location
+<<<<<<< HEAD
     end
     
     --Episode finishing flags
     api._hasEpisodeFinished = false
+=======
+    else
+        nextMapName = kwargs.mapName 
+    end
+    
+    -- Choose corresponding goal location  
+    local height, width = maze:size()
+
+    --Episode finishing flags
+    api._hasEpisodeFinished = false
+    
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         
     --Create goal and apple locations
     local goal_location
@@ -235,6 +342,7 @@ function factory.createLevelApi(kwargs)
         logger:debug(string.format("Visiting (%d, %d): %d", row, col, distance))
         -- Axis is flipped in DeepMind Lab.
         local key = text_row_col_to_map_key(row, col, intpairkey)
+<<<<<<< HEAD
         local direct_key = string.format("%d %d", row, col)
         
         -- Fill in goal location
@@ -250,6 +358,17 @@ function factory.createLevelApi(kwargs)
           all_spawn_locations[#all_spawn_locations + 1] = key
         end
 
+=======
+
+        if distance == 0 then
+          goal_location = key
+        end
+        if distance > 0 then
+          fruit_locations[#fruit_locations + 1] = key
+          all_spawn_locations[#all_spawn_locations + 1] = key
+        end
+        local direct_key = string.format("%d %d", row, col)
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         logger:debug("Checking key " .. direct_key)
       end}
       helpers.shuffleInPlace(fruit_locations)
@@ -325,20 +444,32 @@ function factory.createLevelApi(kwargs)
     api._obs_value = {}
     
     -- Add Goal locations
+<<<<<<< HEAD
     words = {}
     for word in api._goal_location:gmatch("%w+") do table.insert(words, word) end
     
     api._obs_value[ goal_location_custom_obs.name ] =
         tensor.DoubleTensor{tonumber(words[1]), tonumber(words[2])}
+=======
+    api._obs_value[ goal_location_custom_obs.name ] =
+        tensor.DoubleTensor{api._goal[1], api._goal[2]}
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
     
     api._obs_value[ goal_found_custom_obs.name ] =
         tensor.DoubleTensor{api._goal_found}
 
     -- Add chosen apple locations
     v = 0
+<<<<<<< HEAD
     api._obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(50, 2):apply(
             function() v = v + 1 return fruit_locations_list[v] end)
 
+=======
+    api._obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(100, 2):apply(
+            function() v = v + 1 return fruit_locations_list[v] end)
+
+    
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
     -- Return the chosen mapname
     return nextMapName
   end

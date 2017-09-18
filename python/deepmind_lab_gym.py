@@ -387,7 +387,19 @@ class _DeepmindLab(gym.Env):
                  , enable_velocity=False
                  , enable_depth=True
                  , additional_observation_types = []
+<<<<<<< HEAD
                  , init_game_seed=0):
+=======
+                 , init_game_seed=0
+                 , apple_prob = 0.25
+                 , num_maps = 1
+                 , rows = 9
+                 , cols = 9
+                 , mode = "training"
+                 , episode_length_seconds=30
+                 , worker_id = -1
+                 , entitydir="/z/home/shurjo/implicit-mapping/maps"):
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
         
         # init_game_seed should be random (is messing with experiments)
         init_game_seed = int(1e7*random.random())
@@ -420,6 +432,16 @@ class _DeepmindLab(gym.Env):
         self.img_save_file_template = '/tmp/{user}/{klass}/{level_script}/{index:05d}.png'
         self.init_game_seed = init_game_seed
 
+        # Additional params to be fed in to simulation
+        self.apple_prob = apple_prob
+        self.num_maps = num_maps
+        self.rows = rows
+        self.cols = cols
+        self.mode = mode
+        self.episode_length_seconds = episode_length_seconds
+        self.entitydir = entitydir
+        self.worker_id = worker_id
+
     def force_unset_dl_env(self):
         "Assumes you know what you are doing"
         self._dl_env = None
@@ -444,6 +466,20 @@ class _DeepmindLab(gym.Env):
             # that's when the maps get loaded.
             with ChDirCtxt(curr_mod_dir):
                 input_dict = {k:str(v) for k,v in self.lab_config.items()}
+<<<<<<< HEAD
+=======
+
+                # More config params
+                input_dict['apple_prob'] = str(self.apple_prob)
+                input_dict['num_maps'] = str(self.num_maps)
+                input_dict['rows'] = str(self.rows)
+                input_dict['cols'] = str(self.cols)
+                input_dict['mode'] = self.mode
+                input_dict['episode_length_seconds'] = str(self.episode_length_seconds)
+                input_dict['entitydir'] = self.entitydir
+                input_dict['worker_id'] = str(self.worker_id)
+
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
                 observation_types = self.observation_types \
                                             + self.additional_observation_types
                 dlenv = deepmind_lab.Lab(self.level_script

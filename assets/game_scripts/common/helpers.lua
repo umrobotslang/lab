@@ -40,11 +40,12 @@ end
 --- Returns string representation of object obj
 -- @return String representation of obj
 ------------------------------------------------------------------------
-function helpers.dir(obj,level)
+function helpers.dir(obj,level, maxlevel)
   local s,t = '', type(obj)
 
   level = level or ' '
-  if string.len(level) > 5 then
+  maxlevel = maxlevel or 5
+  if string.len(level) > maxlevel then
      return '...'
   end
 
@@ -85,14 +86,15 @@ function helpers.map_xy_to_text_row_col(x, y, height)
 end
 
 
-function helpers.parsePossibleGoalLocations(maze, intpairkey)
+function helpers.parsePossibleGoalLocations(maze, intpairkey, entity, checkcellfunc)
+    entity = entity or "G"
+    checkcellfunc = checkcellfunc or function (entityCell) return entityCell == entity end
     local height, width = maze:size()
     local possibleGoalLocations = {}
     for r = 1,height do
         for c = 1,width do
-            if maze:getEntityCell(r, c) == "G" then
+           if checkcellfunc(maze:getEntityCell(r, c)) then
                 possibleGoalLocations[#possibleGoalLocations + 1] = {r, c}
-                --print(string.format("Found G at (%d, %d)", r, c))
             end
         end
     end
@@ -102,12 +104,14 @@ function helpers.parsePossibleGoalLocations(maze, intpairkey)
        local rc_key = intpairkey(r, c)
        local pgl = { unpack(possibleGoalLocations) }
        table.remove(pgl, i)
+       print(string.format("Found G at (%d, %d) '%s'", r, c, rc_key))
        otherGoalLocations[rc_key] = pgl
     end
     return possibleGoalLocations, otherGoalLocations
 end
 
 function helpers.parsePossibleSpawnLocations(maze, intpairkey)
+<<<<<<< HEAD
     local height, width = maze:size()
     local possibleGoalLocations = {}
     for r = 1,height do
@@ -179,6 +183,19 @@ function helpers.parsePossibleAppleLocations(maze, intpairkey)
        otherGoalLocations[rc_key] = pgl
     end
     return possibleGoalLocations, otherGoalLocations
+=======
+   return helpers.parsePossibleGoalLocations(maze, intpairkey, "P")
+end
+
+function helpers.parseAllLocations(maze, intpairkey)
+   return helpers.parsePossibleGoalLocations(
+      maze, intpairkey, "P"
+      , function (entityCell) return entityCell == " " or entityCell == "A" or entityCell == "G" end)
+end
+
+function helpers.parsePossibleAppleLocations(maze, intpairkey)
+   return helpers.parsePossibleGoalLocations(maze,intpairkey, "A")
+>>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
 end
 
 
@@ -186,7 +203,7 @@ local Logger = {}
 Logger.DEBUG = 3
 Logger.NONE = 0
 function Logger:new(o)
-   o = o or {level = DEBUG}
+   o = o or {level = Logger.DEBUG}
    setmetatable(o, self)
    self.__index = self
    return o
