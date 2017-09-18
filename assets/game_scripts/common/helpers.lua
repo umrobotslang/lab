@@ -104,7 +104,7 @@ function helpers.parsePossibleGoalLocations(maze, intpairkey, entity, checkcellf
        local rc_key = intpairkey(r, c)
        local pgl = { unpack(possibleGoalLocations) }
        table.remove(pgl, i)
-       print(string.format("Found G at (%d, %d) '%s'", r, c, rc_key))
+       --print(string.format("Found G at (%d, %d) '%s'", r, c, rc_key))
        otherGoalLocations[rc_key] = pgl
     end
     return possibleGoalLocations, otherGoalLocations
