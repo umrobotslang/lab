@@ -196,7 +196,12 @@ function factory.createLevelApi(kwargs)
         episode_has_finished_flag = false
         
         -- For new map name, reset possible locations
-        local chosenMap = api.map_index or random.uniformInt(1, #mapnames)
+        local chosenMap
+        if api.map_index then
+           chosenMap = (api.map_index % #mapnames) + 1
+        else
+           chosenMap = random.uniformInt(1, #mapnames)
+        end
         
         nextMapName = mapnames[chosenMap]
         
