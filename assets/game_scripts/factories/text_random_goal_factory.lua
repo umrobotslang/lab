@@ -9,7 +9,9 @@ local pursuit_test_mode = require 'decorators.pursuit_test_mode'
 
 local logger = helpers.Logger:new{level = helpers.Logger.NONE}
 local factory = {}
+local goal_found_custom_obs = { name = 'GOAL.FOUND', type = 'Doubles', shape = {1} }
 local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
+local apple_location_custom_obs = { name = 'APPLES.LOC', type = 'Doubles', shape = {100, 2} }
 local function intpairkey(r, c)
    return string.format("%d %d", r, c)
 end
@@ -69,6 +71,7 @@ function factory.createLevelApi(kwargs)
     api._obs_value = {}
     api._obs_value[ goal_location_custom_obs.name ] =
         tensor.DoubleTensor{api._goal[1], api._goal[2]}
+    api._obs_value[ goal_found_custom_obs.name ] = tensor.DoubleTensor{0}
 
     local goal_location
     local all_spawn_locations = {}
@@ -105,6 +108,13 @@ function factory.createLevelApi(kwargs)
     end
     api._all_spawn_locations = all_spawn_locations
   end
+  
+  function api:pickup(spawn_id)
+     print(string.format("pickup(%d)", spawn_id))
+    if spawn_id == 2 then
+        api._obs_value[ goal_found_custom_obs.name ] = tensor.DoubleTensor{1}
+    end
+  end 
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
@@ -124,6 +134,7 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:nextMap()
+     api._obs_value[ goal_found_custom_obs.name ] = tensor.DoubleTensor{0}
     api._newSpawnVars = {}
 
     local maxFruit = math.floor(kwargs.scatteredRewardDensity *
@@ -134,7 +145,8 @@ function factory.createLevelApi(kwargs)
       end
       api._newSpawnVars[fruit_location] = {
           classname = 'apple_reward',
-          origin = fruit_location .. ' 30'
+          origin = fruit_location .. ' 30',
+          id = tostring(i+2)
       }
     end
 
@@ -143,13 +155,15 @@ function factory.createLevelApi(kwargs)
     logger:debug("Chosen spawn location: " .. spawn_location)
     api._newSpawnVars[spawn_location] = {
         classname = 'info_player_start',
-        origin = spawn_location .. ' 30'
+        origin = spawn_location .. ' 30',
+        id = "1"
     }
 
     logger:debug("Chosen goal location: " .. api._goal_location)
     api._newSpawnVars[api._goal_location] = {
         classname = 'goal',
-        origin = api._goal_location .. ' 20'
+        origin = api._goal_location .. ' 20',
+        id = "2"
     }
     return kwargs.mapName
   end
@@ -160,11 +174,15 @@ function factory.createLevelApi(kwargs)
     -- This is called before api:init so it should depend on constant things
     local specs = customObservationSpec and customObservationSpec(api) or {}
     specs[#specs + 1] = goal_location_custom_obs
+    -- Add apple locations
+    specs[#specs + 1] = apple_location_custom_obs
+    -- Add goal found spec
+    specs[#specs + 1] = goal_found_custom_obs
     return specs
   end
 
   -- Return GOAL.LOC value when requested
-  local customObservation = api.customObservation
+  local customObservation = api.customObservation or function (api, name) end
   function api:customObservation(name)
     return api._obs_value[name] or customObservation(api, name)
   end
