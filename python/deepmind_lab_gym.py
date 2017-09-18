@@ -1,3 +1,5 @@
+from __future__ import print_function
+import sys
 import time
 import os
 import functools
@@ -163,7 +165,7 @@ class ActionMapper(object):
         [  50.0 ,-50.0 ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  .25 , -.25 ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.05, -0.05,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
-        , [ 0.  ,  0.  ,  1   , -1   ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
+        , [ 0.  ,  0.  ,  3   , -3   ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  1.  , 0.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 1.  ,  0.  ]
         , [ 0.  ,  0.  ,  0.  ,  0.  ]#,  0.  ,  0.  ,  0.  ,  0.  ,  0.  , 0.  ,  1.  ]
@@ -386,6 +388,7 @@ class _DeepmindLab(gym.Env):
                  , enable_depth=True
                  , additional_observation_types = []
                  , init_game_seed=0):
+        
         # init_game_seed should be random (is messing with experiments)
         init_game_seed = int(1e7*random.random())
 
@@ -425,8 +428,9 @@ class _DeepmindLab(gym.Env):
         return self._dm_lab_env().environment_name()
 
     def _dm_lab_reset(self):
+        init_game_seed = int(1e7*random.random())
         with self._chdir_mod_ctxt:
-            self._dm_lab_env().reset(seed=self.init_game_seed)
+            self._dm_lab_env().reset(init_game_seed)
 
     def _dm_lab_step(self, *args, **kwargs):
         with self._chdir_mod_ctxt:
@@ -439,12 +443,12 @@ class _DeepmindLab(gym.Env):
             # While loading the map the directory should be changed because
             # that's when the maps get loaded.
             with ChDirCtxt(curr_mod_dir):
+                input_dict = {k:str(v) for k,v in self.lab_config.items()}
                 observation_types = self.observation_types \
                                             + self.additional_observation_types
                 dlenv = deepmind_lab.Lab(self.level_script
                                          , observation_types
-                                         , {k: str(v)
-                                            for k, v in self.lab_config.items()})
+                                         , input_dict)
             # Wraps all the callable methods so that they are called from
             # the current module directory
             self._dl_env = dlenv
@@ -566,7 +570,7 @@ class _DeepmindLab(gym.Env):
         info['env_name'] = self.environment_name()
         return obs, info
 
-    def _render(self, mode='human', close=False):
+    def _render(self, mode='return', close=False):
         if close:
             return
 
@@ -576,8 +580,9 @@ class _DeepmindLab(gym.Env):
         if mode == 'return':
             pass
         elif mode == 'human':
-            cv2.imshow("c",im)
-            cv2.waitKey(1)
+            #cv2.imshow("c",im)
+            #cv2.waitKey(1)
+            pass
         elif mode == 'file':
             warnings.warn("""mode = file is deprecated. Use mode =
             return and write on your own write to file logic.  You may
@@ -702,6 +707,9 @@ class TopViewDeepmindLab(gym.Wrapper):
 
 class DeepmindLab(TopViewDeepmindLab):
     def __init__(self, *args, **kwargs):
+        print("kwargs", file=sys.stderr)
+        print(kwargs, file=sys.stderr)
+
         P = type(self).mro()[1]
         wrapper_kwargs = {
             k : kwargs.pop(k)
