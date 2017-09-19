@@ -843,29 +843,8 @@ genrule(
 
 genrule(
     name = "map_assets",
-<<<<<<< HEAD
-    srcs = MAPS,
-    outs = ["baselab/allmaps.pk3"],
-    cmd = "cp -t $(@D)/ $(SRCS); " +
-          "for s in $(SRCS); do " +
-          "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
-          "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
-          "done",
-    tools = [
-        "//:bspc",
-        "//deepmind/level_generation:compile_map_sh",
-        "//q3map2",
-    ],
-)
-
-genrule(
-    name = "map_assets_pk3_per_map",
-    srcs = MAPS,
-    outs = ["baselab/" + f[12:-3] + "pk3" for f in MAPS],
-=======
     srcs = OTHER_MAPS,
     outs = ["baselab/" + f[12:-3] + "pk3" for f in OTHER_MAPS],
->>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
     cmd = "cp -t $(@D)/baselab $(SRCS); " +
           "for s in $(SRCS); do " +
           "  BM=$$(basename $${s}); M=$${BM/.map/}; " +

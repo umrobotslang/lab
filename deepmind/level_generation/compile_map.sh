@@ -40,11 +40,7 @@
 set -e
 
 readonly MAPBASE="${1}"
-<<<<<<< HEAD
-readonly PK3BASE="${2}"
-=======
 PK3BASE="${2}"
->>>>>>> f045865e8ef04871934b78020b6cd58258fe6036
 
 readonly BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly Q3MP="${BASE}/../../q3map2/q3map2"
