@@ -314,7 +314,7 @@ function factory.createLevelApi(kwargs)
     api.compute_spawn_location_args = csl_args
 
     -- Compute the height and width of the first map
-    local mapstring1 = api.mapstrings[1] or error("Need atlest one mapstring")
+    local mapstring1 = api.mapstrings[1] or error("Need atleast one mapstring")
     local maplines = helpers.split(mapstring1, "\n")
     api.height = #maplines
     api.width = maplines[1]:len()

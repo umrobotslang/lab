@@ -17,28 +17,30 @@ def get_free_port(host='127.0.0.1'):
         port = s.getsockname()[1]
     return port
 
+def maps_from_config(config):
+    entitydir = config.get(
+        "entitydir",
+        op.join((op.dirname(__file__) or '.'), '../assets/entityLayers'))
+    rows, cols, mode, num_maps = [
+        config[k] for k in "rows  cols  mode num_maps".split()]
+
+    # Set in maps and map names
+    entitydir = op.join(entitydir, "%02dx%02d" %(rows, cols),
+                            mode, "entityLayers")
+
+    # Send in mapnames and corresponding entity-files as comma separated strings
+    mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
+    entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
+    mapnames = [mapname_prepend + os.path.basename(f).replace(".entityLayer","")\
+                                for f in entityfiles]
+    mapstrings = [open(e).read() for e in entityfiles]
+    return mapnames, mapstrings
+    
 class RandomMazesDMLab(object):
     def __init__(self, level_script, config, actionmap, **kwargs):
-        if "mapnames" not in config:
-            entitydir = config.get(
-                "entitydir",
-                op.join((op.dirname(__file__) or '.'), '../assets/entityLayers'))
-            rows, cols, mode, num_maps = [
-                config[k] for k in "rows  cols  mode num_maps".split()]
-
-            # Set in maps and map names
-            entitydir = op.join(entitydir, "%02dx%02d" %(rows, cols),
-                                    mode, "entityLayers")
-
-            # Send in mapnames and corresponding entity-files as comma separated strings
-            mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
-            entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
-            mapnames = [mapname_prepend + os.path.basename(f).replace(".entityLayer","")\
-                                        for f in entityfiles]
+        if "mapnames" not in config or "mapstrings" not in config:
+            mapnames, mapstrings = maps_from_config(config)
             config["mapnames"] = ",".join(mapnames)
-
-        if "mapstrings" not in config:
-            mapstrings = [open(e).read() for e in entityfiles]
             config["mapstrings"] = ",".join(mapstrings)
 
         self.env = DeepmindLab(level_script, config, actionmap, **kwargs)
@@ -120,40 +122,20 @@ class MultiProcDeepmindLab(object):
 
     def process_config(self):
         config = self.dmlab_config()
-        if "mapnames" not in config:
-            entitydir = config.get(
-                "entitydir",
-                op.join((op.dirname(__file__) or '.'), '../assets/entityLayers'))
-            rows, cols, mode, num_maps = [
-                config[k] for k in "rows  cols  mode num_maps".split()]
-
-            # Set in maps and map names
-            entitydir = op.join(entitydir, "%02dx%02d" %(rows, cols),
-                                    mode, "entityLayers")
-
-            # Send in mapnames and corresponding entity-files as comma separated strings
-            mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
-            entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
-            mapnames = [mapname_prepend +
-                        os.path.basename(f).replace(".entityLayer","")\
-                        for f in entityfiles]
-            self.mapnames = mapnames
-            config["mapnames"] = ",".join(mapnames)
+        if "mapnames" not in config or "mapstrings" not in config:
+            self.mapnames, self.mapstrings = maps_from_config(config)
+            config["mapnames"] = ",".join(self.mapnames)
+            config["mapstrings"] = ",".join(self.mapstrings)
         else:
-            self.mapnames = config["mapnames"].split(",")
-
-        if "mapstrings" not in config:
-            mapstrings = [open(e).read() for e in entityfiles]
-            self.mapstrings = mapstrings
-            config["mapstrings"] = ",".join(mapstrings)
-        else:
-            self.mapstrings = config["mapstrings"].split(",")
+            self.mapnames = config["mapnames"]
+            self.mapstrings = config["mapstrings"]
 
     def create_new_episode_queue(self):
         next_pipes = [Pipe()
                  for _ in range(self.num_workers)]
         next_episode_config = self.dmlab_config().copy()
         mapidx = np.random.randint(100)
+        print("Sending maps : {}".format(self.mapstrings[mapidx:mapidx+1]))
         next_episode_config.update(
             dict(mapnames = ",".join(self.mapnames[mapidx:mapidx+1])
                  , mapstrings = ",".join(self.mapstrings[mapidx:mapidx+1])
@@ -247,6 +229,16 @@ class MultiProcDeepmindLab(object):
 
     def render(self):
         return self.call_sync("render")
+
+    @property
+    def metadata(self):
+        return self.call_sync("__getattr__", "metadata")
+    @property
+    def action_space(self):
+        return self.call_sync("__getattr__", "action_space")
+    @property
+    def observation_space(self):
+        return self.call_sync("__getattr__", "observation_space")
 
     def __del__(self):
         self.close_current_queue()
