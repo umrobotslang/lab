@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os.path as op
 import os
 import glob
@@ -204,10 +205,9 @@ class MultiProcDeepmindLab(object):
         else:
             obs, rew, done, info = self.call_sync(
                 "step", (act,), {})
-            self.mproc_last_goal_found = bool(
-                info.get('GOAL.FOUND', np.array([False]))[0])
+            self.mproc_last_goal_found = (info['GOAL.FOUND'][0] == 1)
             assert not done, "We should never get 'done'"
-            self.mproc_last_obs = obs, rew, done, info
+            self.mproc_last_obs = obs, rew, done, info.copy()
             return obs, rew, done, info
 
     def sub_episode_reset(self):
