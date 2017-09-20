@@ -4,9 +4,9 @@ local pickup_observations = {}
 local obs = {}
 local obsSpec = {}
 
-local goal_found_custom_obs = { name = 'GOAL.FOUND', type = 'Doubles', shape = {1} }
-local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Doubles', shape = {2} }
-local apple_location_custom_obs = { name = 'APPLES.LOC', spawn_id = 1, type = 'Doubles', shape = {50, 2} }
+local goal_found_custom_obs = { name = 'GOAL.FOUND', type = 'Bytes', shape = {1} }
+local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Bytes', shape = {2} }
+local apple_location_custom_obs = { name = 'APPLES.LOC', type = 'Doubles', shape = {50, 2} }
 local pickup_observations = {goal_found_custom_obs, goal_location_custom_obs, apple_location_custom_obs}
 local class2spawnid = { goal = 2, apple_reward = function (prev) return prev + 1 end }
 
@@ -35,19 +35,19 @@ local PickupObs = {}
 function PickupObs:new(o)
    o = o or {}
    o.api = o.api or error("Need api")
-   o.maxapples = o.maxapples or error("Need maxapples")
    o.obs_value = o.obs_value or {}
    setmetatable(o, self)
    self.__index = self
+   o:initObs()
    return o
 end
 
 function PickupObs:initObs()
-   self.obs_value[ goal_found_custom_obs.name ] = tensor.DoubleTensor{0}
+   self.obs_value[ goal_found_custom_obs.name ] = tensor.ByteTensor{0}
    local apple_locations = self.api:getAppleLocations()
    local v = 0
    self.obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(
-      options.maxapples, 2)
+      self.api.maxapples, 2)
    for i, v in ipairs(apple_locations) do
       self.obs_value[ apple_location_custom_obs.name ](i, 0):val(v[1])
       self.obs_value[ apple_location_custom_obs.name ](i, 1):val(v[2])
@@ -56,30 +56,29 @@ end
 
 -- Decorate the api with a player translation velocity and angular velocity
 -- observation. These observations are relative to the player.
-function pickup_observations.decorate(api, options)
+function pickup_observations.decorate(api)
    local init = api.init
    function api:init(params)
+     local ret  = init and init(api, params)
     -- Add custom obsevations
-     apple_location_custom_obs.shape = { options.maxapples, 2 }
+     apple_location_custom_obs.shape = { api.maxapples, 2 }
      for i, v in ipairs(pickup_observations) do
         pickup_observations.add_spec(
            v.name, v.type, v.shape,
            function ()  return api:getobs(v.name) end)
      end
-     api.pickupobs = PickupObs:new{ api = api, maxapples = options.maxapples }
-    return init and init(api, params)
+     api.pickupobs = PickupObs:new{ api = api }
+     return ret
   end
 
   function api:getobs(obsname)
      if obsname == goal_location_custom_obs.name then
-        local goal_loc = api.episode.goal_location
-        return tensor.DoubleTensor{goal_loc[1], goal_loc[2]}
+        local goal_loc = api.episode:getGoalLocation()
+        return tensor.ByteTensor{goal_loc[1], goal_loc[2]}
      elseif (obsname == goal_found_custom_obs.name or
                 obsname == apple_location_custom_obs.name)
      then
-        return api.episode.subepiso.obs_value[obsname]
-     else
-        error(string.format("Unknown observation name : %s", obsname))
+        return api.pickupobs.obs_value[obsname]
      end
   end
  
@@ -90,17 +89,17 @@ function pickup_observations.decorate(api, options)
     elseif spawn_id >= 3 then
        spawn_id = tonumber(spawn_id)
        api.pickupobs.obs_value[ apple_location_custom_obs.name ](
-          (spawn_id - 3), 0):val(0)
+          (spawn_id - 2), 1):val(0)
        api.pickupobs.obs_value[ apple_location_custom_obs.name ](
-          (spawn_id - 3), 1):val(0)
+          (spawn_id - 2), 2):val(0)
     end
-    oldApiPickup(api, spawn_id)
+    return oldApiPickup and oldApiPickup(api, spawn_id)
   end 
 
   local oldApiNextMap = api.nextMap
   function api:nextMap()
      local mapName = oldApiNextMap(api)
-     api.pickupobs = PickupObs:new{ api = api, maxapples = options.maxapples }
+     api.pickupobs = PickupObs:new{ api = api }
      return mapName
   end
 
@@ -115,11 +114,7 @@ function pickup_observations.decorate(api, options)
 
   local customObservation = api.customObservation
   function api:customObservation(name)
-    cobs = obs[name] and obs[name]() or customObservation(api, name)
-    if name == 'POSE' then
-       api.last_pose = cobs
-    end
-    return cobs
+     return api:getobs(name) or (customObservation and customObservation(api, name))
   end
 end
 

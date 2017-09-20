@@ -39,24 +39,21 @@ end
 function SubEpisode:newSpawnVars()
     --Create goal and apple locations
     local api = self.api
-    local goal_location = self.episode.goal_location
-    local goalr, goalc = unpack(goal_location)
-    local goal_location_key = intpairkey(goalr, goalc)
-    local all_spawn_locations = self.maze.getOtherLocationsExceptKey("P", goal_location_key)
-    local fruit_locations = self.maze.getOtherLocationsExceptKey("A", goal_location_key)
+    local goal_location = self:getGoalLocation()
+    local fruit_locations = self.maze:getOtherLocationsExceptKey("A", goal_location_key)
 
     -- Choose a spawn location
-    local spawn_location_index = random.uniformInt(1, #api._all_spawn_locations)
-    local spawn_location = all_spawn_locations[spawn_location_index]
+    local spawn_location = self:getSpawnLocation()
     
     -- Chose fruit locations based on input probability
     local maxFruit = math.floor(api.scatteredRewardDensity *
-                                   #api._fruit_locations + 0.5)
+                                   #fruit_locations + 0.5)
     
     -- Number of possible apple locations 
     local newSpawnVars = {}
     local spawn_location_key = api:text_row_col_to_map_key(
        spawn_location[1], spawn_location[2])
+    helpers.shuffleInPlace(fruit_locations)
     for i, fruit_location in ipairs(fruit_locations) do
        --make sure not to include goal location
        local fruit_location_key = api:text_row_col_to_map_key(
@@ -67,7 +64,6 @@ function SubEpisode:newSpawnVars()
           end
           newSpawnVars[fruit_location_key] = {
              classname = 'apple_reward',
-             location = fruit_location, 
              origin = fruit_location_key .. ' 30',
              id = tostring(i+2)
           }
@@ -78,7 +74,6 @@ function SubEpisode:newSpawnVars()
     logger:debug("Chosen spawn location: " .. spawn_location_key)
     newSpawnVars[spawn_location_key] = {
        classname = 'info_player_start',
-       location = spawn_location, 
        origin = spawn_location_key .. ' 30',
        id="1"
     }
@@ -89,7 +84,6 @@ function SubEpisode:newSpawnVars()
     logger:debug("Chosen goal location: " .. goal_location_key)
     newSpawnVars[goal_location_key] = {
        classname = 'goal',
-       location = goal_location, 
        origin = goal_location_key .. ' 20',
        id="2"
     }
@@ -101,21 +95,37 @@ function SubEpisode:getSpawnVarByLoc(coords)
    return self._newSpawnVars[origin_2D]
 end
 
+function SubEpisode:getGoalLocation()
+   return self.api.compute_goal_location(self)
+end
+
+function SubEpisode:getSpawnLocation()
+   return self.api.compute_spawn_location(self)
+end
+
+
 -----------------------------------------------------------------
 -- Episode:
 -- An episode lasts till the time runs out
 -----------------------------------------------------------------
-Episode = { SubEpisode = PSubEpisode }
+Episode = { SubEpisode = SubEpisode }
 function Episode:new(o)
     o = o or {}   -- create object if user does not provide one
     o.maze = o.maze or error('need maze')
-    o.goal_location = o.goal_location or error('need goal location')
     o.api = o.api or error('need api')
-    o.subepisode = self.SubEpisode:new{ api = api, maze = maze, episode = o }
-    o.time_remaining = api.episodeLengthSeconds
+    o.subepisode = self.SubEpisode:new{ api = o.api, maze = o.maze, episode = o }
+    o.time_remaining = o.api.episodeLengthSeconds
     setmetatable(o, self)
     self.__index = self
     return o
+end
+
+function Episode:getGoalLocation()
+   return self.subepisode:getGoalLocation()
+end
+
+function Episode:getSpawnLocation()
+   return self.subepisode:getSpawnLocation()
 end
 
 function Episode:getMapName()
@@ -131,11 +141,11 @@ end
 
 function Episode:newSubEpisode()
    self.subepisode = self.SubEpisode:new{
-      api = api , episode = episode, maze = maze}
+      api = self.api , episode = self, maze = self.maze}
 end
 
-function Episode:getSpawnVarByLoc()
-   return self.subepisode:getSpawnVarByLoc()
+function Episode:getSpawnVarByLoc(coords)
+   return self.subepisode:getSpawnVarByLoc(coords)
 end
 
 function Episode:getSpawnVars()
@@ -164,8 +174,12 @@ end
 
 function Maze:parseEntityLayer()
     self.cppmaze = maze_gen.MazeGeneration{entity = self.entityLayer}
+    -- Contains a mapping of entity type -> (row,col) where the entity type is allowed to be placed.
+    self.possibleLocations = {}
+    -- Contains a mapping of entity type -> 'row col' -> {(row, col)} other location except key.
+    self.otherLocationsExceptKey = {}
     for i, entity in ipairs(ENTITY_TYPES) do
-       if self.api.random_spawn_random_goal then
+       if self.api.all_entities_swappable then
           self.possibleLocations[entity], self.otherLocationsExceptKey[entity] =
              helpers.parseAllLocations(self.cppmaze, intpairkey)
        else
@@ -173,10 +187,6 @@ function Maze:parseEntityLayer()
              helpers.parsePossibleGoalLocations(self.cppmaze, intpairkey, entity)
        end
     end
-    -- self.possibleLocations
-    -- Contains a mapping of entity type -> (row,col) where the entity type is allowed to be placed.
-    -- self.otherLocationsExceptKey
-    -- Contains a mapping of entity type -> 'row col' -> {(row, col)} other location except key.
 end
 
 function Maze:sampleEntityLocation(entity)
@@ -188,6 +198,61 @@ function Maze:getOtherLocationsExceptKey(entity, key)
    return self.otherLocationsExceptKey[entity][key] or self.possibleLocations[entity]
 end
 
+local ComputeGoalLocation = {}
+function ComputeGoalLocation.random_per_episode(subepisode)
+   if subepisode.episode.goal_location == nil then
+        subepisode.episode.goal_location = subepisode.maze:sampleEntityLocation("G")
+   end
+   return subepisode.episode.goal_location
+end
+
+function ComputeGoalLocation.fixedindex(subepisode)
+   if subepisode.episode.goal_location == nil then
+      local possibleGoalLocations = subepisode.maze.possibleLocations["G"]
+      local idx = 1 + tonumber(subepisode.api.compute_goal_location_args) % #possibleGoalLocations 
+      subepisode.episode.goal_location = possibleGoalLocations[idx]
+   end
+   return subepisode.episode.goal_location
+end
+
+
+function ComputeGoalLocation.fixed(subepisode)
+   if subepisode.goal_location == nil then
+      local goal_loc = {}
+      for i, v in ipairs(helpers.split(api.compute_goal_location_args, ",")) do
+         goal_loc[i] = tonumber(v)
+      end
+      subepisode.goal_location = {goal_loc[1], goal_loc[2]}
+   end
+   return subepisode.goal_location
+end
+
+
+local ComputeSpawnLocation = {}
+function ComputeSpawnLocation.random_per_subepisode(subepisode)
+   if subepisode.spawn_location == nil then
+      subepisode.episode.spawn_location = nil
+      local goal_location = subepisode:getGoalLocation()
+      local goal_location_key = intpairkey(unpack(goal_location))
+      local all_spawn_locations = subepisode.maze:getOtherLocationsExceptKey("P", goal_location_key)
+      local spawn_location_index = random.uniformInt(1, #all_spawn_locations)
+      subepisode.spawn_location = all_spawn_locations[spawn_location_index]
+   end
+   return subepisode.spawn_location
+end
+
+function ComputeSpawnLocation.fixed(subepisode)
+   if subepisode.spawn_location == nil then
+      local spawn_loc = {}
+      for i, v in ipairs(helpers.split(api.compute_spawn_location_args, ",")) do
+         spawn_loc[i] = tonumber(v)
+      end
+      subepisode.spawn_location = {spawn_loc[1], spawn_loc[2]}
+   end
+   return subepisode.spawn_location
+end
+
+
 --[[ Creates a Nav Maze Random Goal.
 Keyword arguments:
 
@@ -197,13 +262,13 @@ Keyword arguments:
 *   `scatteredRewardDensity` (number, default 0.1) - Density of rewards.
 ]]
 function factory.createLevelApi(kwargs)
-   kwargs.maxapples = kwargs.maxapples or 50
   
   local api = {Episode = Episode, Maze = Maze}
 
   function api:text_row_col_to_map_xy(row, col)
       return helpers.text_row_col_to_map_xy(row, col, api.height)
   end
+
   function api:map_xy_to_text_row_col(x, y)
       return helpers.map_xy_to_text_row_col(x, y, api.height)
   end
@@ -216,35 +281,49 @@ function factory.createLevelApi(kwargs)
 
   function api:init(params)
     -- initialize parameters from python
-    api.height = tonumber(params["rows"])
-    api.width = tonumber(params["cols"])
+    api.maxapples = params.maxapples or 50
     
     --Random spawn, random goal or fixed spawn, fixed goal
-    api.random_spawn_random_goal = params["random_spawn_random_goal"] == "True"
+    api.all_entities_swappable = params["random_spawn_random_goal"] ~= "False"
     
     --Initialize all mapnames nad mapstrings as lists
-    api.mapnames = helpers.split(params["mapnames"] or error("Need mapnames"), ",")
-    api.mapstrings = helpers.split(params["mapstrings"] or error("Need mapstrings"), ",")
+    api.mapnames = helpers.split(
+       params.mapnames or error("Need mapnames") , ",")
+    api.mapstrings = helpers.split(
+       params.mapstrings or error("Need mapstrings") , ",")
 
-    -- We will create a maze object as required
-    api.mazes = {}
+    -- More parameters
+	api.scatteredRewardDensity = tonumber(params["apple_prob"] or "0.25")
+    api.episodeLengthSeconds = tonumber(params["episode_length_seconds"] or "20")
+    api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
 
+    -- How to compute the goal location
+    compute_goal_location, cgl_args = unpack(
+       helpers.split(
+          params.compute_goal_location or "random_per_episode", ":"))
+    api.compute_goal_location = ComputeGoalLocation[compute_goal_location] or
+       error("Bad compute_goal_location " .. compute_goal_location)
+    api.compute_goal_location_args = cgl_args
 
-    -- A sub-class to keep track of variables that have life-time of a sub-episode i.e. period between spawning and hitting a goal
-    local mapIdx = helpers.find(kwargs.mapName, api.mapnames)
-    if mapIdx < 1 then
-       error(string.format("Unable to find %s in \n %s", kwargs.mapName, params.mapnames))
-    end
+    -- How to compute the spawn location
+    compute_spawn_location, csl_args = unpack(
+       helpers.split(
+          params.compute_spawn_location or "random_per_subepisode", ":"))
+    api.compute_spawn_location = ComputeSpawnLocation[compute_spawn_location] or
+       error("Bad compute_spawn_location " .. compute_spawn_location)
+    api.compute_spawn_location_args = csl_args
+
+    -- Compute the height and width of the first map
+    local mapstring1 = api.mapstrings[1] or error("Need atlest one mapstring")
+    local maplines = helpers.split(mapstring1, "\n")
+    api.height = #maplines
+    api.width = maplines[1]:len()
     
+
+    local maze = api:getMaze()
     api.episode = api.Episode:new{
        api = api
-       , maze = api.getMaze(mapIdx)
-       , goal_location = api.getMaze(mapIdx):sampleEntityLocation("G")}
-    
-    -- Used to create nextMapNames
-	api.scatteredRewardDensity = tonumber(params["apple_prob"])
-    api.episodeLengthSeconds = tonumber(params["episode_length_seconds"])
-    api.minSpawnGoalDistance = 0
+       , maze = maze }
   end
 
   function api:createPickup(class_name)
@@ -256,7 +335,7 @@ function factory.createLevelApi(kwargs)
   end
  
   function api:hasEpisodeFinished(time_seconds)
-     return api.episode.hasFinished(time_seconds)
+     return api.episode:hasFinished(time_seconds)
   end
   
   function api:updateSpawnVars(spawnVars)
@@ -267,7 +346,7 @@ function factory.createLevelApi(kwargs)
       for x in spawnVars.origin:gmatch("%S+") do
           coords[#coords + 1] = x
       end
-      local updated_spawn_vars = api.episode.getSpawnVarByLoc(coords)
+      local updated_spawn_vars = api.episode:getSpawnVarByLoc(coords)
       return updated_spawn_vars
     end
 	
@@ -276,6 +355,7 @@ function factory.createLevelApi(kwargs)
 
   function api:getMaze(mazeidx)
      mazeidx = mazeidx or random.uniformInt(1, #api.mapnames)
+     api.mazes = api.mazes or {}
      if not api.mazes[mazeidx] then
         api.mazes[mazeidx] = api.Maze:new{
            mapName = api.mapnames[mazeidx]
@@ -288,8 +368,13 @@ function factory.createLevelApi(kwargs)
   function api:getAppleLocations()
      local apple_locations = {}
      for k, v in pairs(api.episode:getSpawnVars()) do
+
         if v.apple_reward ~= nil then
-           apple_locations[#apple_locations + 1] = v.location
+           local coords = {}
+           for x in k:gmatch("%S+") do
+              coords[#coords + 1] = tonumber(x)
+           end
+           apple_locations[#apple_locations + 1] = {coords[1], coords[2]}
         end
      end
      return apple_locations
@@ -297,7 +382,7 @@ function factory.createLevelApi(kwargs)
 
   function api:nextMap()
      -- reload the same map
-    if api.episode.hasFinished() then
+    if api.episode:hasFinished() then
         -- Start a new episode
         api.episode = api.Episode:new{
            api = api
@@ -308,12 +393,16 @@ function factory.createLevelApi(kwargs)
     end
     
     -- Return the chosen mapname
-    return api.episode:getMapName()
+    local nMapName = api.episode:getMapName()
+    return nMapName
   end
 
-  pickup_observations.decorate(api, { maxapples = kwargs.maxapples })
+  pickup_observations.decorate(api)
   custom_observations.decorate(api)
-  timeout.decorate(api, kwargs.episodeLengthSeconds)
+  -- Although we handle the episode timeout ourselves so that we can
+  -- reinitialize the maze with new map and new goal.
+  -- But the timeout decorator is useful in terms of displaying time as a message.
+  timeout.decorate(api, api.episodeLengthSeconds)
   
   return api
 end

@@ -2,6 +2,8 @@ from __future__ import print_function
 import sys
 import time
 import os
+import os.path as op
+import glob
 import functools
 import numbers
 import itertools
@@ -706,9 +708,6 @@ class TopViewDeepmindLab(gym.Wrapper):
 
 class DeepmindLab(TopViewDeepmindLab):
     def __init__(self, *args, **kwargs):
-        print("kwargs", file=sys.stderr)
-        print(kwargs, file=sys.stderr)
-
         P = type(self).mro()[1]
         wrapper_kwargs = {
             k : kwargs.pop(k)
@@ -724,9 +723,9 @@ L2NActionMapper_v0 = L2NActionMapper(L2NActMapParams_v0.inc_mat
 ManhattanWorldActionMapper_v0 = L2NActionMapper(ManhattanWorldActMap_v0.inc_mat
                                         , ManhattanWorldActMap_v0.rel_mask_mat)
 
-def register_gym_env(entry_point_name, dl_args, dl_kwargs):
+def register_gym_env(entry_point_name, dl_args, dl_kwargs, entry_point_object=DeepmindLab):
     globals()[entry_point_name] = \
-        functools.partial(DeepmindLab
+        functools.partial(entry_point_object
                           , *dl_args, **dl_kwargs)
     env_id = '{}-v1'.format(entry_point_name.replace("_", "-"))
     register(
@@ -741,7 +740,14 @@ def random_string(N):
 def register_and_make(*args, **kwargs):
     name  = random_string(5)
     entry_point_name = "DeepmindLab" + name
-    env_id = register_gym_env(entry_point_name, args, kwargs)
+    kw = {}
+    EPO = "entry_point_object"
+    if EPO in kwargs:
+        kw[EPO] = kwargs.pop(EPO)
+        if isinstance(kw[EPO], str):
+            kw[EPO] = globals()[kw[EPO]]
+        
+    env_id = register_gym_env(entry_point_name, args, kwargs, **kw)
     return gym.make(env_id)
 
 if __name__ == '__main__':

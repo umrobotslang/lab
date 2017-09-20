@@ -140,9 +140,9 @@ function helpers.split(str, pat)
 end
 
 function helpers.find(value, array)
-   for i, v in array do
+   for i, v in ipairs(array) do
       if v == value then
-         return v
+         return i
       end
    end
    return -1

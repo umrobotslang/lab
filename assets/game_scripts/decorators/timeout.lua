@@ -33,8 +33,10 @@ function timeout.decorate(api, episodeLength)
 
   local start = api.start
   function api:start(...)
-    timeRemaining = episodeLength
-    return start and start(api, ...)
+    local ret = start and start(api, ...)
+    api.episodeLengthSeconds = api.episodeLengthSeconds or episodeLength
+    timeRemaining = api.episodeLengthSeconds
+    return ret
   end
 
   local screenMessages = api.screenMessages
@@ -46,7 +48,7 @@ function timeout.decorate(api, episodeLength)
 
   local hasEpisodeFinished = api.hasEpisodeFinished
   function api:hasEpisodeFinished(time_seconds)
-    timeRemaining = episodeLength - time_seconds
+    timeRemaining = api.episodeLengthSeconds - time_seconds
     return hasEpisodeFinished and hasEpisodeFinished(api, time_seconds) or
            timeRemaining <= 0
   end

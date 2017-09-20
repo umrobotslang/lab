@@ -61,7 +61,7 @@ function custom_observations.decorate(api)
   function api:customObservation(name)
     cobs = obs[name] and obs[name]() or customObservation(api, name)
     if name == 'POSE' then
-	api.last_pose = cobs
+       api.last_pose = cobs
     end
     return cobs
   end

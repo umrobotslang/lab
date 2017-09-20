@@ -820,12 +820,13 @@ ASSETS = [
     "assets/q3config.cfg",
 ] + glob(["assets/game_scripts/**/*.lua"])
 
-TRAIN_OR_TRAIN_MAPS = glob(["assets/maps/t*.map"])
+TRAIN_OR_TEST_MAPS = glob(["assets/maps/t*.map"])
 OTHER_MAPS = glob(["assets/maps/*.map"], exclude = ["assets/maps/t*.map"])
 
 genrule(
     name = "allmaps_assets",
-    srcs = TRAIN_OR_TRAIN_MAPS,
+    #srcs = TRAIN_OR_TEST_MAPS,
+    srcs = ["assets/pk3s/allmaps.pk3"],
     outs = ["baselab/allmaps.pk3"],
     #cmd = "cp -t $(@D)/ $(SRCS); " +
     #      "for s in $(SRCS); do " +
@@ -833,7 +834,7 @@ genrule(
     #      "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
     #      "done",
     cmd = "cp -t $(@D)/ $(SRCS); " +
-          "cp /z/tmp/dhiman/deepmind-lab-sep-13-2017/build/execroot/deepmind-lab/bazel-out/local-fastbuild/genfiles/baselab/allmaps.pk3 $@",
+          "cp $(SRCS) $@",
     tools = [
         "//:bspc",
         "//deepmind/level_generation:compile_map_sh",
@@ -1018,6 +1019,7 @@ cc_binary(
         ":assets_oa_pk3",
         ":assets_pk3",
         ":map_assets",
+        ":allmaps_assets",
         ":non_pk3_assets",
         ":vm_pk3",
     ],
@@ -1056,6 +1058,7 @@ py_binary(
     srcs = ["python/deepmind_lab_gym.py"
            , "python/top_view_renderer.py"
            , "python/test_distance_transform.py"
+           , "python/multiprocdmlab.py"
            , "python/deepmind_lab_gym_dummy.py"],
     data = [":deepmind_lab.so"],
     main = "python/deepmind_lab_gym_dummy.py"

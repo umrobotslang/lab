@@ -923,7 +923,7 @@ void Context::CustomObservation(int idx, EnvCApi_Observation* observation) {
   }
   CHECK(layout != nullptr)
       << "[customObservation] - Must return a contiguous tensor!\n:"
-      << "at idx" << idx << "\n"
+      << "at idx " << idx << " name : " << info.name << "\n"
       << lua::ToString(L, -1);
 
   observation_tensor_shape_.resize(layout->shape().size());
