@@ -42,6 +42,9 @@ class RandomMazesDMLab(object):
             mapnames, mapstrings = maps_from_config(config)
             config["mapnames"] = ",".join(mapnames)
             config["mapstrings"] = ",".join(mapstrings)
+        else:
+            self.mapnames = config["mapnames"].split(",")
+            self.mapstrings = config["mapstrings"].split(",")
 
         self.env = DeepmindLab(level_script, config, actionmap, **kwargs)
 
@@ -86,8 +89,9 @@ def worker_target(conn, env_class, env_args, env_kwargs):
         m_name, m_args, m_kwargs = conn.recv()
         if m_name == 'worker.quit':
             break
-        assert isinstance(m_args, tuple)
-        assert isinstance(m_kwargs, dict)
+        assert isinstance(m_args, tuple), "{} {} {}".format(m_name, m_args, m_kwargs)
+        assert isinstance(m_kwargs, dict), "{} {} {}".format(m_name, m_args, m_kwargs)
+
         if m_name != '__getattr__':
             res = getattr(env, m_name)(*m_args, **m_kwargs)
         else:
@@ -127,14 +131,14 @@ class MultiProcDeepmindLab(object):
             config["mapnames"] = ",".join(self.mapnames)
             config["mapstrings"] = ",".join(self.mapstrings)
         else:
-            self.mapnames = config["mapnames"]
-            self.mapstrings = config["mapstrings"]
+            self.mapnames = config["mapnames"].split(",")
+            self.mapstrings = config["mapstrings"].split(",")
 
     def create_new_episode_queue(self):
         next_pipes = [Pipe()
                  for _ in range(self.num_workers)]
         next_episode_config = self.dmlab_config().copy()
-        mapidx = np.random.randint(100)
+        mapidx = np.random.randint(len(self.mapnames))
         print("Sending maps : {}".format(self.mapstrings[mapidx:mapidx+1]))
         next_episode_config.update(
             dict(mapnames = ",".join(self.mapnames[mapidx:mapidx+1])
@@ -221,24 +225,20 @@ class MultiProcDeepmindLab(object):
         self.episode_step_counter = 0
         return self.mproc_last_obs[0], self.mproc_last_obs[-1]
 
-    def close(self):
-        return self.call_sync("close")
-
-    def seed(self):
-        return self.call_sync("seed")
-
-    def render(self):
-        return self.call_sync("render")
-
     @property
-    def metadata(self):
-        return self.call_sync("__getattr__", "metadata")
-    @property
-    def action_space(self):
-        return self.call_sync("__getattr__", "action_space")
-    @property
-    def observation_space(self):
-        return self.call_sync("__getattr__", "observation_space")
+    def unwrapped(self):
+        return self
+
+    def configure(self, *args, **kwargs):
+        return self.call_sync("configure", args, kwargs)
+
+    def __getattr__(self, attr):
+        if attr in "metadata action_space observation_space reward_range _configured".split():
+            return self.call_sync("__getattr__", (attr,))
+        elif attr in "close seed render".split():
+            return self.call_sync(attr)
+        else:
+            raise AttributeError("No attr %s" % attr)
 
     def __del__(self):
         self.close_current_queue()
