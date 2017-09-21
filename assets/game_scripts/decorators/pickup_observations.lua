@@ -1,5 +1,6 @@
 local tensor = require 'dmlab.system.tensor'
 local game = require 'dmlab.system.game'
+local helpers = require 'common.helpers'
 local pickup_observations = {}
 local obs = {}
 local obsSpec = {}
@@ -49,8 +50,8 @@ function PickupObs:initObs()
    self.obs_value[ apple_location_custom_obs.name ] = tensor.DoubleTensor(
       self.api.maxapples, 2)
    for i, v in ipairs(apple_locations) do
-      self.obs_value[ apple_location_custom_obs.name ](i, 0):val(v[1])
-      self.obs_value[ apple_location_custom_obs.name ](i, 1):val(v[2])
+      self.obs_value[ apple_location_custom_obs.name ](i, 1):val(v[1])
+      self.obs_value[ apple_location_custom_obs.name ](i, 2):val(v[2])
    end
 end
 

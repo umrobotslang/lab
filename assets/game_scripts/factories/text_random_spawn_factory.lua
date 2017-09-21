@@ -87,6 +87,7 @@ function SubEpisode:newSpawnVars()
        origin = goal_location_key .. ' 20',
        id="2"
     }
+
     return newSpawnVars
 end
 
@@ -369,18 +370,17 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:getAppleLocations()
-     local apple_locations = {}
-     for k, v in pairs(api.episode:getSpawnVars()) do
-
-        if v.apple_reward ~= nil then
-           local coords = {}
-           for x in k:gmatch("%S+") do
-              coords[#coords + 1] = tonumber(x)
-           end
-           apple_locations[#apple_locations + 1] = {coords[1], coords[2]}
+    local apple_locations = {}
+    for k, v in pairs(api.episode:getSpawnVars()) do
+        if v.classname == "apple_reward"  then
+            local coords = {}
+            for x in k:gmatch("%S+") do
+                coords[#coords + 1] = tonumber(x)
+            end
+            apple_locations[tonumber(v.id) - 2] = {coords[1], coords[2]}
         end
-     end
-     return apple_locations
+    end
+    return apple_locations
   end
 
   function api:nextMap()
