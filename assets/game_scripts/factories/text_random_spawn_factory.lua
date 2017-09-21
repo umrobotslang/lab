@@ -356,7 +356,7 @@ function factory.createLevelApi(kwargs)
   function api:getMaze(mazeidx)
      mazeidx = mazeidx or random.uniformInt(1, #api.mapnames)
      api.mazes = api.mazes or {}
-     if not api.mazes[mazeidx] then
+     if api.mazes[mazeidx] == nil then
         api.mazes[mazeidx] = api.Maze:new{
            mapName = api.mapnames[mazeidx]
            , entityLayer = api.mapstrings[mazeidx]
@@ -384,10 +384,10 @@ function factory.createLevelApi(kwargs)
      -- reload the same map
     if api.episode:hasFinished() then
         -- Start a new episode
+        local maze = api:getMaze()
         api.episode = api.Episode:new{
            api = api
-           , goal_location = api.getMaze():sampleEntityLocation("G")
-           , maze = api.mazes[chosenMap]}
+           , maze = maze}
     else
        api.episode:newSubEpisode()
     end
