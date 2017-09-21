@@ -282,6 +282,8 @@ function factory.createLevelApi(kwargs)
   function api:init(params)
     -- initialize parameters from python
     api.maxapples = params.maxapples or 50
+    _ = params.game_seed or error("Need game_seed")
+    random.seed(params.game_seed)
     
     --Random spawn, random goal or fixed spawn, fixed goal
     api.all_entities_swappable = params["random_spawn_random_goal"] ~= "False"
@@ -331,7 +333,8 @@ function factory.createLevelApi(kwargs)
   end
   
   function api:start(episode, seed)
-    random.seed(seed)
+      --print("seed :" .. seed)
+      -- random.seed()
   end
  
   function api:hasEpisodeFinished(time_seconds)

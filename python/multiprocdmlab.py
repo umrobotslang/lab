@@ -86,8 +86,7 @@ def ZMQPipe(other_host):
 
 def worker_target(conn, env_class, env_args, env_kwargs, worker_name):
     for sig in signal.SIGHUP, signal.SIGINT, signal.SIGTERM:
-        signal.signal(sig, 
-                lambda *args: print("game worker died {}".format(worker_name), file=sys.stderr))
+        signal.signal(sig, lambda *args: 0)
     m_name = ""  
     env = env_class(*env_args, **env_kwargs)
     while m_name != 'worker.quit':
@@ -102,7 +101,6 @@ def worker_target(conn, env_class, env_args, env_kwargs, worker_name):
         else:
             res = getattr(env, m_args[0])
         conn.send((m_name, res))
-    print("Worker going away", file=sys.stderr)
     conn.close()
     os._exit(0)
 
@@ -146,7 +144,6 @@ class MultiProcDeepmindLab(object):
                  for _ in range(self.num_workers)]
         next_episode_config = self.dmlab_config().copy()
         mapidx = np.random.randint(len(self.mapnames))
-        print("Sending maps : {}".format(self.mapstrings[mapidx:mapidx+1]))
         next_episode_config.update(
             dict(mapnames = ",".join(self.mapnames[mapidx:mapidx+1])
                  , mapstrings = ",".join(self.mapstrings[mapidx:mapidx+1])
@@ -155,41 +152,40 @@ class MultiProcDeepmindLab(object):
         next_episode_conn = [client for client, server in next_pipes]
         next_episode_workernames = [
                 "{}-{}".format(self.mapnames[mapidx], i) for i in range(len(next_pipes))]
+        next_episode_kwargs = [self.dmlab_kwargs.copy() for _ in next_pipes]
+        for kw in next_episode_kwargs:
+            kw["init_game_seed"] = np.random.randint(1000)
+
         next_episode_queue = [
             Process(
                 target=worker_target
                 , args=(server , self.deepmind_lab_class
                         , (self.dmlab_args[0] , next_episode_config, self.dmlab_args[2])
-                        , self.dmlab_kwargs, worker_name))
-            for worker_name, (client, server) in zip(next_episode_workernames, next_pipes)]
+                        , kw , worker_name))
+            for kw, worker_name, (client, server) in 
+            zip(next_episode_kwargs, next_episode_workernames, next_pipes)]
         for wp in next_episode_queue:
             wp.start()
         return next_episode_conn, next_episode_queue
 
     def close_current_queue(self):
         for conn in self.current_conn:
-            print("Sending quit", file=sys.stderr)
             conn.send(("worker.quit", (), {}))
         for conn in self.current_conn:
-            print("close", file=sys.stderr)
             conn.close()
 
         #for wp in self.current_queue:
         #    print("terminate", file=sys.stderr)
         #    wp.terminate()
         for wp in self.current_queue:
-            print("180: waiting on worker to join", file=sys.stderr)
             wp.join()
-            print("180: waiting on worker to join", file=sys.stderr)
 
     def current_worker_conn(self):
         return self.current_conn[self.current_worker_idx]
 
     def flush_recv_queue(self):
         while self.pending_recv_requests[self.current_worker_idx] > 0:
-            print("187: waiting on worker", file=sys.stderr)
             _, _ = self.current_worker_conn().recv()
-            print("187: done waiting on worker", file=sys.stderr)
             self.pending_recv_requests[self.current_worker_idx] -= 1
 
     def call_sync(self, m_name, m_args=(), m_kwargs={}):
@@ -200,12 +196,10 @@ class MultiProcDeepmindLab(object):
         return m_res
 
     def call_async(self, m_name, m_args=(), m_kwargs={}):
-        print("call_async {}".format(m_name), file=sys.stderr)
         self.current_worker_conn().send((m_name, m_args, m_kwargs))
         self.pending_recv_requests[self.current_worker_idx] += 1
         self.current_worker_idx = (
             self.current_worker_idx + 1) % len(self.current_queue)
-        print("done async {}".format(m_name), file=sys.stderr)
 
     def step(self, act):
         self.episode_step_counter += 1
@@ -215,7 +209,6 @@ class MultiProcDeepmindLab(object):
             return self.mproc_last_obs[0], self.mproc_last_obs[1], True, self.mproc_last_obs[3]
 
         if self.mproc_last_goal_found:
-            print("got goal going to next map. async step called", file=sys.stderr)
             self.call_async("step", (act,), {})
             self.sub_episode_reset()
             return self.mproc_last_obs
@@ -234,9 +227,7 @@ class MultiProcDeepmindLab(object):
         # Do not need to call actual reset because we are going to
         # throw away the process and restart a new one.
         self.sub_episode_reset()
-        print("Closing current queue", file=sys.stderr)
         self.close_current_queue()
-        print("Done  closing current queue", file=sys.stderr)
         (self.current_conn, self.current_queue
         ) = (self.next_episode_conn, self.next_episode_queue)
         (self.next_episode_conn, self.next_episode_queue
@@ -251,6 +242,10 @@ class MultiProcDeepmindLab(object):
 
     def configure(self, *args, **kwargs):
         return self.call_sync("configure", args, kwargs)
+
+    def observations(self):
+        obs, info = self.call_sync("observations")
+        return obs, info
 
     def __getattr__(self, attr):
         if attr in "metadata action_space observation_space reward_range _configured".split():

@@ -391,13 +391,14 @@ class _DeepmindLab(gym.Env):
                  , additional_observation_types = []
                  , init_game_seed=0):
         # init_game_seed should be random (is messing with experiments)
-        init_game_seed = int(1e7*random.random())
+        #init_game_seed = int(time.time())
 
         self.observation_types = [self.RGB_OBS_TYPE]
         self.enable_depth = enable_depth
         self.enable_velocity = enable_velocity
         self.level_script = level_script
         self.lab_config = config
+        self.lab_config["game_seed"] = self.lab_config.get("game_seed", init_game_seed)
         self.action_mapper = action_mapper
         self.additional_observation_types = additional_observation_types
 
@@ -429,9 +430,9 @@ class _DeepmindLab(gym.Env):
         return self._dm_lab_env().environment_name()
 
     def _dm_lab_reset(self):
-        init_game_seed = int(1e7*random.random())
+        #init_game_seed = int(time.time())
         with self._chdir_mod_ctxt:
-            self._dm_lab_env().reset(init_game_seed)
+            self._dm_lab_env().reset(self.init_game_seed)
 
     def _dm_lab_step(self, *args, **kwargs):
         with self._chdir_mod_ctxt:
@@ -508,7 +509,7 @@ class _DeepmindLab(gym.Env):
     def reward_range(self):
         return [-1, 100]
 
-    def _observations(self):
+    def observations(self):
         if self._dm_lab_env().is_running():
             obs = self._dm_lab_env().observations()
         else:
@@ -551,7 +552,7 @@ class _DeepmindLab(gym.Env):
         reward = self._dm_lab_step(deepmind_lab_actions
                                    , num_steps=num_steps)
         episode_over = (not self._dm_lab_env().is_running())
-        observations, info = self._observations()
+        observations, info = self.observations()
 
         # output checking
         assert isinstance(reward, numbers.Number), \
@@ -565,7 +566,7 @@ class _DeepmindLab(gym.Env):
         # Reset the velocities
         self._current_velocities = \
                             self.action_mapper.initial_deepmind_velocities()
-        obs, info = self._observations()
+        obs, info = self.observations()
 
         # Return env name (we often switch between new envs)
         info['env_name'] = self.environment_name()
@@ -595,10 +596,6 @@ class _DeepmindLab(gym.Env):
             raise ValueError("bad mode: {}".format(mode))
         return im
 
-    def _seed(self, seed=None):
-        if seed is not None:
-            np.random.seed(seed)
-        self.init_game_seed = seed
 
 class TopViewDeepmindLab(gym.Wrapper):
     def __init__(self, env=None
