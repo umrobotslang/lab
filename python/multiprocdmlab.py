@@ -168,15 +168,16 @@ class MultiProcDeepmindLab(object):
             wp.start()
         return next_episode_conn, next_episode_queue
 
-    def close_current_queue(self):
+    def close_current_queue(self, terminate=False):
         for conn in self.current_conn:
             conn.send(("worker.quit", (), {}))
         for conn in self.current_conn:
             conn.close()
 
-        #for wp in self.current_queue:
-        #    print("terminate", file=sys.stderr)
-        #    wp.terminate()
+        if terminate:
+            for wp in self.current_queue:
+                print("terminate", file=sys.stderr)
+                wp.terminate()
         for wp in self.current_queue:
             wp.join()
 
@@ -256,7 +257,8 @@ class MultiProcDeepmindLab(object):
             raise AttributeError("No attr %s" % attr)
 
     def __del__(self):
-        self.close_current_queue()
+        print("\n\ndel called\n\n", file=sys.stderr)
+        self.close_current_queue(terminate=True)
         (self.current_conn, self.current_queue
         ) = (self.next_episode_conn, self.next_episode_queue)
-        self.close_current_queue()
+        self.close_current_queue(terminate=True)
