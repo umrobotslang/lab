@@ -3,6 +3,7 @@ local maze_gen = require 'dmlab.system.maze_generation'
 local random = require 'common.random'
 local pickups = require 'common.pickups'
 local helpers = require 'common.helpers'
+local make_map = require 'common.make_map'
 local custom_observations = require 'decorators.custom_observations'
 local pickup_observations = require 'decorators.pickup_observations'
 local timeout = require 'decorators.timeout'
@@ -287,13 +288,18 @@ function factory.createLevelApi(kwargs)
     random.seed(params.game_seed)
     
     --Random spawn, random goal or fixed spawn, fixed goal
-    api.all_entities_swappable = params["random_spawn_random_goal"] ~= "False"
+    api.all_entities_swappable = params.random_spawn_random_goal ~= "False"
+    api.make_map = (params.make_map ~= "False") and true
     
     --Initialize all mapnames nad mapstrings as lists
     api.mapnames = helpers.split(
        params.mapnames or error("Need mapnames") , ",")
     api.mapstrings = helpers.split(
        params.mapstrings or error("Need mapstrings") , ",")
+    
+    if params.variationsLayers then
+       api.variationsLayers = helpers.split(params.variationsLayers, ",")
+    end
 
     -- More parameters
 	api.scatteredRewardDensity = tonumber(params["apple_prob"] or "0.25")
@@ -301,7 +307,7 @@ function factory.createLevelApi(kwargs)
     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
 
     -- How to compute the goal location
-    compute_goal_location, cgl_args = unpack(
+    local compute_goal_location, cgl_args = unpack(
        helpers.split(
           params.compute_goal_location or "random_per_episode", ":"))
     api.compute_goal_location = ComputeGoalLocation[compute_goal_location] or
@@ -309,7 +315,7 @@ function factory.createLevelApi(kwargs)
     api.compute_goal_location_args = cgl_args
 
     -- How to compute the spawn location
-    compute_spawn_location, csl_args = unpack(
+    local compute_spawn_location, csl_args = unpack(
        helpers.split(
           params.compute_spawn_location or "random_per_subepisode", ":"))
     api.compute_spawn_location = ComputeSpawnLocation[compute_spawn_location] or
@@ -361,12 +367,24 @@ function factory.createLevelApi(kwargs)
      mazeidx = mazeidx or random.uniformInt(1, #api.mapnames)
      api.mazes = api.mazes or {}
      if api.mazes[mazeidx] == nil then
+        if api.make_map then
+           mapName = api.mapnames[mazeidx]
+           entityLayer = api.mapstrings[mazeidx]
+           variationsLayer = api.variationsLayers[mazeidx]
+           local made = make_map.makeMap(mapName, entityLayer, variationsLayer)
+           print("made map : " .. made)
+        end
         api.mazes[mazeidx] = api.Maze:new{
            mapName = api.mapnames[mazeidx]
            , entityLayer = api.mapstrings[mazeidx]
            , api = api}
      end
      return api.mazes[mazeidx]
+  end
+
+  function api:commandLine(oldCommandLine)
+     -- Adds tmp path to the searchable directories for maps
+     return make_map.commandLine(oldCommandLine)
   end
 
   function api:getAppleLocations()
@@ -397,6 +415,7 @@ function factory.createLevelApi(kwargs)
     
     -- Return the chosen mapname
     local nMapName = api.episode:getMapName()
+    print("Looking for map: " .. nMapName)
     return nMapName
   end
 
