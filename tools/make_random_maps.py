@@ -45,12 +45,21 @@ def level_data_dir():
     return "/tmp/dmlab_level_data_0/baselab/"
     
 
-def mv_map_files(assets_map_location, mapname):
-    mapfile = op.join(level_data_dir(), mapname + ".map")
-    print("Adding %s to %s" % (mapfile, assets_map_location))
-    shutil.move(mapfile, assets_map_location)
+def mv_map_files(assets_map_location, pk3dir, mapname):
+    mapfile, pk3file = [op.join(level_data_dir(), mapname + ext)
+                        for ext in ".map .pk3".split()]
+    try:
+        print("Adding %s to %s" % (mapfile, assets_map_location))
+        shutil.move(mapfile, assets_map_location)
+    except shutil.Error, e:
+        print(e)
+    print("Adding %s to %s" % (pk3file, pk3dir))
+    shutil.move(pk3file, pk3dir)
     for df in [op.join(level_data_dir(), mapname + "." + ext)
-               for ext in "srf pk3 aas bsp".split()]:
+               for ext in "srf aas bsp".split()]:
+        os.remove(df)
+    for df in [op.join(level_data_dir(), "maps", mapname + "." + ext)
+               for ext in "aas bsp".split()]:
         os.remove(df)
 
 def exists_pk3_file(assets_pk3_path, fname):
@@ -80,7 +89,7 @@ def pack_pk3_files(assets_pk3_path, mapname):
     mapsdir = op.join(level_data_dir(), "maps/")
     files = [op.join(mapsdir, mapname + "." + ext)
              for ext in "bsp aas".split()]
-    with open(assets_pk3_path, 'w') as f, \
+    with open(assets_pk3_path, 'a') as f, \
          ZipFile(f, 'a') as zip, \
          FileLock(f, fcntl.LOCK_EX):
         for f in files:
@@ -89,17 +98,14 @@ def pack_pk3_files(assets_pk3_path, mapname):
             os.remove(f)
 
 def make_map_and_copy(args):
-    pk3path, mapsdir, mapname, mode, idx = args
-    if (exists_pk3_file(pk3path, mapname + ".aas")
+    pk3dir, mapsdir, mapname, mode, idx = args
+    if (op.exists(op.join(mapsdir, mapname + ".pk3"))
         and op.exists(op.join(mapsdir, mapname + ".map"))):
         print("File %s.map exists" % mapname)
-        return
+        return mapname
     generate_map(idx, num_maps=False, mode=mode)
-    if not op.exists(op.join(mapsdir, mapname + ".map")):
-        mv_map_files(mapsdir, mapname)
-
-    if not exists_pk3_file(pk3path, mapname + ".aas"):
-        pack_pk3_files(pk3path, mapname)
+    mv_map_files(mapsdir, pk3dir, mapname)
+    return mapname
     
 def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , train_num_maps = 1000
@@ -107,18 +113,23 @@ def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , shape = (9, 9)):
     mapsdir = op.join(thisdir, "../assets/maps/")
     pk3dir = op.join(thisdir, "../assets/pk3s/")
-    pk3path = op.join(pk3dir, 'var_maps.pk3')
     pool = Pool(processes=4)
-    pool.map(make_map_and_copy
-             , [(pk3path, mapsdir
+    mapnames = pool.map(make_map_and_copy
+             , [(pk3dir, mapsdir
                   , mapfile_basename('training', shape, idx)
                   , 'training', idx)
-                 for idx in range(1, train_num_maps + 1)])
-    pool.map(make_map_and_copy
-             , [(pk3path, mapsdir
+                 for idx in range(1, train_num_maps + 1)]
+             + [
+                 (pk3dir, mapsdir
                   , mapfile_basename('testing', shape, idx)
                   , 'testing', idx)
                  for idx in range(1, train_num_maps + 1)])
+    pk3path = op.join(pk3dir, 'var_maps.pk3')
+    with ZipFile(pk3path, 'w') as zip:
+        for pf in [op.join(pk3dir, f + ".pk3") for f in mapnames]:
+            with ZipFile(pf, 'r') as pfzip:
+                for pffile in pfzip.namelist():
+                    zip.writestr(pffile, pfzip.read())
 
 if __name__ == '__main__':
     make_random_maps()
