@@ -19,22 +19,31 @@ def get_free_port(host='127.0.0.1'):
         port = s.getsockname()[1]
     return port
 
+def default_entity_root():
+    return op.join((op.dirname(__file__) or '.'), '../assets/entityLayers')
+
+def entity_dir(entity_root, mode,rows, cols):
+    # Set in maps and map names
+    entitydir = op.join(entity_root, "%02dx%02d" %(rows, cols),
+                            mode, "entityLayers")
+    return entitydir
+
+def mapname_from_entity_file(entity_file, mode, rows, cols):
+    # Send in mapnames and corresponding entity-files as comma separated strings
+    mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
+    return mapname_prepend + os.path.basename(f).replace(".entityLayer","")
+
 def maps_from_config(config):
-    entitydir = config.get(
-        "entitydir",
-        op.join((op.dirname(__file__) or '.'), '../assets/entityLayers'))
+    entitydir = config.get("entitydir", default_entity_root())
     rows, cols, mode, num_maps = [
         config[k] for k in "rows  cols  mode num_maps".split()]
 
-    # Set in maps and map names
-    entitydir = op.join(entitydir, "%02dx%02d" %(rows, cols),
-                            mode, "entityLayers")
 
-    # Send in mapnames and corresponding entity-files as comma separated strings
-    mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
-    entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
-    mapnames = [mapname_prepend + os.path.basename(f).replace(".entityLayer","")\
-                                for f in entityfiles]
+    entitydir = entity_dir(entitydir, mode, rows, cols)
+    if num_maps:
+        entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
+    mapnames = [mapname_from_entity_file(f, mode, rows, cols)
+                for f in entityfiles]
     mapstrings = [open(e).read() for e in entityfiles]
     return mapnames, mapstrings
     
