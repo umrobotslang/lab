@@ -113,7 +113,7 @@ end
 function helpers.parseAllLocations(maze, intpairkey)
    return helpers.parsePossibleGoalLocations(
       maze, intpairkey, "P"
-      , function (entityCell) return entityCell == " " or entityCell == "A" or entityCell == "G" end)
+      , function (entityCell) return entityCell == "A" or entityCell == "G" or entityCell == "P" end)
 end
 
 function helpers.parsePossibleAppleLocations(maze, intpairkey)

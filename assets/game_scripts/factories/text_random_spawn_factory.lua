@@ -98,7 +98,7 @@ function SubEpisode:getSpawnVarByLoc(coords)
 end
 
 function SubEpisode:getGoalLocation()
-   return self.api.compute_goal_location(self)
+   return self.api.compute_goal_location(self) or error("Need some goal location")
 end
 
 function SubEpisode:getSpawnLocation()
@@ -211,10 +211,10 @@ end
 function ComputeGoalLocation.fixedindex(subepisode)
    if subepisode.episode.goal_location == nil then
       local possibleGoalLocations = subepisode.maze.possibleLocations["G"]
-      local idx = 1 + tonumber(subepisode.api.compute_goal_location_args) % #possibleGoalLocations 
-      subepisode.episode.goal_location = possibleGoalLocations[idx]
+      local idx = 1 + (tonumber(subepisode.api.compute_goal_location_args) % #possibleGoalLocations )
+      subepisode.episode.goal_location = possibleGoalLocations[idx] or error("Need some goal location")
    end
-   return subepisode.episode.goal_location
+   return subepisode.episode.goal_location or error("Need some goal location")
 end
 
 
@@ -289,7 +289,7 @@ function factory.createLevelApi(kwargs)
     
     --Random spawn, random goal or fixed spawn, fixed goal
     api.all_entities_swappable = params.random_spawn_random_goal ~= "False"
-    api.make_map = (params.make_map ~= "False") and true
+    api.make_map = (params.make_map == "True")
     
     --Initialize all mapnames nad mapstrings as lists
     api.mapnames = helpers.split(
@@ -415,7 +415,7 @@ function factory.createLevelApi(kwargs)
     
     -- Return the chosen mapname
     local nMapName = api.episode:getMapName()
-    print("Looking for map: " .. nMapName)
+    -- print("Looking for map: " .. nMapName)
     return nMapName
   end
 

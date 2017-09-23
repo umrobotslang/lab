@@ -28,21 +28,27 @@ def entity_dir(entity_root, mode,rows, cols):
                             mode, "entityLayers")
     return entitydir
 
-def mapname_from_entity_file(entity_file, mode, rows, cols):
+def mapname_from_entity_file(entity_file, mode, rows, cols, withvariations=False):
     # Send in mapnames and corresponding entity-files as comma separated strings
-    mapname_prepend = "%s-%02dx%02d-" %(mode, rows, cols)
-    return mapname_prepend + os.path.basename(f).replace(".entityLayer","")
+    var = "var-" if withvariations else ""
+    mapname_prepend = "%s-%02dx%02d-%s" %(mode, rows, cols, var)
+    return mapname_prepend + os.path.basename(entity_file).replace(".entityLayer","")
+
+def entity_files(entitydir, mode, rows, cols):
+    entitydirpath = entity_dir(entitydir, mode, rows, cols)
+    entityfiles = glob.glob(entitydirpath + "/*.entityLayer")
+    return entityfiles
 
 def maps_from_config(config):
     entitydir = config.get("entitydir", default_entity_root())
-    rows, cols, mode, num_maps = [
-        config[k] for k in "rows  cols  mode num_maps".split()]
+    rows, cols, mode, num_maps, withvariations = [
+        config[k] for k in "rows  cols  mode num_maps withvariations".split()]
 
-
-    entitydir = entity_dir(entitydir, mode, rows, cols)
+    entityfiles = entity_files(entitydir, mode, rows, cols)
     if num_maps:
-        entityfiles = sorted(glob.glob(entitydir + '/*'))[:num_maps]
-    mapnames = [mapname_from_entity_file(f, mode, rows, cols)
+        entityfiles = sorted(entityfiles)[:num_maps]
+
+    mapnames = [mapname_from_entity_file(f, mode, rows, cols, withvariations)
                 for f in entityfiles]
     mapstrings = [open(e).read() for e in entityfiles]
     return mapnames, mapstrings
@@ -101,6 +107,7 @@ def worker_target(conn, env_class, env_args, env_kwargs, worker_name):
     while m_name != 'worker.quit':
         m_name, m_args, m_kwargs = conn.recv()
         if m_name == 'worker.quit':
+            conn.send("quiting")
             break
         assert isinstance(m_args, tuple), "{} {} {}".format(m_name, m_args, m_kwargs)
         assert isinstance(m_kwargs, dict), "{} {} {}".format(m_name, m_args, m_kwargs)
@@ -113,6 +120,99 @@ def worker_target(conn, env_class, env_args, env_kwargs, worker_name):
     conn.close()
     os._exit(0)
 
+class CountingConnection(object):
+    def __init__(self, conn):
+        self.conn = conn
+        self.async_requests = 0
+
+    def send(self, msg):
+        self.async_requests += 1
+        return self.conn.send(msg)
+
+    def recv(self):
+        self.async_requests -= 1
+        return self.conn.recv()
+
+    def flush(self):
+        while self.async_requests >= 1:
+            _ = self.recv()
+
+    def __getattr__(self, attr):
+        return getattr(self.conn, attr)
+
+        
+class Episode(object):
+    def __init__(self, mpdmlab):
+        self.step_counter = 0
+        self.current_worker_idx = 0
+
+        self.goal_found = False
+        self.last_obs = (np.zeros(()), 0, 0, {})
+
+        self.conn, self.queue = self.create(mpdmlab)
+
+    def worker_conn(self):
+        return self.conn[self.current_worker_idx]
+
+    def create(self, mpdmlab):
+        next_pipes = [Pipe()
+                 for _ in range(mpdmlab.num_workers)]
+        next_episode_config = mpdmlab.dmlab_config().copy()
+        mapidx = np.random.randint(len(mpdmlab.mapnames))
+        next_episode_config.update(
+            dict(mapnames = ",".join(mpdmlab.mapnames[mapidx:mapidx+1])
+                 , mapstrings = ",".join(mpdmlab.mapstrings[mapidx:mapidx+1])
+                 , compute_goal_location = "fixedindex:%d" % np.random.randint(100)
+                 , compute_spawn_location = "random_per_subepisode"))
+        next_episode_conn = [client for client, server in next_pipes]
+        next_episode_workernames = [
+            "{}-{}".format(mpdmlab.mapnames[mapidx], i)
+            for i in range(len(next_pipes))]
+        next_episode_kwargs = [mpdmlab.dmlab_kwargs.copy()
+                               for _ in next_pipes]
+        for kw in next_episode_kwargs:
+            kw["init_game_seed"] = np.random.randint(1000)
+
+        next_episode_queue = [
+            Process(
+                target=worker_target
+                , args=(server , mpdmlab.deepmind_lab_class
+                        , (mpdmlab.dmlab_args[0] , next_episode_config, mpdmlab.dmlab_args[2])
+                        , kw , worker_name))
+            for kw, worker_name, (client, server) in 
+            zip(next_episode_kwargs, next_episode_workernames, next_pipes)]
+        for wp in next_episode_queue:
+            wp.start()
+        return map(CountingConnection, next_episode_conn), next_episode_queue
+
+
+    def call_sync(self, m_name, m_args=(), m_kwargs={}):
+        self.worker_conn().flush()
+        self.worker_conn().send((m_name, m_args, m_kwargs))
+        m_name_recv, m_res = self.worker_conn().recv()
+        assert m_name_recv == m_name
+        return m_res
+
+    def call_async(self, m_name, m_args=(), m_kwargs={}):
+        self.worker_conn().send((m_name, m_args, m_kwargs))
+        self.current_worker_idx = (
+            self.current_worker_idx + 1) % len(self.queue)
+
+    def close(self, terminate=False):
+        for idx, conn in enumerate(self.conn):
+            conn.send(("worker.quit", (), {}))
+            
+        for conn in self.conn:
+            conn.flush()
+            conn.close()
+
+        if terminate:
+            for wp in self.queue:
+                print("terminate", file=sys.stderr)
+                wp.terminate()
+        for wp in self.queue:
+            wp.join()
+
 class MultiProcDeepmindLab(object):
     process_class = Process
     def __init__(self, deepmind_lab_class, *args, **kwargs):
@@ -122,129 +222,56 @@ class MultiProcDeepmindLab(object):
         self.dmlab_kwargs = kwargs
 
         self.episode_num_steps = self.dmlab_config()["episode_length_seconds"] * self.dmlab_config()["fps"]
-        self.episode_step_counter = 0
-        self.current_worker_idx = 0
-        self.pending_recv_requests = [0] * self.num_workers
-        self.mproc_last_goal_found = False
-        self.mproc_last_obs = (np.zeros(()), 0, 0, {})
+        self.mapnames, self.mapstrings, dlconfig = self.process_config(
+            self.dmlab_config())
+        self.dmlab_args = (self.dmlab_args[0], dlconfig, self.dmlab_args[2])
 
-        self.process_config()
-        (self.current_conn, self.current_queue
-        ) = self.create_new_episode_queue()
-        (self.next_episode_conn, self.next_episode_queue
-        ) = self.create_new_episode_queue()
-        time.sleep(5)
+        # Episodes
+        self.current = Episode(self)
+        self.next = Episode(self)
+        # time.sleep(5)
 
     def dmlab_config(self):
         return self.dmlab_args[1]
 
-    def process_config(self):
-        config = self.dmlab_config()
+    def process_config(self, config):
         if "mapnames" not in config or "mapstrings" not in config:
-            self.mapnames, self.mapstrings = maps_from_config(config)
-            config["mapnames"] = ",".join(self.mapnames)
-            config["mapstrings"] = ",".join(self.mapstrings)
+            mapnames, mapstrings = maps_from_config(config)
+            config["mapnames"] = ",".join(mapnames)
+            config["mapstrings"] = ",".join(mapstrings)
         else:
-            self.mapnames = config["mapnames"].split(",")
-            self.mapstrings = config["mapstrings"].split(",")
-
-    def create_new_episode_queue(self):
-        next_pipes = [Pipe()
-                 for _ in range(self.num_workers)]
-        next_episode_config = self.dmlab_config().copy()
-        mapidx = np.random.randint(len(self.mapnames))
-        next_episode_config.update(
-            dict(mapnames = ",".join(self.mapnames[mapidx:mapidx+1])
-                 , mapstrings = ",".join(self.mapstrings[mapidx:mapidx+1])
-                 , compute_goal_location = "fixedindex:%d" % np.random.randint(100)
-                 , compute_spawn_location = "random_per_subepisode"))
-        next_episode_conn = [client for client, server in next_pipes]
-        next_episode_workernames = [
-                "{}-{}".format(self.mapnames[mapidx], i) for i in range(len(next_pipes))]
-        next_episode_kwargs = [self.dmlab_kwargs.copy() for _ in next_pipes]
-        for kw in next_episode_kwargs:
-            kw["init_game_seed"] = np.random.randint(1000)
-
-        next_episode_queue = [
-            Process(
-                target=worker_target
-                , args=(server , self.deepmind_lab_class
-                        , (self.dmlab_args[0] , next_episode_config, self.dmlab_args[2])
-                        , kw , worker_name))
-            for kw, worker_name, (client, server) in 
-            zip(next_episode_kwargs, next_episode_workernames, next_pipes)]
-        for wp in next_episode_queue:
-            wp.start()
-        return next_episode_conn, next_episode_queue
-
-    def close_current_queue(self, terminate=False):
-        for conn in self.current_conn:
-            conn.send(("worker.quit", (), {}))
-        for conn in self.current_conn:
-            conn.close()
-
-        if terminate:
-            for wp in self.current_queue:
-                print("terminate", file=sys.stderr)
-                wp.terminate()
-        for wp in self.current_queue:
-            wp.join()
-
-    def current_worker_conn(self):
-        return self.current_conn[self.current_worker_idx]
-
-    def flush_recv_queue(self):
-        while self.pending_recv_requests[self.current_worker_idx] > 0:
-            _, _ = self.current_worker_conn().recv()
-            self.pending_recv_requests[self.current_worker_idx] -= 1
-
-    def call_sync(self, m_name, m_args=(), m_kwargs={}):
-        self.flush_recv_queue()
-        self.current_worker_conn().send((m_name, m_args, m_kwargs))
-        m_name_recv, m_res = self.current_worker_conn().recv()
-        assert m_name_recv == m_name
-        return m_res
-
-    def call_async(self, m_name, m_args=(), m_kwargs={}):
-        self.current_worker_conn().send((m_name, m_args, m_kwargs))
-        self.pending_recv_requests[self.current_worker_idx] += 1
-        self.current_worker_idx = (
-            self.current_worker_idx + 1) % len(self.current_queue)
+            mapnames = config["mapnames"].split(",")
+            mapstrings = config["mapstrings"].split(",")
+        return mapnames, mapstrings, config
 
     def step(self, act):
-        self.episode_step_counter += 1
-        if self.episode_step_counter >= self.episode_num_steps:
+        self.current.step_counter += 1
+        if self.current.step_counter >= self.episode_num_steps:
             # Make an async reset call
+            obs, rew, done, info = self.current.last_obs
             self.reset()
-            return self.mproc_last_obs[0], self.mproc_last_obs[1], True, self.mproc_last_obs[3]
+            return obs, rew, True, info
 
-        if self.mproc_last_goal_found:
-            self.call_async("step", (act,), {})
-            self.sub_episode_reset()
-            return self.mproc_last_obs
+        if self.current.goal_found:
+            self.current.goal_found = False
+            self.current.call_async("step", (act,), {})
+            return self.last_obs
         else:
-            obs, rew, done, info = self.call_sync(
+            obs, rew, done, info = self.current.call_sync(
                 "step", (act,), {})
-            self.mproc_last_goal_found = (info['GOAL.FOUND'][0] == 1)
+            self.current.goal_found = (info['GOAL.FOUND'][0] == 1)
             assert not done, "We should never get 'done'"
-            self.mproc_last_obs = obs, rew, done, info.copy()
-            return obs, rew, done, info
-
-    def sub_episode_reset(self):
-        self.mproc_last_goal_found = False
+            self.last_obs = (obs, rew, done, info.copy())
+            return (obs, rew, done, info)
 
     def reset(self):
         # Do not need to call actual reset because we are going to
         # throw away the process and restart a new one.
-        self.sub_episode_reset()
-        self.close_current_queue()
-        (self.current_conn, self.current_queue
-        ) = (self.next_episode_conn, self.next_episode_queue)
-        (self.next_episode_conn, self.next_episode_queue
-        ) = self.create_new_episode_queue()
-        self.episode_step_counter = 0
-        self.pending_recv_requests = [0] * self.num_workers
-        return self.mproc_last_obs[0], self.mproc_last_obs[-1]
+        self.current.close()
+        old = self.current
+        self.current = self.next
+        self.next = Episode(self)
+        return old.last_obs[0], old.last_obs[-1]
 
     @property
     def unwrapped(self):
@@ -266,8 +293,9 @@ class MultiProcDeepmindLab(object):
             raise AttributeError("No attr %s" % attr)
 
     def __del__(self):
-        print("\n\ndel called\n\n", file=sys.stderr)
-        self.close_current_queue(terminate=True)
-        (self.current_conn, self.current_queue
-        ) = (self.next_episode_conn, self.next_episode_queue)
-        self.close_current_queue(terminate=True)
+        print("__del__ called")
+        self.current.close(terminate=True)
+        self.next.close(terminate=True)
+        del self.current
+        del self.next
+

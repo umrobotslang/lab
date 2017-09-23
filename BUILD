@@ -866,7 +866,7 @@ genrule(
     cmd = "cp -t $(@D) $(SRCS); " +
           "for s in $(SRCS); do " +
           "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
-          "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/baselab/$${M}; " +
+          "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M}; " +
           "done",
     tools = [
         "//:bspc",
