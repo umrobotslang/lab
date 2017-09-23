@@ -826,8 +826,8 @@ OTHER_MAPS = glob(["assets/maps/*.map"], exclude = ["assets/maps/t*.map"])
 genrule(
     name = "allmaps_assets",
     #srcs = TRAIN_OR_TEST_MAPS,
-    srcs = ["assets/pk3s/allmaps.pk3"],
-    outs = ["baselab/allmaps.pk3"],
+    srcs = ["assets/pk3s/allmaps.pk3", "assets/pk3s/var_maps.pk3"],
+    outs = ["baselab/allmaps.pk3", "baselab/var_maps.pk3"],
     #cmd = "cp -t $(@D)/ $(SRCS); " +
     #      "for s in $(SRCS); do " +
     #      "  BM=$$(basename $${s}); M=$${BM/.map/}; " +

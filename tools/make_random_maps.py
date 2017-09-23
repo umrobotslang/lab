@@ -99,13 +99,21 @@ def pack_pk3_files(assets_pk3_path, mapname):
 
 def make_map_and_copy(args):
     pk3dir, mapsdir, mapname, mode, idx = args
-    if (op.exists(op.join(mapsdir, mapname + ".pk3"))
+    if (op.exists(op.join(pk3dir, mapname + ".pk3"))
         and op.exists(op.join(mapsdir, mapname + ".map"))):
         print("File %s.map exists" % mapname)
         return mapname
     generate_map(idx, num_maps=False, mode=mode)
     mv_map_files(mapsdir, pk3dir, mapname)
     return mapname
+
+def merge_zip_files(pk3path, source_zip_files):
+    with ZipFile(pk3path, 'a') as zip:
+        for pf in source_zip_files:
+            with ZipFile(pf, 'r') as pfzip:
+                print("Zipping {}".format(pf))
+                for pffile in pfzip.namelist():
+                    zip.writestr(pffile, pfzip.read(pffile))
     
 def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , train_num_maps = 1000
@@ -113,7 +121,7 @@ def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , shape = (9, 9)):
     mapsdir = op.join(thisdir, "../assets/maps/")
     pk3dir = op.join(thisdir, "../assets/pk3s/")
-    pool = Pool(processes=4)
+    pool = Pool(processes=6)
     mapnames = pool.map(make_map_and_copy
              , [(pk3dir, mapsdir
                   , mapfile_basename('training', shape, idx)
@@ -123,13 +131,9 @@ def make_random_maps(thisdir = op.dirname(__file__) or '.'
                  (pk3dir, mapsdir
                   , mapfile_basename('testing', shape, idx)
                   , 'testing', idx)
-                 for idx in range(1, train_num_maps + 1)])
+                 for idx in range(1, test_num_maps + 1)])
     pk3path = op.join(pk3dir, 'var_maps.pk3')
-    with ZipFile(pk3path, 'w') as zip:
-        for pf in [op.join(pk3dir, f + ".pk3") for f in mapnames]:
-            with ZipFile(pf, 'r') as pfzip:
-                for pffile in pfzip.namelist():
-                    zip.writestr(pffile, pfzip.read())
+    merge_zip_files(pk3path, [op.join(pk3dir, f + ".pk3") for f in mapnames])
 
 if __name__ == '__main__':
     make_random_maps()
