@@ -21,7 +21,8 @@ function api:nextMap()
   for i = 0, api._count do
     map = map.." A"
   end
-  return make_map.makeMap("demo_map_" .. api._count, map)
+  -- return make_map.makeMap("demo_map_" .. api._count, map)
+  return 'training-09x09-var-0001.map'
 end
 
 return api

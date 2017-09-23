@@ -824,17 +824,34 @@ TRAIN_OR_TEST_MAPS = glob(["assets/maps/t*.map"])
 OTHER_MAPS = glob(["assets/maps/*.map"], exclude = ["assets/maps/t*.map"])
 
 genrule(
-    name = "allmaps_assets",
+    name = "varmaps_assets",
     #srcs = TRAIN_OR_TEST_MAPS,
-    srcs = ["assets/pk3s/allmaps.pk3", "assets/pk3s/var_maps.pk3"],
-    outs = ["baselab/allmaps.pk3", "baselab/var_maps.pk3"],
+    srcs = ["assets/pk3s/var_maps.pk3"],
+    outs = [ "baselab/var_maps.pk3"],
     #cmd = "cp -t $(@D)/ $(SRCS); " +
     #      "for s in $(SRCS); do " +
     #      "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
     #      "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
     #      "done",
-    cmd = "cp -t $(@D)/ $(SRCS); " +
-          "cp $(SRCS) $@",
+    cmd = "cp -t $(@D)/ $(SRCS) ",
+    tools = [
+        "//:bspc",
+        "//deepmind/level_generation:compile_map_sh",
+        "//q3map2",
+    ],
+)
+
+genrule(
+    name = "allmaps_assets",
+    #srcs = TRAIN_OR_TEST_MAPS,
+    srcs = ["assets/pk3s/allmaps.pk3"],
+    outs = ["baselab/allmaps.pk3"],
+    #cmd = "cp -t $(@D)/ $(SRCS); " +
+    #      "for s in $(SRCS); do " +
+    #      "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
+    #      "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/$${M} allmaps;" +
+    #      "done",
+    cmd = "cp -t $(@D)/ $(SRCS) ",
     tools = [
         "//:bspc",
         "//deepmind/level_generation:compile_map_sh",
@@ -846,7 +863,7 @@ genrule(
     name = "map_assets",
     srcs = OTHER_MAPS,
     outs = ["baselab/" + f[12:-3] + "pk3" for f in OTHER_MAPS],
-    cmd = "cp -t $(@D)/baselab $(SRCS); " +
+    cmd = "cp -t $(@D) $(SRCS); " +
           "for s in $(SRCS); do " +
           "  BM=$$(basename $${s}); M=$${BM/.map/}; " +
           "  $(location //deepmind/level_generation:compile_map_sh).runfiles/org_deepmind_lab/deepmind/level_generation/compile_map_sh $(@D)/baselab/$${M}; " +
@@ -927,7 +944,8 @@ cc_binary(
         ":assets_bots_pk3",
         ":assets_oa_pk3",
         ":assets_pk3",
-        ":map_assets",
+        ":allmaps_assets",
+        ":varmaps_assets",
         ":non_pk3_assets",
         ":vm_pk3",
     ],
@@ -1020,6 +1038,7 @@ cc_binary(
         ":assets_pk3",
         ":map_assets",
         ":allmaps_assets",
+        ":varmaps_assets",
         ":non_pk3_assets",
         ":vm_pk3",
     ],
