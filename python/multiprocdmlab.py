@@ -147,7 +147,6 @@ class Episode(object):
         self.current_worker_idx = 0
 
         self.goal_found = False
-        self.last_obs = (np.zeros(()), 0, 0, {})
 
         self.conn, self.queue = self.create(mpdmlab)
 
@@ -208,7 +207,6 @@ class Episode(object):
 
         if terminate:
             for wp in self.queue:
-                print("terminate", file=sys.stderr)
                 wp.terminate()
         for wp in self.queue:
             wp.join()
@@ -229,6 +227,7 @@ class MultiProcDeepmindLab(object):
         # Episodes
         self.current = Episode(self)
         self.next = Episode(self)
+        self.last_obs = (np.zeros(()), 0, 0, {})
         # time.sleep(5)
 
     def dmlab_config(self):
@@ -248,14 +247,15 @@ class MultiProcDeepmindLab(object):
         self.current.step_counter += 1
         if self.current.step_counter >= self.episode_num_steps:
             # Make an async reset call
-            obs, rew, done, info = self.current.last_obs
             self.reset()
+            obs, rew, done, info = self.last_obs
             return obs, rew, True, info
 
         if self.current.goal_found:
             self.current.goal_found = False
             self.current.call_async("step", (act,), {})
-            return self.last_obs
+            obs, rew, done, info = self.last_obs
+            return obs, rew, done, info
         else:
             obs, rew, done, info = self.current.call_sync(
                 "step", (act,), {})
@@ -268,32 +268,30 @@ class MultiProcDeepmindLab(object):
         # Do not need to call actual reset because we are going to
         # throw away the process and restart a new one.
         self.current.close()
-        old = self.current
         self.current = self.next
         self.next = Episode(self)
-        return old.last_obs[0], old.last_obs[-1]
+        return self.last_obs[0], self.last_obs[-1]
 
     @property
     def unwrapped(self):
         return self
 
     def configure(self, *args, **kwargs):
-        return self.call_sync("configure", args, kwargs)
+        return self.current.call_sync("configure", args, kwargs)
 
     def observations(self):
-        obs, info = self.call_sync("observations")
+        obs, info = self.current.call_sync("observations")
         return obs, info
 
     def __getattr__(self, attr):
         if attr in "metadata action_space observation_space reward_range _configured".split():
-            return self.call_sync("__getattr__", (attr,))
+            return self.current.call_sync("__getattr__", (attr,))
         elif attr in "close seed render".split():
-            return self.call_sync(attr)
+            return self.current.call_sync(attr)
         else:
             raise AttributeError("No attr %s" % attr)
 
     def __del__(self):
-        print("__del__ called")
         self.current.close(terminate=True)
         self.next.close(terminate=True)
         del self.current
