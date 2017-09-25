@@ -41,11 +41,12 @@ def entity_files(entitydir, mode, rows, cols):
 
 def maps_from_config(config):
     entitydir = config.get("entitydir", default_entity_root())
+    
     rows, cols, mode, num_maps, withvariations = [
         config[k] for k in "rows  cols  mode num_maps withvariations".split()]
-
+    
     entityfiles = entity_files(entitydir, mode, rows, cols)
-    if num_maps:
+    if num_maps and mode=="training":
         entityfiles = sorted(entityfiles)[:num_maps]
 
     mapnames = [mapname_from_entity_file(f, mode, rows, cols, withvariations)
