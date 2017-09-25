@@ -223,6 +223,8 @@ class MultiProcDeepmindLab(object):
         self.episode_num_steps = self.dmlab_config()["episode_length_seconds"] * self.dmlab_config()["fps"]
         self.mapnames, self.mapstrings, dlconfig = self.process_config(
             self.dmlab_config())
+        # Ask the underlying game to run for longer, may be 2 times longer
+        dlconfig["episode_length_seconds"] *= 2
         self.dmlab_args = (self.dmlab_args[0], dlconfig, self.dmlab_args[2])
 
         # Episodes
