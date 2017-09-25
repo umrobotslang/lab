@@ -246,24 +246,33 @@ class MultiProcDeepmindLab(object):
 
     def step(self, act):
         self.current.step_counter += 1
-        if self.current.step_counter >= self.episode_num_steps:
-            # Make an async reset call
-            self.reset()
-            obs, rew, done, info = self.last_obs
-            return obs, rew, True, info
-
+        return_val = self.last_obs
         if self.current.goal_found:
             self.current.goal_found = False
             self.current.call_async("step", (act,), {})
-            obs, rew, done, info = self.last_obs
-            return obs, rew, done, info
+            # We have switched to a new scene the agent has respawned
+            # so get the new observation.
+            obs, info = self.observations()
+            # Agent should get any reward for spawning
+            rew = 0
+            return_val = (obs, 0, False, info)
         else:
             obs, rew, done, info = self.current.call_sync(
                 "step", (act,), {})
             self.current.goal_found = (info['GOAL.FOUND'][0] == 1)
             assert not done, "We should never get 'done'"
             self.last_obs = (obs, rew, done, info.copy())
-            return (obs, rew, done, info)
+            return_val = (obs, rew, False, info)
+
+        if self.current.step_counter >= self.episode_num_steps:
+            # Make an async reset call
+            self.reset()
+            obs, rew, _, info = return_val
+            new_return_val = obs, rew, True, info
+        else:
+            new_return_val = return_val
+
+        return new_return_val
 
     def reset(self):
         # Do not need to call actual reset because we are going to
