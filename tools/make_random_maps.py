@@ -9,9 +9,35 @@ from zipfile import ZipFile
 from multiprocessing import Pool
 import fcntl
 
+def variationsLayer_file(entitydir, idx):
+    variationsFile = op.join(entitydir, "%04d.variationsLayer" % idx)
+    return variationsFile
+    
+def get_variationsLayer(entitydir, idx, shape):
+    variationsFile = variationsLayer_file(entitydir, idx)
+    if not op.exists(variationsFile):
+        variationsLayer = random_variation_layer(shape)
+        with open(variationsFile, "w") as f: f.write(variationsLayer)
+    else:
+        with open(variationsFile, "r") as f: variationsLayer = f.read()
+    return variationsLayer
+
 def random_variation_layer((r, c)):
-    rint = np.random.randint(0 + ord('A'), 26 + ord('A'), size=(r, c), dtype='u1')
+    rint = np.random.randint(0 + ord('A'), 26 + ord('A')
+                             , size=(r, c), dtype='u1')
     return "\n".join(rint.view(dtype='|S%d' % c).reshape(r))
+
+def entityLayer_file(entitydir, idx):
+    entityFile = op.join(entitydir, "%04d.entityLayer" % idx)
+    return entityFile
+
+def get_entityLayer(entitydir, idx, shape):
+    entityFile = entityLayer_file(entitydir, idx)
+    if not op.exists(entityFile):
+        raise NotImplementedError("Do not know how to create entity layer")
+    else:
+        with open(entityFile) as f: entityLayer = f.read()
+    return entityLayer
 
 def mapfile_basename(mode, shape, idx):
     mapname = "%s-%02dx%02d-var-%04d" % (mode, shape[0], shape[1], idx)
@@ -24,11 +50,8 @@ def generate_map(idx
     entitydir = entity_dir(default_entity_root(),
                            rows=shape[0], cols=shape[1], mode=mode)
     mapname = mapfile_basename(mode, shape, idx)
-    entityFile = op.join(entitydir, "%04d.entityLayer" % idx)
-    with open(entityFile) as f: entityLayer = f.read()
-    variationsLayer = random_variation_layer(shape)
-    variationsFile = op.splitext(entityFile)[0] + ".variationsLayer"
-    with open(variationsFile, "w") as f: f.write(variationsLayer)
+    entityLayer = get_entityLayer(entitydir, idx, shape)
+    variationsLayer = get_variationsLayer(entitydir, idx, shape)
 
     config = dict(width=84, height=84, fps=30
                   , mapnames = mapname
@@ -116,22 +139,26 @@ def merge_zip_files(pk3path, source_zip_files):
                     zip.writestr(pffile, pfzip.read(pffile))
     
 def make_random_maps(thisdir = op.dirname(__file__) or '.'
-                     , train_num_maps = 1000
-                     , test_num_maps = 200
+                     , training_num_maps = 0 # 1000
+                     , testing_num_maps = 0 # 200
+                     , planning_num_maps = 3
                      , shape = (9, 9)):
     mapsdir = op.join(thisdir, "../assets/maps/")
     pk3dir = op.join(thisdir, "../assets/pk3s/")
     pool = Pool(processes=6)
-    mapnames = pool.map(make_map_and_copy
+    mapnames = map(make_map_and_copy
              , [(pk3dir, mapsdir
                   , mapfile_basename('training', shape, idx)
                   , 'training', idx)
-                 for idx in range(1, train_num_maps + 1)]
-             + [
-                 (pk3dir, mapsdir
+                 for idx in range(1, training_num_maps + 1)]
+             + [(pk3dir, mapsdir
                   , mapfile_basename('testing', shape, idx)
                   , 'testing', idx)
-                 for idx in range(1, test_num_maps + 1)])
+                 for idx in range(1, testing_num_maps + 1)]
+             + [(pk3dir, mapsdir,
+                  mapfile_basename('planning', shape, idx)
+                  , 'planning', idx)
+                 for idx in range(1, planning_num_maps + 1)])
     pk3path = op.join(pk3dir, 'var_maps.pk3')
     merge_zip_files(pk3path, [op.join(pk3dir, f + ".pk3") for f in mapnames])
 
