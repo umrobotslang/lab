@@ -39,15 +39,24 @@ def entity_files(entitydir, mode, rows, cols):
     entityfiles = glob.glob(entitydirpath + "/*.entityLayer")
     return entityfiles
 
+def entity_file(entitydir, mode, rows, cols, chosen_map):
+    chosen_map = chosen_map.split('-')[-1]
+    entitydirpath = entity_dir(entitydir, mode, rows, cols)
+    entityfiles = entitydirpath + "/%s.entityLayer" %chosen_map
+    return [entityfiles]
+
 def maps_from_config(config):
     entitydir = config.get("entitydir", default_entity_root())
     
-    rows, cols, mode, num_maps, withvariations = [
-        config[k] for k in "rows  cols  mode num_maps withvariations".split()]
+    rows, cols, mode, num_maps, withvariations, chosen_map= [
+        config[k] for k in "rows  cols  mode num_maps withvariations chosen_map".split()]
     
-    entityfiles = entity_files(entitydir, mode, rows, cols)
-    if num_maps and mode=="training":
-        entityfiles = sorted(entityfiles)[:num_maps]
+    entityfiles = sorted(entity_files(entitydir, mode, rows, cols))
+    if num_maps:
+        if num_maps == 1 and chosen_map:
+            entityfiles = entity_file(entitydir, mode, rows, cols, chosen_map)
+        elif mode=="training":
+            entityfiles = entityfiles[:num_maps]
 
     mapnames = [mapname_from_entity_file(f, mode, rows, cols, withvariations)
                 for f in entityfiles]

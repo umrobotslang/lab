@@ -529,6 +529,7 @@ class _DeepmindLab(gym.Env):
         
         # Store current environment name
         self._last_info['env_name'] = self.environment_name()
+        self._last_info['LOOP.CLOSURE'] = False
 
         assert self._obs_space.contains(self._last_obs), \
             'Observations outside observation space'
@@ -570,6 +571,7 @@ class _DeepmindLab(gym.Env):
 
         # Return env name (we often switch between new envs)
         info['env_name'] = self.environment_name()
+        info['LOOP.CLOSURE'] = False
         return obs, info
 
     def _render(self, mode='return', close=False):
