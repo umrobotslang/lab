@@ -9,6 +9,7 @@ import matplotlib as mplib
 mplib.use('Agg')
 import matplotlib.cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.backends.backend_pdf import FigureCanvasPdf
 from matplotlib.backends import pylab_setup
 import sys
 import math
@@ -98,13 +99,23 @@ class EntityMap(object):
                 self._entity_layer_lines = ef.readlines()
         return self._entity_layer_lines
 
-    def _wall_coordinates_from_string(self, size):
+    def _wall_coordinates_from_string(self, size, wallchar="*"):
         wall_coords = []
         for row, line in enumerate(self.entity_layer_lines()):
             row_inv = self.height() - row - 1
             for col, char in enumerate(line):
-                if char == "*":
+                if char == wallchar:
                     yield (col * size[0], row_inv * size[1])
+
+    def goal_coordinates_from_string(self, size=[1, 1]):
+        return sum([[(r+1, c+1)
+                     for c, char in enumerate(line) if char == "G"]
+                    for r, line in enumerate(self.entity_layer_lines())], [])
+
+    def spawn_coordinates_from_string(self, size=[1, 1]):
+        return sum([[(r+1, c+1)
+                     for c, char in enumerate(line) if char == "P"]
+                    for r, line in enumerate(self.entity_layer_lines())], [])
 
     def wall_coordinates_from_string(self, size=np.asarray((100, 100))):
         if not self._wall_coordinates:
@@ -149,7 +160,9 @@ class MatplotlibVisualizer(object):
         return self._render_fig_manager
 
     def print_figure(self, fig, filename, dpi):
-        FigureCanvasAgg(fig).print_figure(filename, dpi=dpi)
+        #FigureCanvasAgg(fig).print_figure(filename, dpi=dpi)
+        fig.set_canvas(FigureCanvasPdf(fig))
+        fig.savefig(filename)
 
 class TopView(object):
     def __init__(self, assets_top_dir=None, level_script=None, draw_fq=10, method="3D"):
@@ -192,11 +205,9 @@ class TopView(object):
         return self._ax
 
     def _entity_file(self):
-        return os.path.join("/z/home/shurjo/implicit-mapping/maps/09x09/testing/entityLayers",
-                            "%s.entityLayer" %self.level_script[-4:])
-        #return os.path.join(
-        #    self.assets_top_dir
-        #    , "assets/game_scripts/{}.entityLayer".format(self.level_script))
+        return os.path.join(
+            self.assets_top_dir
+            , "assets/entityLayers/09x09/planning/entityLayers/{}.entityLayer".format(self.level_script))
 
     def add_pose(self, pose, reward=0):
         if self.supported():
@@ -214,6 +225,9 @@ class TopView(object):
     def reset(self):
         if self.supported():
             self._top_view_episode_map = TopViewEpisodeMap(self)
+
+    def draw_spawn(self, ax, spawn_loc):
+        self._top_view_episode_map.draw_spawn(ax, spawn_loc)
 
 
 class TopViewEpisodeMap(object):
@@ -261,11 +275,12 @@ class TopViewEpisodeMap(object):
     def get_axes(self):
         return self._top_view.get_axes()
 
-    def _goal_patch(self, coord):
+    def _goal_patch(self, coord, color='g', fill=True):
         goal_size = self.block_size * 0.67
         goal_pos_offset = (self.block_size - goal_size) / 2
-        return mplib.patches.Rectangle( coord+goal_pos_offset,
-            goal_size[0], goal_size[1] , color='g' , fill=True)
+        return mplib.patches.Rectangle(
+            coord+goal_pos_offset,
+            goal_size[0], goal_size[1] , color=color, fill=fill)
     
     def _text_patch(self, coord):
         goal_size = self.block_size * 0.67
@@ -274,6 +289,12 @@ class TopViewEpisodeMap(object):
         return mplib.patches.Rectangle( coord+goal_pos_offset,
             goal_size[0], goal_size[1] , color='g' , fill=True)
 
+    def draw_spawn(self, ax, spawn_loc):
+        xyblocks = np.asarray(
+            (spawn_loc[1] - 1, self.map_height() - spawn_loc[0]))
+        xy = xyblocks * self.block_size
+        ax.add_patch(self._goal_patch(xy, color='y'))
+        ax.text(xy[0]+35, xy[1]+35, "S", fontsize=10)
 
     def _draw_goal(self, ax):
         goal_loc = self._goal_loc
@@ -363,7 +384,7 @@ class TopViewEpisodeMap(object):
             # which cases xlim/ylim to change later.
             ax.set_aspect('equal', adjustable='box')
             ax.set_autoscale_on(False)
-            ax.autoscale_view(tight=True)
+            ax.autoscale_view(tight=False)
             ax.set_xlim(0, self.map_width() * self.block_size[0])
             ax.set_ylim(0, self.map_height() * self.block_size[1])
             ax.set_xticks([])
@@ -372,24 +393,34 @@ class TopViewEpisodeMap(object):
             self._drawn_once = True
 
 
-if __name__ == '__main__':
+def render_entity_layer(level_script):
     # Test top view rendering
     assets_top_dir = os.path.join(
         os.path.dirname(__file__ or "."), "..")
-    level_script = "small_star_map_random_goal_01"
     top_view = TopView(assets_top_dir, level_script)
     assert top_view.supported(), "should be supported"
     top_view.reset()
-    for _ in range(100):
-        pose = np.random.rand(6) * top_view._entity_map.height() * top_view.block_size[1]
-        # print("Adding pose {}".format(pose)) 
-        top_view.add_pose(pose) 
-        goal_loc = [[2, 3],[3, 2], [6, 8], [8,6]][np.random.choice(4)]
-        # print("Adding goal at {}".format(goal_loc))
-        top_view.add_goal(goal_loc) 
+    #for _ in range(100):
+    #    pose = np.random.rand(6) * top_view._entity_map.height() * top_view.block_size[1]
+    #    # print("Adding pose {}".format(pose)) 
+    #    #top_view.add_pose(pose) 
+    #    #goal_loc = [[2, 3],[3, 2], [6, 8], [8,6]][np.random.choice(4)]
+    #    # print("Adding goal at {}".format(goal_loc))
+    #    #top_view.add_goal(goal_loc) 
+    goal_loc = top_view._entity_map.goal_coordinates_from_string()[0]
+    print("goal_loc : {}".format(goal_loc))
+    top_view.add_goal(goal_loc)
+    spawn_loc = top_view._entity_map.spawn_coordinates_from_string()[0]
+    print("spawn_loc: {}".format(spawn_loc))
     fig = top_view.draw()
-    top_view.render(fig)
-    filename = "/tmp/{}_top_view_test.png".format(getpass.getuser())
+    top_view.draw_spawn(top_view.get_axes(), spawn_loc)
+    #top_view.render(fig)
+    filename = "/tmp/{}_{}_entityLayer.pdf".format(getpass.getuser(), level_script)
     print("Writing figure to file {}".format(filename))
     top_view.print_figure(fig , filename , dpi=80)
 
+    
+if __name__ == '__main__':
+    render_entity_layer("0001")
+    render_entity_layer("0002")
+    render_entity_layer("0003")
