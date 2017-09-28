@@ -1,3 +1,4 @@
+local pickup_observations = require 'decorators.pickup_observations'
 local game = require 'dmlab.system.game'
 local random = require 'common.random'
 local pickups = require 'common.pickups'
@@ -17,6 +18,12 @@ function factory.createLevelApi(kwargs)
   assert(kwargs.mapName and kwargs.episodeLengthSeconds)
 
   local api = {}
+
+  function api:init(params)
+     api.mapName = params.mapName or kwargs.mapName
+     api.episodeLengthSeconds = tonumber(
+        params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
+  end
 
   function api:createPickup(class_name)
     return pickups.defaults[class_name]
@@ -60,9 +67,10 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:nextMap()
-    return kwargs.mapName
+    return api.mapName
   end
 
+  pickup_observations.decorate(api)
   custom_observations.decorate(api)
   timeout.decorate(api, kwargs.episodeLengthSeconds)
   return api

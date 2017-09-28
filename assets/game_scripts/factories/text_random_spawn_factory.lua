@@ -264,6 +264,8 @@ Keyword arguments:
 *   `scatteredRewardDensity` (number, default 0.1) - Density of rewards.
 ]]
 function factory.createLevelApi(kwargs)
+   kwargs = kwargs or {}
+   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 20
   
   local api = {Episode = Episode, Maze = Maze}
 
@@ -303,8 +305,14 @@ function factory.createLevelApi(kwargs)
 
     -- More parameters
 	api.scatteredRewardDensity = tonumber(params["apple_prob"] or "0.25")
-    api.episodeLengthSeconds = tonumber(params["episode_length_seconds"] or "20")
+    api.episodeLengthSeconds = tonumber(params["episode_length_seconds"]
+                                           or tostrung(kwargs.episodeLengthSeconds))
     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
+    if api.minSpawnGoalDistance ~= 0 then
+       error(string.format(
+                "minSpawnGoalDistance : %d  is not respected right now"
+                , api.minSpawnGoalDistance))
+    end
 
     -- How to compute the goal location
     local compute_goal_location, cgl_args = unpack(
@@ -327,7 +335,6 @@ function factory.createLevelApi(kwargs)
     local maplines = helpers.split(mapstring1, "\n")
     api.height = #maplines
     api.width = maplines[1]:len()
-    
 
     local maze = api:getMaze()
     api.episode = api.Episode:new{
@@ -424,7 +431,7 @@ function factory.createLevelApi(kwargs)
   -- Although we handle the episode timeout ourselves so that we can
   -- reinitialize the maze with new map and new goal.
   -- But the timeout decorator is useful in terms of displaying time as a message.
-  timeout.decorate(api, api.episodeLengthSeconds)
+  timeout.decorate(api, kwargs.episodeLengthSeconds)
   
   return api
 end

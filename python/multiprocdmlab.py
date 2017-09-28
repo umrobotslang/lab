@@ -114,19 +114,25 @@ def worker_target(conn, env_class, env_args, env_kwargs, worker_name):
         signal.signal(sig, lambda *args: 0)
     m_name = ""  
     env = env_class(*env_args, **env_kwargs)
-    while m_name != 'worker.quit':
+    sucess = True
+    while m_name != 'worker.quit' and sucess:
         m_name, m_args, m_kwargs = conn.recv()
         if m_name == 'worker.quit':
-            conn.send("quiting")
+            conn.send((m_name, sucess, ()))
             break
         assert isinstance(m_args, tuple), "{} {} {}".format(m_name, m_args, m_kwargs)
         assert isinstance(m_kwargs, dict), "{} {} {}".format(m_name, m_args, m_kwargs)
 
-        if m_name != '__getattr__':
-            res = getattr(env, m_name)(*m_args, **m_kwargs)
-        else:
-            res = getattr(env, m_args[0])
-        conn.send((m_name, res))
+        try:
+            if m_name != '__getattr__':
+                res = getattr(env, m_name)(*m_args, **m_kwargs)
+            else:
+                res = getattr(env, m_args[0])
+            success = True
+        except Exception, e:
+            res = e
+            success = False
+        conn.send((m_name, success, res))
     conn.close()
     os._exit(0)
 
@@ -198,8 +204,11 @@ class Episode(object):
     def call_sync(self, m_name, m_args=(), m_kwargs={}):
         self.worker_conn().flush()
         self.worker_conn().send((m_name, m_args, m_kwargs))
-        m_name_recv, m_res = self.worker_conn().recv()
+        m_name_recv, m_success, m_res = self.worker_conn().recv()
         assert m_name_recv == m_name
+        if not m_success:
+            self.close()
+            raise m_res
         return m_res
 
     def call_async(self, m_name, m_args=(), m_kwargs={}):
