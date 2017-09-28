@@ -277,7 +277,6 @@ class MultiProcDeepmindLab(object):
 
         if self.current.step_counter >= self.episode_num_steps:
             # Make an async reset call
-            self.reset()
             obs, rew, _, info = return_val
             new_return_val = obs, rew, True, info
         else:
@@ -286,7 +285,7 @@ class MultiProcDeepmindLab(object):
         return new_return_val
 
     def reset(self):
-        # Do not need to call actual reset because we are going to
+        # Do not need to call underlying reset because we are going to
         # throw away the process and restart a new one.
         self.current.close()
         self.current = self.next
