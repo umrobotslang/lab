@@ -20,7 +20,7 @@ function factory.createLevelApi(kwargs)
   local api = {}
 
   function api:init(params)
-     api.mapName = params.mapName or kwargs.mapName
+     api.mapName = kwargs.mapName
      api.episodeLengthSeconds = tonumber(
         params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
   end
@@ -67,7 +67,9 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:nextMap()
-    return api.mapName
+    local mapName = api.mapName
+    --print("Looking for mapName " .. mapName)
+    return mapName
   end
 
   pickup_observations.decorate(api)

@@ -4,6 +4,7 @@ local random = require 'common.random'
 local pickups = require 'common.pickups'
 local helpers = require 'common.helpers'
 local custom_observations = require 'decorators.custom_observations'
+local pickup_observations = require 'decorators.pickup_observations'
 local timeout = require 'decorators.timeout'
 
 local factory = {}
@@ -20,17 +21,26 @@ Keyword arguments:
 function factory.createLevelApi(kwargs)
   kwargs.scatteredRewardDensity = kwargs.scatteredRewardDensity or 0.1
   kwargs.episodeLengthSeconds = kwargs.episodeLengthSeconds or 600
-  local maze = maze_gen.MazeGeneration{entity = kwargs.entityLayer}
   local api = {}
 
+  function api:init(params)
+     api.mapName = kwargs.mapName
+     api.entityLayer = params.mapstrings or kwargs.entityLayer
+     api.episodeLengthSeconds = tonumber(
+        params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
+     api.scatteredRewardDensity = api.scatteredRewardDensity or kwargs.scatteredRewardDensity
+
+     api.maze = maze_gen.MazeGeneration{entity = api.entityLayer}
+  end
+  
   function api:createPickup(class_name)
     return pickups.defaults[class_name]
   end
 
   function api:start(episode, seed, params)
-    api._time_remaining = kwargs.episodeLengthSeconds
+    api._time_remaining = api.episodeLengthSeconds
     random.seed(seed)
-    local height, width = maze:size()
+    local height, width = api.maze:size()
     height = (height - 1) / 2
     width = (width - 1) / 2
 
@@ -41,7 +51,7 @@ function factory.createLevelApi(kwargs)
     local all_spawn_locations = {}
     local fruit_locations = {}
     local fruit_locations_reverse = {}
-    maze:visitFill{cell = api._goal, func = function(row, col, distance)
+    api.maze:visitFill{cell = api._goal, func = function(row, col, distance)
       if row % 2 == 1 or col % 2 == 1 then
         return
       end
@@ -85,14 +95,14 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:hasEpisodeFinished(time_seconds)
-    api._time_remaining = kwargs.episodeLengthSeconds - time_seconds
+    api._time_remaining = api.episodeLengthSeconds - time_seconds
     return api._time_remaining <= 0
   end
 
   function api:nextMap()
     api._newSpawnVars = {}
 
-    local maxFruit = math.floor(kwargs.scatteredRewardDensity *
+    local maxFruit = math.floor(api.scatteredRewardDensity *
                                 #api._fruit_locations + 0.5)
     for i, fruit_location in ipairs(api._fruit_locations) do
       if i > maxFruit then
@@ -116,11 +126,14 @@ function factory.createLevelApi(kwargs)
         origin = api._goal_location
     }
 
-    return kwargs.mapName
+    local mapName = api.mapName
+    --print("Looking for mapName " .. mapName)
+    return mapName
   end
 
+  pickup_observations.decorate(api)
   custom_observations.decorate(api)
-  timeout.decorate(api, kwargs.episodeLengthSeconds)
+  timeout.decorate(api, api.episodeLengthSeconds)
   return api
 end
 

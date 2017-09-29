@@ -860,7 +860,7 @@ genrule(
 )
 
 genrule(
-    name = "map_assets",
+    name = "maps_assets",
     srcs = OTHER_MAPS,
     outs = ["baselab/" + f[12:-3] + "pk3" for f in OTHER_MAPS],
     cmd = "cp -t $(@D)/baselab/ $(SRCS); " +
@@ -945,6 +945,7 @@ cc_binary(
         ":assets_oa_pk3",
         ":assets_pk3",
         ":allmaps_assets",
+        ":maps_assets",
         ":varmaps_assets",
         ":non_pk3_assets",
         ":vm_pk3",
@@ -1036,7 +1037,7 @@ cc_binary(
         ":assets_bots_pk3",
         ":assets_oa_pk3",
         ":assets_pk3",
-        ":map_assets",
+        ":maps_assets",
         ":allmaps_assets",
         ":varmaps_assets",
         ":non_pk3_assets",
