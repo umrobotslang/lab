@@ -49,7 +49,8 @@ def maps_from_config(config):
     entitydir = config.get("entitydir", default_entity_root())
     
     rows, cols, mode, num_maps, withvariations, chosen_map= [
-        config[k] for k in "rows  cols  mode num_maps withvariations chosen_map".split()]
+        config.get(k, None)
+        for k in "rows  cols  mode num_maps withvariations chosen_map".split()]
     
     entityfiles = sorted(entity_files(entitydir, mode, rows, cols))
     if num_maps:

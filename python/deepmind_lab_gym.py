@@ -53,7 +53,7 @@ L2NActMapParams_v0 = ActionMapperParams(
     # Look left, look right, acc left, acc right,
     # acc left, acc right, acc back, acc forward
     inc_mat = np.array([
-        [  10.0 ,-10.0, 10.0 ,-10.0 ,  0.  ,  0.   ,  0.  ,  0.  ]
+        [  25.0 ,-25.0, 25.0 ,-25.0 ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.5 , -0.5  ,  0.  ,  0.  ]
         , [ 0.  ,  0. ,  0.  ,  0.  ,  0.  ,  0.   ,  0.5 , -0.5 ]
