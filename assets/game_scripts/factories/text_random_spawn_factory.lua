@@ -181,13 +181,10 @@ function Maze:parseEntityLayer()
     -- Contains a mapping of entity type -> 'row col' -> {(row, col)} other location except key.
     self.otherLocationsExceptKey = {}
     for i, entity in ipairs(ENTITY_TYPES) do
-       if self.api.all_entities_swappable then
-          self.possibleLocations[entity], self.otherLocationsExceptKey[entity] =
-             helpers.parseAllLocations(self.cppmaze, intpairkey)
-       else
-          self.possibleLocations[entity], self.otherLocationsExceptKey[entity] =
-             helpers.parsePossibleGoalLocations(self.cppmaze, intpairkey, entity)
-       end
+      local entities_allowed = self.api.possible_entities[entity] -- like "GA" or "GAP" or "G"
+      self.possibleLocations[entity], self.otherLocationsExceptKey[entity] =
+         helpers.parsePossibleGoalLocations(self.cppmaze, intpairkey, entity
+            , function (entityCell) return string.find(entities_allowed, entityCell) end)
     end
 end
 
@@ -289,8 +286,15 @@ function factory.createLevelApi(kwargs)
     _ = params.game_seed or error("Need game_seed")
     random.seed(params.game_seed)
     
+    if params.random_spawn_random_goal == "False" then
+        error("random_spawn_random_goal is deprecated. Please use goal_characters,spawn_characters,apple_characters instead")
+    end
     --Random spawn, random goal or fixed spawn, fixed goal
-    api.all_entities_swappable = params.random_spawn_random_goal ~= "False"
+    api.possible_entities = {}
+    api.possible_entities.G = params.goal_characters  or "GAP"
+    api.possible_entities.P = params.spawn_characters or "GAP"
+    api.possible_entities.A = params.apple_characters or "GAP"
+
     api.make_map = (params.make_map == "True")
     
     --Initialize all mapnames nad mapstrings as lists
