@@ -205,9 +205,12 @@ class TopView(object):
         return self._ax
 
     def _entity_file(self):
+        maze_parts = self.level_script.split('-')
+        folder = maze_parts[0]
+        maze_no = maze_parts[-1]
         return os.path.join(
             self.assets_top_dir
-            , "assets/entityLayers/09x09/planning/entityLayers/{}.entityLayer".format(self.level_script))
+            , "assets/entityLayers/09x09/{}/entityLayers/{}.entityLayer".format(folder, maze_no))
 
     def add_pose(self, pose, reward=0):
         if self.supported():
