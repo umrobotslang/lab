@@ -13,5 +13,5 @@ module-whatis "deepmind-lab 0.0.1"
 conflict $app
 
 # deepmind_lab as python library
-prepend-path PYTHONPATH $installDir/../build/execroot/deepmind-lab/bazel-out/local-fastbuild/bin/deepmind_lab_gym_dummy.runfiles/org_deepmind_lab/python/
-prepend-path PYTHONPATH $installDir/../build/execroot/deepmind-lab/bazel-out/local-fastbuild/bin/deepmind_lab_gym_dummy.runfiles/org_deepmind_lab/
+prepend-path PYTHONPATH $installDir/../build/execroot/org_deepmind_lab/bazel-out/local-fastbuild/bin/deepmind_lab_gym_dummy.runfiles/org_deepmind_lab/python/
+prepend-path PYTHONPATH $installDir/../build/execroot/org_deepmind_lab/bazel-out/local-fastbuild/bin/deepmind_lab_gym_dummy.runfiles/org_deepmind_lab/
