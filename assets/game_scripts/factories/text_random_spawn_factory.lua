@@ -218,7 +218,7 @@ end
 function ComputeGoalLocation.fixed(subepisode)
    if subepisode.goal_location == nil then
       local goal_loc = {}
-      for i, v in ipairs(helpers.split(api.compute_goal_location_args, ",")) do
+      for i, v in ipairs(helpers.new_split(api.compute_goal_location_args, ",")) do
          goal_loc[i] = tonumber(v)
       end
       subepisode.goal_location = {goal_loc[1], goal_loc[2]}
@@ -243,7 +243,7 @@ end
 function ComputeSpawnLocation.fixed(subepisode)
    if subepisode.spawn_location == nil then
       local spawn_loc = {}
-      for i, v in ipairs(helpers.split(api.compute_spawn_location_args, ",")) do
+      for i, v in ipairs(helpers.new_split(api.compute_spawn_location_args, ",")) do
          spawn_loc[i] = tonumber(v)
       end
       subepisode.spawn_location = {spawn_loc[1], spawn_loc[2]}
@@ -298,13 +298,13 @@ function factory.createLevelApi(kwargs)
     api.make_map = (params.make_map == "True")
     
     --Initialize all mapnames nad mapstrings as lists
-    api.mapnames = helpers.split(
+    api.mapnames = helpers.new_split(
        params.mapnames or error("Need mapnames") , ",")
-    api.mapstrings = helpers.split(
+    api.mapstrings = helpers.new_split(
        params.mapstrings or error("Need mapstrings") , ",")
     
     if params.variationsLayers then
-       api.variationsLayers = helpers.split(params.variationsLayers, ",")
+       api.variationsLayers = helpers.new_split(params.variationsLayers, ",")
     end
 
     -- More parameters
@@ -320,7 +320,7 @@ function factory.createLevelApi(kwargs)
 
     -- How to compute the goal location
     local compute_goal_location, cgl_args = unpack(
-       helpers.split(
+       helpers.new_split(
           params.compute_goal_location or "random_per_episode", ":"))
     api.compute_goal_location = ComputeGoalLocation[compute_goal_location] or
        error("Bad compute_goal_location " .. compute_goal_location)
@@ -328,7 +328,7 @@ function factory.createLevelApi(kwargs)
 
     -- How to compute the spawn location
     local compute_spawn_location, csl_args = unpack(
-       helpers.split(
+       helpers.new_split(
           params.compute_spawn_location or "random_per_subepisode", ":"))
     api.compute_spawn_location = ComputeSpawnLocation[compute_spawn_location] or
        error("Bad compute_spawn_location " .. compute_spawn_location)
@@ -336,7 +336,7 @@ function factory.createLevelApi(kwargs)
 
     -- Compute the height and width of the first map
     local mapstring1 = api.mapstrings[1] or error("Need atleast one mapstring")
-    local maplines = helpers.split(mapstring1, "\n")
+    local maplines = helpers.new_split(mapstring1, "\n")
     api.height = #maplines
     api.width = maplines[1]:len()
 

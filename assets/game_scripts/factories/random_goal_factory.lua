@@ -28,7 +28,7 @@ function factory.createLevelApi(kwargs)
      api.entityLayer = params.mapstrings or kwargs.entityLayer
      api.episodeLengthSeconds = tonumber(
         params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
-     api.scatteredRewardDensity = api.scatteredRewardDensity or kwargs.scatteredRewardDensity
+     api.scatteredRewardDensity = params.scatteredRewardDensity or kwargs.scatteredRewardDensity
 
      api.maze = maze_gen.MazeGeneration{entity = api.entityLayer}
   end
