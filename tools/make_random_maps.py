@@ -22,7 +22,8 @@ def get_variationsLayer(entitydir, idx, shape):
         with open(variationsFile, "r") as f: variationsLayer = f.read()
     return variationsLayer
 
-def random_variation_layer((r, c)):
+def random_variation_layer(r_c):
+    r, c = r_c
     rint = np.random.randint(0 + ord('A'), 26 + ord('A')
                              , size=(r, c), dtype='u1')
     return "\n".join(rint.view(dtype='|S%d' % c).reshape(r))
@@ -141,12 +142,15 @@ def merge_zip_files(pk3path, source_zip_files):
 def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , training_num_maps = 0 # 1000
                      , testing_num_maps = 0 # 200
-                     , planning_num_maps = 3
-                     , shape = (9, 9)):
+                     , planning_num_maps = 10
+                     , shape = (9, 9)
+                     , processes = 6):
     mapsdir = op.join(thisdir, "../assets/maps/")
     pk3dir = op.join(thisdir, "../assets/pk3s/")
-    pool = Pool(processes=6)
-    mapnames = map(make_map_and_copy
+    mapfun = (Pool(processes=processes).map
+              if processes > 1
+              else map)
+    mapnames = mapfun(make_map_and_copy
              , [(pk3dir, mapsdir
                   , mapfile_basename('training', shape, idx)
                   , 'training', idx)
@@ -159,7 +163,7 @@ def make_random_maps(thisdir = op.dirname(__file__) or '.'
                   mapfile_basename('planning', shape, idx)
                   , 'planning', idx)
                  for idx in range(1, planning_num_maps + 1)])
-    pk3path = op.join(pk3dir, 'var_maps.pk3')
+    pk3path = op.join(pk3dir, 'planning_var_maps.pk3')
     merge_zip_files(pk3path, [op.join(pk3dir, f + ".pk3") for f in mapnames])
 
 if __name__ == '__main__':

@@ -310,7 +310,7 @@ function factory.createLevelApi(kwargs)
     -- More parameters
 	api.scatteredRewardDensity = tonumber(params["apple_prob"] or "0.25")
     api.episodeLengthSeconds = tonumber(params["episode_length_seconds"]
-                                           or tostrung(kwargs.episodeLengthSeconds))
+                                           or tostring(kwargs.episodeLengthSeconds))
     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
     if api.minSpawnGoalDistance ~= 0 then
        error(string.format(
