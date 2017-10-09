@@ -64,6 +64,8 @@ function factory.createLevelApi(kwargs)
         else
            -- do nothing
         end
+        -- Increment only if spawnVars is non-goal
+        api._spawn_var_idx = api._spawn_var_idx + 1
     end
 
     local pickup = pickups.defaults[spawnVars.classname]
@@ -81,7 +83,6 @@ function factory.createLevelApi(kwargs)
        spawnVars = (random.uniformReal(0, 1) < api.scatteredRewardDensity) and
           spawnVars or nil
     end
-    api._spawn_var_idx = api._spawn_var_idx + 1
     return spawnVars
   end
 
