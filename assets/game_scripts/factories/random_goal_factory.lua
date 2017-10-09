@@ -25,10 +25,14 @@ function factory.createLevelApi(kwargs)
 
   function api:init(params)
      api.mapName = kwargs.mapName
-     api.entityLayer = params.mapstrings or kwargs.entityLayer
+     if params.mapstrings ~= nil then
+        print("[WARNING]: Ignoring mapstrings")
+     end
+     api.entityLayer = kwargs.entityLayer
      api.episodeLengthSeconds = tonumber(
         params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
-     api.scatteredRewardDensity = params.scatteredRewardDensity or kwargs.scatteredRewardDensity
+     api.scatteredRewardDensity = params.apple_prob or kwargs.scatteredRewardDensity
+     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
 
      api.maze = maze_gen.MazeGeneration{entity = api.entityLayer}
   end
@@ -51,12 +55,16 @@ function factory.createLevelApi(kwargs)
     local all_spawn_locations = {}
     local fruit_locations = {}
     local fruit_locations_reverse = {}
-    api.maze:visitFill{cell = api._goal, func = function(row, col, distance)
-      if row % 2 == 1 or col % 2 == 1 then
+    api.maze:visitFill{cell = api._goal, func = function(
+                             textrow, textcol, distance)
+      -- Text maze has twice as many columns and rows as the actual maze
+      -- The odd rows/cols in text maze are walls while even are free space
+      -- The actual maze has no wall thickness so all coordinates is free space.
+      if textrow % 2 == 1 or textcol % 2 == 1 then
         return
       end
-      row = row / 2 - 1
-      col = col / 2 - 1
+      local row = textrow / 2 - 1
+      local col = textcol / 2 - 1
       -- Axis is flipped in DeepMind Lab.
       row = height - row - 1
       local key = ''.. (col * 100 + 50) .. ' ' .. (row * 100 + 50) .. ' '
@@ -67,7 +75,7 @@ function factory.createLevelApi(kwargs)
       if distance > 0 then
         fruit_locations[#fruit_locations + 1] = key .. '20'
       end
-      if distance > 8 then
+      if distance > api.minSpawnGoalDistance then
         all_spawn_locations[#all_spawn_locations + 1] = key .. '30'
       end
     end}
@@ -104,6 +112,7 @@ function factory.createLevelApi(kwargs)
 
     local maxFruit = math.floor(api.scatteredRewardDensity *
                                 #api._fruit_locations + 0.5)
+
     for i, fruit_location in ipairs(api._fruit_locations) do
       if i > maxFruit then
         break
@@ -127,7 +136,6 @@ function factory.createLevelApi(kwargs)
     }
 
     local mapName = api.mapName
-    --print("Looking for mapName " .. mapName)
     return mapName
   end
 
