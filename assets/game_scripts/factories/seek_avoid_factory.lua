@@ -13,6 +13,9 @@ Keyword arguments:
 
 *   `mapName` (string) - Name of map to load.
 *   `episodeLengthSeconds` (number) - Episode length in seconds.
+*   `scatteredrewarddensity` (number) - Probability of apple actually appearing in map.
+*   `spawnVarscount` (number) - Number of info_player_start or non-goal
+                                pickups in in the map
 ]]
 function factory.createLevelApi(kwargs)
   assert(kwargs.mapName and kwargs.episodeLengthSeconds)
@@ -23,6 +26,10 @@ function factory.createLevelApi(kwargs)
      api.mapName = kwargs.mapName
      api.episodeLengthSeconds = tonumber(
         params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
+     api.scatteredRewardDensity = tonumber(params.apple_prob or "0.25")
+     api.spawnVarsCount = kwargs.spawnVarsCount or error("Need spawn vars")
+     _ = params.game_seed or error("Need game_seed")
+     random.seed(params.game_seed)
   end
 
   function api:createPickup(class_name)
@@ -30,10 +37,12 @@ function factory.createLevelApi(kwargs)
   end
 
   function api:start(episode, seed, params)
-    random.seed(seed)
+    -- random.seed(seed)
     api._has_goal = false
+    api.info_player_start_idx = random.uniformInt(1, api.spawnVarsCount)
     api._count = 0
     api._finish_count = 0
+    api._spawn_var_idx = 0
   end
 
   function api:pickup(spawn_id)
@@ -45,13 +54,18 @@ function factory.createLevelApi(kwargs)
 
   function api:updateSpawnVars(spawnVars)
     local classname = spawnVars.classname
-    if spawnVars.random_items then
-      local possibleClassNames = helpers.split(spawnVars.random_items, ',')
-      if #possibleClassNames > 0 then
-        classname = possibleClassNames[
-          random.uniformInt(1,  #possibleClassNames)]
-      end
+
+    -- Replace the info_player_start_idx's spawn var with 
+    if spawnVars.classname ~= "goal" then
+        if api._spawn_var_idx == api.info_player_start_idx then
+           spawnVars.classname = "info_player_start"
+        elseif spawnVars.classname == "info_player_start" then
+           spawnVars.classname = "apple_reward"
+        else
+           -- do nothing
+        end
     end
+
     local pickup = pickups.defaults[spawnVars.classname]
     if pickup then
       if pickup.type == pickups.type.kReward and pickup.quantity > 0 then
@@ -63,6 +77,11 @@ function factory.createLevelApi(kwargs)
       end
     end
 
+    if spawnVars.classname == "apple_reward" then
+       spawnVars = (random.uniformReal(0, 1) < api.scatteredRewardDensity) and
+          spawnVars or nil
+    end
+    api._spawn_var_idx = api._spawn_var_idx + 1
     return spawnVars
   end
 

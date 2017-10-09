@@ -32,7 +32,9 @@ function factory.createLevelApi(kwargs)
      api.episodeLengthSeconds = tonumber(
         params.episode_length_seconds or tostring(kwargs.episodeLengthSeconds))
      api.scatteredRewardDensity = params.apple_prob or kwargs.scatteredRewardDensity
-     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "0")
+     api.minSpawnGoalDistance = tonumber(params.minSpawnGoalDistance or "8")
+     _ = params.game_seed or error("Need game_seed")
+     random.seed(params.game_seed)
 
      api.maze = maze_gen.MazeGeneration{entity = api.entityLayer}
   end
@@ -43,7 +45,7 @@ function factory.createLevelApi(kwargs)
 
   function api:start(episode, seed, params)
     api._time_remaining = api.episodeLengthSeconds
-    random.seed(seed)
+    -- random.seed(seed)
     local height, width = api.maze:size()
     height = (height - 1) / 2
     width = (width - 1) / 2

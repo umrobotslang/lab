@@ -3,6 +3,7 @@ import os.path as op
 import os
 import glob
 import sys
+import ctypes
 from  multiprocessing import Process, Pipe
 import time
 import socket
@@ -12,6 +13,13 @@ from contextlib import closing
 import numpy as np
 
 from deepmind_lab_gym import DeepmindLab
+
+def min_max_signed(ctype):
+    bits = (ctypes.sizeof(ctype)*8) - 1
+    return -2**bits, 2**bits - 1
+
+def max_signed_cint():
+    return min_max_signed(ctypes.c_int)[1]
 
 def get_free_port(host='127.0.0.1'):
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -178,7 +186,8 @@ class Episode(object):
         next_episode_config.update(
             dict(mapnames = ",".join(mpdmlab.mapnames[mapidx:mapidx+1])
                  , mapstrings = ",".join(mpdmlab.mapstrings[mapidx:mapidx+1])
-                 , compute_goal_location = "fixedindex:%d" % np.random.randint(100)
+                 , compute_goal_location = "fixedindex:%d" % np.random.randint(
+                     max_signed_cint())
                  , compute_spawn_location = "random_per_subepisode"))
         next_episode_conn = [client for client, server in next_pipes]
         next_episode_workernames = [
@@ -187,7 +196,9 @@ class Episode(object):
         next_episode_kwargs = [mpdmlab.dmlab_kwargs.copy()
                                for _ in next_pipes]
         for kw in next_episode_kwargs:
-            kw["init_game_seed"] = np.random.randint(1000)
+            # Different seed for each worker of same episode, because
+            # we may want the init spawn location to be different.
+            kw["init_game_seed"] = np.random.randint(max_signed_cint())
 
         next_episode_queue = [
             Process(
