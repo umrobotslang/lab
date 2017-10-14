@@ -396,11 +396,14 @@ class TopViewEpisodeMap(object):
             self._drawn_once = True
 
 
-def render_entity_layer(level_script):
+def render_entity_layer(entityLayer):
     # Test top view rendering
+    level_script = os.path.basename(entityLayer)
     assets_top_dir = os.path.join(
         os.path.dirname(__file__ or "."), "..")
-    top_view = TopView(assets_top_dir, level_script)
+    top_view = TopView(assets_top_dir, "xyz")
+    top_view._entity_file = lambda : entityLayer
+    top_view._entity_map = EntityMap(top_view._entity_file())
     assert top_view.supported(), "should be supported"
     top_view.reset()
     #for _ in range(100):
@@ -424,6 +427,5 @@ def render_entity_layer(level_script):
 
     
 if __name__ == '__main__':
-    render_entity_layer("0001")
-    render_entity_layer("0002")
-    render_entity_layer("0003")
+    render_entity_layer("/tmp/nav_maze_static_01.entityLayer")
+    render_entity_layer("/tmp/nav_maze_static_02.entityLayer")

@@ -36,6 +36,8 @@ function factory.createLevelApi(kwargs)
      _ = params.game_seed or error("Need game_seed")
      random.seed(params.game_seed)
 
+     api._static_goal_location = kwargs.staticGoalLocation
+
      api.maze = maze_gen.MazeGeneration{entity = api.entityLayer}
   end
   
@@ -50,7 +52,7 @@ function factory.createLevelApi(kwargs)
     height = (height - 1) / 2
     width = (width - 1) / 2
 
-    api._goal = {random.uniformInt(1, height) * 2,
+    api._goal = api._static_goal_location or {random.uniformInt(1, height) * 2,
                  random.uniformInt(1, width) * 2}
 
     local goal_location
@@ -75,7 +77,7 @@ function factory.createLevelApi(kwargs)
         goal_location = key .. '20'
       end
       if distance > 0 then
-        fruit_locations[#fruit_locations + 1] = key .. '20'
+        fruit_locations[#fruit_locations + 1] = key
       end
       if distance > api.minSpawnGoalDistance then
         all_spawn_locations[#all_spawn_locations + 1] = key .. '30'
@@ -99,7 +101,10 @@ function factory.createLevelApi(kwargs)
     if classname == 'apple_reward' then
       return api._newSpawnVars[spawnVars.origin]
     elseif classname == 'info_player_start' then
-      return api._newSpawnVarsPlayerStart
+      local newSpawnVar = api._newSpawnVarsPlayerStart or api._newSpawnVars[spawnVars.origin]
+      -- Return _newSpawnVarsPlayerStart only once
+      api._newSpawnVarsPlayerStart = nil
+      return newSpawnVar
     end
     return spawnVars
   end
@@ -119,9 +124,13 @@ function factory.createLevelApi(kwargs)
       if i > maxFruit then
         break
       end
-      api._newSpawnVars[fruit_location] = {
+      api._newSpawnVars[fruit_location .. '20'] = {
           classname = 'apple_reward',
-          origin = fruit_location
+          origin = fruit_location .. '20'
+      }
+      api._newSpawnVars[fruit_location .. '30'] = {
+          classname = 'apple_reward',
+          origin = fruit_location .. '20'
       }
     end
 
