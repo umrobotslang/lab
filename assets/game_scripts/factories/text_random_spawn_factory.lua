@@ -282,7 +282,7 @@ function factory.createLevelApi(kwargs)
 
   function api:init(params)
     -- initialize parameters from python
-    api.maxapples = params.maxapples or 50
+    api.maxapples = params.maxapples or pickup_observations.MAXAPPLES
     _ = params.game_seed or error("Need game_seed")
     random.seed(params.game_seed)
     

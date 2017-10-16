@@ -12,7 +12,7 @@ import fcntl
 def variationsLayer_file(entitydir, idx):
     variationsFile = op.join(entitydir, "%04d.variationsLayer" % idx)
     return variationsFile
-    
+
 def get_variationsLayer(entitydir, idx, shape):
     variationsFile = variationsLayer_file(entitydir, idx)
     if not op.exists(variationsFile):
@@ -35,20 +35,32 @@ def entityLayer_file(entitydir, idx):
 def get_entityLayer(entitydir, idx, shape):
     entityFile = entityLayer_file(entitydir, idx)
     if not op.exists(entityFile):
-        raise NotImplementedError("Do not know how to create entity layer")
+        raise NotImplementedError("Do not know how to create entity layer: {}"
+                                 .format(entityFile))
     else:
         with open(entityFile) as f: entityLayer = f.read()
     return entityLayer
 
 def mapfile_basename(mode, shape, idx):
-    mapname = "%s-%02dx%02d-var-%04d" % (mode, shape[0], shape[1], idx)
+    if mode == "nav_maze":
+        mapname = "%s-var-%04d" % (mode, idx)
+    else:
+        mapname = "%s-%02dx%02d-var-%04d" % (mode, shape[0], shape[1], idx)
     return mapname
+
+def nav_maze_entity_dir(entity_root, rows, cols, mode):
+    return op.join(entity_root, mode)
+
+_entity_dir_by_mode_sources = dict(nav_maze=nav_maze_entity_dir)
+def entity_dir_by_mode(entity_root, rows, cols, mode):
+    return _entity_dir_by_mode_sources.get(mode, entity_dir)(entity_root,
+                                                             rows, cols, mode)
 
 def generate_map(idx
                  , num_maps = 1000
                  , mode='training'
                  , shape=(9, 9)):
-    entitydir = entity_dir(default_entity_root(),
+    entitydir = entity_dir_by_mode(default_entity_root(),
                            rows=shape[0], cols=shape[1], mode=mode)
     mapname = mapfile_basename(mode, shape, idx)
     entityLayer = get_entityLayer(entitydir, idx, shape)
@@ -67,7 +79,6 @@ def generate_map(idx
 
 def level_data_dir():
     return "/tmp/dmlab_level_data_0/baselab/"
-    
 
 def mv_map_files(assets_map_location, pk3dir, mapname):
     mapfile, pk3file = [op.join(level_data_dir(), mapname + ext)
@@ -138,11 +149,12 @@ def merge_zip_files(pk3path, source_zip_files):
                 print("Zipping {}".format(pf))
                 for pffile in pfzip.namelist():
                     zip.writestr(pffile, pfzip.read(pffile))
-    
+
 def make_random_maps(thisdir = op.dirname(__file__) or '.'
                      , training_num_maps = 0 # 1000
                      , testing_num_maps = 0 # 200
-                     , planning_num_maps = 10
+                     , planning_num_maps = 0 # 10
+                     , nav_maze_num_maps = 4
                      , shape = (9, 9)
                      , processes = 6):
     mapsdir = op.join(thisdir, "../assets/maps/")
@@ -162,9 +174,20 @@ def make_random_maps(thisdir = op.dirname(__file__) or '.'
              + [(pk3dir, mapsdir,
                   mapfile_basename('planning', shape, idx)
                   , 'planning', idx)
-                 for idx in range(1, planning_num_maps + 1)])
-    pk3path = op.join(pk3dir, 'planning_var_maps.pk3')
-    merge_zip_files(pk3path, [op.join(pk3dir, f + ".pk3") for f in mapnames])
+                 for idx in range(1, planning_num_maps + 1)]
+             + [(pk3dir, mapsdir,
+                  mapfile_basename('nav_maze', shape, idx)
+                  , 'nav_maze', idx)
+                for idx in range(1, nav_maze_num_maps + 1)]
+                     )
+    for mode in 'training testing planning nav_maze'.split():
+        pk3path = op.join(pk3dir, mode + '_var_maps.pk3')
+        pk3files_to_merge = [op.join(pk3dir, f + ".pk3")
+                             for f in mapnames
+                             if mode in mapnames]
+        merge_zip_files(pk3path , pk3files_to_merge)
+        for f in pk3files_to_merge:
+            os.unlink(f)
 
 if __name__ == '__main__':
     make_random_maps()

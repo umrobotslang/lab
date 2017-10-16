@@ -1,7 +1,7 @@
 local tensor = require 'dmlab.system.tensor'
 local game = require 'dmlab.system.game'
 local helpers = require 'common.helpers'
-local MAXAPPLES = 50
+local MAXAPPLES = 80
 local pickup_observations = {}
 local obs = {}
 local obsSpec = {}

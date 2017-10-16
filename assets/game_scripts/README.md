@@ -141,6 +141,7 @@ Expected return value: A list of tables with message properties as following key
   
 ## Other helper classes and functions
 * dmlab.system.tensor.DoubleTensor(*args)
+    deepmind/tensor/lua_tensor.h
 * dmlab.system.tensor.ByteTensor(*args)
 * dmlab.system.game.playerInfo()
 * dmlab.system.maze_generation.MazeGeneration(params)
