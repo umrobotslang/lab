@@ -1,7 +1,7 @@
 local tensor = require 'dmlab.system.tensor'
 local game = require 'dmlab.system.game'
 local helpers = require 'common.helpers'
-local MAXAPPLES = 80
+local MAXAPPLES = 50
 local pickup_observations = {}
 local obs = {}
 local obsSpec = {}
@@ -104,7 +104,7 @@ function pickup_observations.decorate(api)
           (spawn_id - 2), 2):val(0)
     end
     return oldApiPickup and oldApiPickup(api, spawn_id)
-  end 
+  end
 
   local oldApiNextMap = api.nextMap
   function api:nextMap()
