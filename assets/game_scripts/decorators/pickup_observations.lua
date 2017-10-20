@@ -8,9 +8,10 @@ local obsSpec = {}
 
 local goal_found_custom_obs = { name = 'GOAL.FOUND', type = 'Bytes', shape = {1} }
 local goal_location_custom_obs = { name = 'GOAL.LOC', type = 'Bytes', shape = {2} }
+local spawn_location_custom_obs = { name = 'SPAWN.LOC', type = 'Bytes', shape = {2} }
 local apple_location_custom_obs = {
    name = 'APPLES.LOC', type = 'Doubles', shape = {MAXAPPLES, 2} }
-local pickup_observations = {goal_found_custom_obs, goal_location_custom_obs, apple_location_custom_obs}
+local pickup_observations = {goal_found_custom_obs, goal_location_custom_obs, apple_location_custom_obs, spawn_location_custom_obs}
 
 function pickup_observations.add_spec(name, type, shape, callback)
   obsSpec[#obsSpec + 1] = {name = name, type = type, shape = shape}
@@ -85,6 +86,9 @@ function pickup_observations.decorate(api)
      if obsname == goal_location_custom_obs.name then
         local goal_loc = api.episode:getGoalLocation()
         return tensor.ByteTensor{goal_loc[1], goal_loc[2]}
+     elseif obsname == spawn_location_custom_obs.name then
+        local spawn_loc = api.episode:getSpawnLocation()
+        return tensor.ByteTensor{spawn_loc[1], spawn_loc[2]}
      elseif (obsname == goal_found_custom_obs.name or
                 obsname == apple_location_custom_obs.name)
      then
